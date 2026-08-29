@@ -1,0 +1,70 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../components/FormattedDate.astro';
+
+const SITE_TITLE = 'Unfiltered Analytics: 2026 NFL Chaos, Underdogs, and Championships';
+const SITE_DESCRIPTION = 'Sharp, data-driven NFL projections, conference breakdowns, and value-hunting futures.';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      .blog-grid ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      .blog-grid a {
+        text-decoration: none;
+        color: inherit;
+      }
+      .blog-grid a:hover h4 {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="home-hero">
+        <h1>{SITE_TITLE}</h1>
+        <p class="hero-lead">
+          <strong>Sharp, data-driven NFL projections, conference breakdowns, and value-hunting futures that strip away the noise to show you where the betting markets and models actually align.</strong>
+        </p>
+        <p>
+          Whether you're looking for deep-dive conference predictions, schedule matrix breakdowns, or major regular-season award picks, every projection is built to cut through the mainstream narrative and find the real value.
+        </p>
+      </section>
+
+      <hr />
+
+      <section class="blog-grid">
+        <h2>Latest Breakdowns</h2>
+        <ul>
+          {posts.map((post) => (
+            <li>
+              <a href={`/blog/${post.id}/`}>
+                {post.data.heroImage && (
+                  <img width={720} height={360} src={post.data.heroImage} alt="" />
+                )}
+                <h4 class="title">{post.data.title}</h4>
+                <p class="date">
+                  <FormattedDate date={post.data.pubDate} />
+                </p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>

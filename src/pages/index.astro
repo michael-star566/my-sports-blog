@@ -12,6 +12,8 @@ const SITE_DESCRIPTION = 'Sharp, data-driven NFL projections, conference breakdo
 const posts = (await getCollection('blog')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
 ---
 
 <!doctype html>
@@ -52,7 +54,7 @@ const posts = (await getCollection('blog')).sort(
         <ul>
           {posts.map((post) => (
             <li>
-              <a href={`/blog/${post.id}/`}>
+              <a href={`${basePath}/blog/${post.id}/`}>
                 {post.data.heroImage && (
                   <Image width={720} height={360} src={post.data.heroImage} alt="" />
                 )}
@@ -68,4 +70,4 @@ const posts = (await getCollection('blog')).sort(
     </main>
     <Footer />
   </body>
-</html> 
+</html>

@@ -6,13 +6,22 @@ type Props = HTMLAttributes<'a'>;
 const { href, class: className, ...props } = Astro.props;
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, '');
 const subpath = pathname.match(/[^\/]+/g);
-const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
+
+// Ensure both paths have trailing slashes to keep the underline styling active
+const checkPathname = pathname.endsWith('/') ? pathname : pathname + '/';
+const checkHref = typeof href === 'string' && !href.endsWith('/') ? href + '/' : href;
+
+const isActive = checkHref === checkPathname || checkHref === '/' + (subpath?.[0] || '') + '/';
 
 let finalHref = href;
 if (typeof href === 'string' && href.startsWith('/')) {
     const base = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
     finalHref = base + (href === '/' ? '' : href);
-    if (finalHref === '') finalHref = '/';
+    
+    // Force trailing slash on the final rendered link
+    if (!finalHref.endsWith('/')) {
+        finalHref += '/';
+    }
 }
 ---
 

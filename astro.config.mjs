@@ -8,6 +8,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 export default defineConfig({
     site: 'https://michael-star566.github.io',
     base: '/my-sports-blog',
+    trailingSlash: 'always',
     integrations: [mdx(), sitemap()],
     fonts: [
         {

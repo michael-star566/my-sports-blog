@@ -1,0 +1,65 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Comments | ${SITE_TITLE}`} description="Join the discussion and share your thoughts on our data-driven NFL analytics." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Community Discussion</h1>
+			<p>
+				Welcome to the community! Feel free to ask questions, debate projections, drop a compliment, or share your thoughts on the latest NFL chaos below.
+			</p>
+			
+			<div class="giscus-wrapper">
+				<script src="https://giscus.app/client.js"
+					data-repo="michael-star566/my-sports-blog"
+					data-repo-id="R_kgDOUIHP9w"
+					data-category="General"
+					data-category-id="DIC_kwDOUIHP984DEuJP"
+					data-mapping="pathname"
+					data-strict="0"
+					data-reactions-enabled="1"
+					data-emit-metadata="0"
+					data-input-position="bottom"
+					data-theme="dark"
+					data-lang="en"
+					crossorigin="anonymous"
+					async>
+				</script>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	main {
+		width: 960px;
+		max-width: calc(100% - 2em);
+		margin: auto;
+		padding: 3em 1em;
+	}
+	h1 {
+		margin-bottom: 0.25em;
+		color: #ffffff;
+	}
+	p {
+		color: #a1a1aa;
+		margin-bottom: 2em;
+		font-size: 1.1em;
+		line-height: 1.6;
+	}
+	.giscus-wrapper {
+		margin-top: 3em;
+		padding-top: 2em;
+		border-top: 1px solid #222222;
+	}
+</style>

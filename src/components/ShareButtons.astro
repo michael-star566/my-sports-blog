@@ -1,0 +1,105 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const currentUrl = Astro.url.href;
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl = encodeURIComponent(currentUrl);
+
+const xShareUrl = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`;
+---
+
+<div class="share-container">
+  <h3>Share this breakdown</h3>
+  <div class="share-buttons">
+    <a href={xShareUrl} target="_blank" rel="noopener noreferrer" class="share-btn x-btn">
+      <svg viewBox="0 0 16 16" aria-hidden="true" width="16" height="16">
+        <path fill="currentColor" d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"></path>
+      </svg>
+      Post on X
+    </a>
+    
+    <button id="copy-link-btn" class="share-btn copy-btn" data-url={currentUrl}>
+      <svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+      </svg>
+      <span id="copy-text">Copy Link</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  const copyBtn = document.getElementById('copy-link-btn');
+  const copyText = document.getElementById('copy-text');
+
+  copyBtn?.addEventListener('click', async () => {
+    const url = copyBtn.getAttribute('data-url');
+    if (url) {
+      try {
+        await navigator.clipboard.writeText(url);
+        if (copyText) {
+          copyText.textContent = 'Copied!';
+          setTimeout(() => {
+            copyText.textContent = 'Copy Link';
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    }
+  });
+</script>
+
+<style>
+  .share-container {
+    margin: 3em 0 2em 0;
+    padding: 1.5em;
+    background: #111111;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .share-container h3 {
+    margin: 0 0 1em 0;
+    font-size: 1rem;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .share-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .x-btn {
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid #333333;
+  }
+  .x-btn:hover {
+    background: #1a1a1a;
+    border-color: #555555;
+  }
+  .copy-btn {
+    background: #1f2937;
+    color: #ffffff;
+    border: 1px solid #374151;
+  }
+  .copy-btn:hover {
+    background: #374151;
+  }
+</style>

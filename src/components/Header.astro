@@ -3,19 +3,21 @@ import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
 
 const base = import.meta.env.BASE_URL;
+const normalizedBase = base.endsWith('/') ? base : base + '/';
+const loginPath = `${normalizedBase}login/`;
 ---
 
 <header>
 	<nav>
-		<h2><a href={base}>{SITE_TITLE}</a></h2>
+		<h2><a href={normalizedBase}>{SITE_TITLE}</a></h2>
 		<div class="internal-links">
-			<HeaderLink href={base}>Home</HeaderLink>
-			<HeaderLink href={`${base}blog/`}>Blog</HeaderLink>
-			<HeaderLink href={`${base}discussion/`}>Discussion</HeaderLink>
-			<HeaderLink href={`${base}about/`}>About</HeaderLink>
+			<HeaderLink href={normalizedBase}>Home</HeaderLink>
+			<HeaderLink href={`${normalizedBase}blog/`}>Blog</HeaderLink>
+			<HeaderLink href={`${normalizedBase}discussion/`}>Discussion</HeaderLink>
+			<HeaderLink href={`${normalizedBase}about/`}>About</HeaderLink>
 		</div>
 		<div class="auth-link-container">
-			<a href={`${base}login/`} id="nav-auth-link" class="auth-btn">Log In</a>
+			<a href={loginPath} id="nav-auth-link" class="auth-btn">Log In</a>
 		</div>
 	</nav>
 </header>
@@ -29,17 +31,19 @@ const base = import.meta.env.BASE_URL;
 
 		const { data: { session } } = await supabase.auth.getSession();
 		const base = import.meta.env.BASE_URL;
+		const normalizedBase = base.endsWith('/') ? base : base + '/';
+		const loginPath = `${normalizedBase}login/`;
 
 		if (session) {
 			navAuthLink.textContent = 'Account';
-			navAuthLink.href = `${base}login/`;
+			navAuthLink.href = loginPath;
 			navAuthLink.style.border = '1px solid #10b981';
 			navAuthLink.style.padding = '0.3em 0.8em';
 			navAuthLink.style.borderRadius = '4px';
 			navAuthLink.style.color = '#10b981';
 		} else {
 			navAuthLink.textContent = 'Log In';
-			navAuthLink.href = `${base}login/`;
+			navAuthLink.href = loginPath;
 			navAuthLink.style.border = 'none';
 			navAuthLink.style.padding = '1em 0.5em';
 			navAuthLink.style.color = '#e4e4e7';

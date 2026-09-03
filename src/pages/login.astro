@@ -99,15 +99,15 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 <!-- Logged Out View -->
                 <div id="logged-out-view">
                     <div class="form-group">
-                        <label for="signup-username">Username (For Sign Up)</label>
-                        <input type="text" id="signup-username" placeholder="CoolSportsFan99" />
+                        <label for="signup-username">Username <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="signup-username" placeholder="CoolSportsFan99" required />
                     </div>
                     <div class="form-group">
-                        <label for="email">Email Address</label>
+                        <label for="email">Email Address <span style="color: #ef4444;">*</span></label>
                         <input type="email" id="email" placeholder="you@example.com" required />
                     </div>
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password">Password <span style="color: #ef4444;">*</span></label>
                         <input type="password" id="password" placeholder="••••••••" required />
                     </div>
                     <div class="button-group">
@@ -193,16 +193,20 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             }
 
             signupBtn?.addEventListener('click', async () => {
-                if (!emailInput?.value || !passwordInput?.value) {
-                    return showMessage('Please enter both email and password.', true);
+                const username = signupUsernameInput?.value.trim();
+                const email = emailInput?.value.trim();
+                const password = passwordInput?.value;
+
+                if (!username || !email || !password) {
+                    return showMessage('Please fill out all fields, including a username.', true);
                 }
-                const username = signupUsernameInput?.value.trim() || 'SportsFan';
+
                 showMessage('Creating account...');
                 
                 try {
                     const { error } = await supabase.auth.signUp({
-                        email: emailInput.value.trim(),
-                        password: passwordInput.value,
+                        email: email,
+                        password: password,
                         options: {
                             data: {
                                 username: username

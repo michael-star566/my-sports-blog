@@ -8,30 +8,46 @@ const pathPrefix = '/my-sports-blog';
 <header>
     <nav>
         <h2><a href={`${pathPrefix}/`}>{SITE_TITLE}</a></h2>
-        <div class="internal-links">
-            <HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
-            <HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
-            <HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
-            
-            <!-- Pick'em Dropdown Menu -->
-            <div class="dropdown">
-                <button class="dropbtn">Pick'em ▾</button>
-                <div class="dropdown-content">
-                    <a href={`${pathPrefix}/picks/`}>Weekly Picks</a>
-                    <a href={`${pathPrefix}/leaderboard/`}>Season Standings</a>
-                </div>
-            </div>
+        
+        <!-- Mobile Menu Toggle Button -->
+        <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle Menu">
+            ☰
+        </button>
 
-            <HeaderLink href={`${pathPrefix}/about/`}>About</HeaderLink>
-        </div>
-        <div class="auth-link-container">
-            <a href={`${pathPrefix}/login/`} id="nav-auth-link" class="auth-btn">Log In</a>
+        <div class="nav-links-wrapper" id="nav-links-container">
+            <div class="internal-links">
+                <HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
+                <HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
+                <HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
+                
+                <!-- Pick'em Dropdown Menu -->
+                <div class="dropdown">
+                    <button class="dropbtn">Pick'em ▾</button>
+                    <div class="dropdown-content">
+                        <a href={`${pathPrefix}/picks/`}>Weekly Picks</a>
+                        <a href={`${pathPrefix}/leaderboard/`}>Season Standings</a>
+                    </div>
+                </div>
+
+                <HeaderLink href={`${pathPrefix}/about/`}>About</HeaderLink>
+            </div>
+            <div class="auth-link-container">
+                <a href={`${pathPrefix}/login/`} id="nav-auth-link" class="auth-btn">Log In</a>
+            </div>
         </div>
     </nav>
 </header>
 
 <script>
     import { supabase } from '../utils/supabase';
+
+    // Toggle Mobile Menu Open/Close
+    const mobileToggle = document.getElementById('mobile-menu-toggle');
+    const navContainer = document.getElementById('nav-links-container');
+
+    mobileToggle?.addEventListener('click', () => {
+        navContainer?.classList.toggle('mobile-open');
+    });
 
     async function updateHeaderAuth() {
         const navAuthLink = document.getElementById('nav-auth-link') as HTMLAnchorElement;
@@ -67,10 +83,12 @@ const pathPrefix = '/my-sports-blog';
         background: #111111;
         border-bottom: 1px solid #222222;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        position: relative;
     }
     h2 {
         margin: 0;
-        font-size: 1em;
+        font-size: 0.95rem;
+        max-width: 50%;
     }
     h2 a,
     h2 a.active {
@@ -81,16 +99,17 @@ const pathPrefix = '/my-sports-blog';
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 0.75rem 0;
     }
     nav a, .dropbtn {
-        padding: 1em 0.5em;
+        padding: 0.5em 0.5em;
         color: #e4e4e7;
         border-bottom: 2px solid transparent;
         text-decoration: none;
         background: none;
         border: none;
         font-family: inherit;
-        font-size: 1rem;
+        font-size: 0.95rem;
         cursor: pointer;
     }
     nav a:hover,
@@ -98,6 +117,11 @@ const pathPrefix = '/my-sports-blog';
     .dropdown:hover .dropbtn {
         color: white;
         border-bottom-color: #ffffff;
+    }
+    .nav-links-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
     }
     .internal-links {
         display: flex;
@@ -107,6 +131,16 @@ const pathPrefix = '/my-sports-blog';
     .auth-link-container {
         display: flex;
         align-items: center;
+    }
+
+    /* Hamburger Button Hidden on Desktop */
+    .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+        cursor: pointer;
     }
 
     /* Dropdown Styles */
@@ -128,7 +162,7 @@ const pathPrefix = '/my-sports-blog';
     }
     .dropdown-content a {
         color: #e4e4e7;
-        padding: 12px 16px;
+        padding: 10px 14px;
         text-decoration: none;
         display: block;
         border-bottom: none !important;
@@ -139,5 +173,61 @@ const pathPrefix = '/my-sports-blog';
     }
     .dropdown:hover .dropdown-content {
         display: block;
+    }
+
+    /* MOBILE RESPONSIVENESS (Screens under 850px wide) */
+    @media (max-width: 850px) {
+        .mobile-menu-btn {
+            display: block;
+        }
+        .nav-links-wrapper {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #111111;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.6);
+            border-bottom: 1px solid #222222;
+            z-index: 1000;
+            gap: 1rem;
+        }
+        .nav-links-wrapper.mobile-open {
+            display: flex;
+        }
+        .internal-links {
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            gap: 0.5rem;
+        }
+        .internal-links a, .dropbtn {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 0.5rem;
+        }
+        /* Make dropdown expand inline nicely on mobile */
+        .dropdown {
+            width: 100%;
+        }
+        .dropdown-content {
+            position: relative;
+            box-shadow: none;
+            border: none;
+            background: #18181b;
+            padding-left: 1rem;
+            width: 100%;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .auth-link-container {
+            width: 100%;
+            padding-top: 0.5rem;
+            border-top: 1px solid #27272a;
+        }
     }
 </style>

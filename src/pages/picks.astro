@@ -42,6 +42,27 @@ const pathPrefix = '/my-sports-blog';
                 color: #38bdf8;
                 text-decoration: underline;
             }
+            .dropdown-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 2rem;
+                text-align: center;
+            }
+            .week-select {
+                padding: 0.5rem 1rem;
+                background: #27272a;
+                color: white;
+                border: 1px solid #3f3f46;
+                border-radius: 4px;
+                font-size: 1.1rem;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            .week-select:focus {
+                outline: 2px solid #38bdf8;
+            }
             .games-list {
                 display: flex;
                 flex-direction: column;
@@ -118,6 +139,9 @@ const pathPrefix = '/my-sports-blog';
             .locked-text {
                 color: #ef4444;
             }
+            .tbd-text {
+                color: #f59e0b; 
+            }
             table {
                 width: 100%;
                 border-collapse: collapse;
@@ -139,6 +163,7 @@ const pathPrefix = '/my-sports-blog';
                 text-align: center;
                 color: #a1a1aa;
                 padding: 2rem;
+                font-size: 1.1rem;
             }
             .hidden {
                 display: none !important;
@@ -148,13 +173,36 @@ const pathPrefix = '/my-sports-blog';
     <body>
         <Header />
         <main>
-            <h1 style="text-align: center; margin-bottom: 0.5rem;">NFL Week 1 Pick'em & Standings</h1>
-            <p style="text-align: center; color: #a1a1aa; margin-bottom: 2rem;">Make your selections for the opening week slate and track your leaderboard points.</p>
+            <h1 style="text-align: center; margin-bottom: 0.5rem;">NFL Pick'em & Standings</h1>
+            <p style="text-align: center; color: #a1a1aa; margin-bottom: 2rem;">Make your selections and track your leaderboard points.</p>
 
             <!-- Pick'em Minigame Section -->
             <div class="section-box">
-                <h2>Week 1 Matchup Predictions</h2>
-                <p class="widget-subtitle">Click a team box to lock in your pick for each matchup.</p>
+                <div class="dropdown-container">
+                    <label for="week-selector" style="color: #a1a1aa; font-weight: bold; text-transform: uppercase;">Select NFL Schedule:</label>
+                    <select id="week-selector" class="week-select">
+                        <option value="1">Week 1</option>
+                        <option value="2">Week 2</option>
+                        <option value="3">Week 3</option>
+                        <option value="4">Week 4</option>
+                        <option value="5">Week 5</option>
+                        <option value="6">Week 6</option>
+                        <option value="7">Week 7</option>
+                        <option value="8">Week 8</option>
+                        <option value="9">Week 9</option>
+                        <option value="10">Week 10</option>
+                        <option value="11">Week 11</option>
+                        <option value="12">Week 12</option>
+                        <option value="13">Week 13</option>
+                        <option value="14">Week 14</option>
+                        <option value="15">Week 15</option>
+                        <option value="16">Week 16</option>
+                        <option value="17">Week 17</option>
+                        <option value="18">Week 18</option>
+                    </select>
+                </div>
+                
+                <p class="widget-subtitle" style="text-align: center;">Click a team box to lock in your pick for each matchup.</p>
 
                 <div id="auth-warning" class="warning-box">
                     Please <a href={`${pathPrefix}/login/`}>log in</a> to submit and save your weekly picks!
@@ -167,8 +215,8 @@ const pathPrefix = '/my-sports-blog';
 
             <!-- Leaderboard Section -->
             <div class="section-box">
-                <h2>Live Community Leaderboard (ATS)</h2>
-                <p class="widget-subtitle">Standings ranked by total Win % Against the Spread.</p>
+                <h2 id="leaderboard-title">Live Community Leaderboard (ATS)</h2>
+                <p class="widget-subtitle">Standings ranked by total Win % Against the Spread for the selected week.</p>
 
                 <div id="loading-view" class="loading">Fetching live scores and generating standings...</div>
                 <table id="leaderboard-table" class="hidden">
@@ -192,30 +240,15 @@ const pathPrefix = '/my-sports-blog';
         <script>
             import { supabase } from '../utils/supabase';
 
-            // NFL Kickoffs added using strictly typed UTC timestamps for time-gating
-            const week1Games = [
-                { id: 'w1_01', time: 'Wed, Sep 9 • 8:20 PM ET', kickoff: '2026-09-09T20:20:00-04:00', away: 'New England Patriots', awaySpread: '+3.5', home: 'Seattle Seahawks', homeSpread: '-3.5' },
-                { id: 'w1_02', time: 'Thu, Sep 10 • 8:35 PM ET', kickoff: '2026-09-10T20:35:00-04:00', away: 'San Francisco 49ers', awaySpread: '+3.5', home: 'Los Angeles Rams', homeSpread: '-3.5' },
-                { id: 'w1_03', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Chicago Bears', awaySpread: '-2.5', home: 'Carolina Panthers', homeSpread: '+2.5' },
-                { id: 'w1_04', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Tampa Bay Buccaneers', awaySpread: '+3.5', home: 'Cincinnati Bengals', homeSpread: '-3.5' },
-                { id: 'w1_05', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'New Orleans Saints', awaySpread: '+6.5', home: 'Detroit Lions', homeSpread: '-6.5' },
-                { id: 'w1_06', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Buffalo Bills', awaySpread: '-1.5', home: 'Houston Texans', homeSpread: '+1.5' },
-                { id: 'w1_07', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Baltimore Ravens', awaySpread: '-3.5', home: 'Indianapolis Colts', homeSpread: '+3.5' },
-                { id: 'w1_08', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Cleveland Browns', awaySpread: '+7.5', home: 'Jacksonville Jaguars', homeSpread: '-7.5' },
-                { id: 'w1_09', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Atlanta Falcons', awaySpread: '+3.0', home: 'Pittsburgh Steelers', homeSpread: '-3.0' },
-                { id: 'w1_10', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'New York Jets', awaySpread: '+2.5', home: 'Tennessee Titans', homeSpread: '-2.5' },
-                { id: 'w1_11', time: 'Sun, Sep 13 • 4:25 PM ET', kickoff: '2026-09-13T16:25:00-04:00', away: 'Arizona Cardinals', awaySpread: '+9.5', home: 'Los Angeles Chargers', homeSpread: '-9.5' },
-                { id: 'w1_12', time: 'Sun, Sep 13 • 4:25 PM ET', kickoff: '2026-09-13T16:25:00-04:00', away: 'Miami Dolphins', awaySpread: '+3.5', home: 'Las Vegas Raiders', homeSpread: '-3.5' },
-                { id: 'w1_13', time: 'Sun, Sep 13 • 4:25 PM ET', kickoff: '2026-09-13T16:25:00-04:00', away: 'Green Bay Packers', awaySpread: '+1.5', home: 'Minnesota Vikings', homeSpread: '-1.5' },
-                { id: 'w1_14', time: 'Sun, Sep 13 • 4:25 PM ET', kickoff: '2026-09-13T16:25:00-04:00', away: 'Washington Commanders', awaySpread: '+5.5', home: 'Philadelphia Eagles', homeSpread: '-5.5' },
-                { id: 'w1_15', time: 'Sun, Sep 13 • 8:20 PM ET', kickoff: '2026-09-13T20:20:00-04:00', away: 'Dallas Cowboys', awaySpread: '-2.5', home: 'New York Giants', homeSpread: '+2.5' },
-                { id: 'w1_16', time: 'Mon, Sep 14 • 8:15 PM ET', kickoff: '2026-09-14T20:15:00-04:00', away: 'Denver Broncos', awaySpread: '+2.5', home: 'Kansas City Chiefs', homeSpread: '-2.5' }
-            ];
-
             const authWarning = document.getElementById('auth-warning');
             const gamesContainer = document.getElementById('games-container');
+            const weekSelector = document.getElementById('week-selector') as HTMLSelectElement;
+            const lbTitle = document.getElementById('leaderboard-title');
+            
             let currentUser: any = null;
             let userPicks: { [key: string]: string } = {};
+            let currentGames: any[] = [];
+            let currentWeek = '1';
 
             async function init() {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -228,8 +261,16 @@ const pathPrefix = '/my-sports-blog';
                     authWarning?.classList.remove('hidden');
                     gamesContainer?.classList.add('hidden');
                 }
-                renderGames();
-                await fetchLeaderboard();
+
+                weekSelector.addEventListener('change', async (e) => {
+                    const target = e.target as HTMLSelectElement;
+                    currentWeek = target.value;
+                    if (lbTitle) lbTitle.textContent = `Live Community Leaderboard - Week ${currentWeek} (ATS)`;
+                    await fetchESPNData(currentWeek);
+                });
+
+                // Trigger initial load for Week 1
+                await fetchESPNData(currentWeek);
             }
 
             async function loadUserPicks() {
@@ -244,31 +285,114 @@ const pathPrefix = '/my-sports-blog';
                 }
 
                 if (data) {
+                    userPicks = {};
                     data.forEach((row: any) => {
                         userPicks[row.game_id] = row.selected_team;
                     });
                 }
             }
 
+            async function fetchESPNData(week: string) {
+                const loadingView = document.getElementById('loading-view');
+                const tableEl = document.getElementById('leaderboard-table');
+                
+                if (gamesContainer) {
+                    gamesContainer.innerHTML = '<div class="loading">Loading matchups & live odds from ESPN...</div>';
+                }
+                tableEl?.classList.add('hidden');
+                loadingView?.classList.remove('hidden');
+
+                try {
+                    const espnRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=${week}`);
+                    const espnData = await espnRes.json();
+
+                    currentGames = espnData.events.map((event: any) => {
+                        const comp = event.competitions[0];
+                        const homeTeamInfo = comp.competitors.find((c: any) => c.homeAway === 'home');
+                        const awayTeamInfo = comp.competitors.find((c: any) => c.homeAway === 'away');
+                        
+                        let homeSpread = 'TBD';
+                        let awaySpread = 'TBD';
+                        
+                        if (comp.odds && comp.odds.length > 0) {
+                            const details = comp.odds[0].details || '';
+                            if (details.toUpperCase() === 'EVEN') {
+                                homeSpread = '+0';
+                                awaySpread = '+0';
+                            } else {
+                                const parts = details.split(' ');
+                                if (parts.length >= 2) {
+                                    const favAbbrev = parts[0];
+                                    const val = parseFloat(parts[1]); 
+                                    const oppositeVal = val > 0 ? `-${val}` : `+${Math.abs(val)}`;
+                                    const currentValStr = val > 0 ? `+${val}` : `${val}`;
+                                    
+                                    if (homeTeamInfo.team.abbreviation === favAbbrev) {
+                                        homeSpread = currentValStr;
+                                        awaySpread = oppositeVal;
+                                    } else if (awayTeamInfo.team.abbreviation === favAbbrev) {
+                                        awaySpread = currentValStr;
+                                        homeSpread = oppositeVal;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Automatically converts UTC kickoff to user's local timezone
+                        const eventDate = new Date(event.date);
+                        return {
+                            id: event.id,
+                            time: eventDate.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }),
+                            kickoff: event.date,
+                            away: awayTeamInfo.team.displayName,
+                            awaySpread: awaySpread,
+                            awayScore: parseInt(awayTeamInfo.score) || 0,
+                            home: homeTeamInfo.team.displayName,
+                            homeSpread: homeSpread,
+                            homeScore: parseInt(homeTeamInfo.score) || 0,
+                            completed: event.status.type.completed
+                        };
+                    });
+
+                    renderGames();
+                    await fetchLeaderboard();
+                } catch (error) {
+                    console.error('Error fetching ESPN data:', error);
+                    if (gamesContainer) gamesContainer.innerHTML = '<div class="loading" style="color: #ef4444;">Failed to load schedule from ESPN.</div>';
+                }
+            }
+
             function renderGames() {
                 if (!gamesContainer) return;
                 gamesContainer.innerHTML = '';
-                const now = new Date(); // Current time on user's device
+                const now = new Date();
 
-                week1Games.forEach(game => {
+                if (currentGames.length === 0) {
+                    gamesContainer.innerHTML = '<div class="loading">No matchups scheduled for this week.</div>';
+                    return;
+                }
+
+                currentGames.forEach(game => {
                     const card = document.createElement('div');
                     card.className = 'matchup-card';
 
                     const isAwaySelected = userPicks[game.id] === game.away;
                     const isHomeSelected = userPicks[game.id] === game.home;
                     
-                    // Evaluate if kickoff time has passed
                     const gameKickoffTime = new Date(game.kickoff);
                     const isLocked = now > gameKickoffTime;
+                    const isTBD = game.awaySpread === 'TBD' || game.homeSpread === 'TBD';
+                    const isDisabled = isLocked || isTBD;
 
                     let feedbackText = '';
+                    let feedbackClass = '';
+                    
                     if (isLocked) {
                         feedbackText = userPicks[game.id] ? `Locked In: ${userPicks[game.id]} (Game Started)` : 'Game Started - Picks Locked';
+                        feedbackClass = 'locked-text';
+                    } else if (isTBD) {
+                        feedbackText = 'Waiting on Vegas Odds...';
+                        feedbackClass = 'tbd-text';
                     } else if (userPicks[game.id]) {
                         feedbackText = `Locked Pick: ${userPicks[game.id]}`;
                     }
@@ -276,17 +400,17 @@ const pathPrefix = '/my-sports-blog';
                     card.innerHTML = `
                         <span class="game-info">${game.time}</span>
                         <div class="teams-row">
-                            <button type="button" class="team-btn away-btn" data-game="${game.id}" data-team="${game.away}" ${isLocked ? 'disabled' : ''} style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background-color: ${isAwaySelected ? '#064e3b' : '#27272a'} !important;">
+                            <button type="button" class="team-btn away-btn" data-game="${game.id}" data-team="${game.away}" ${isDisabled ? 'disabled' : ''} style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background-color: ${isAwaySelected ? '#064e3b' : '#27272a'} !important;">
                                 <span class="team-name" style="color: #ffffff !important; font-size: 1.1rem !important; font-weight: bold !important;">${game.away}</span>
                                 <span class="spread" style="color: #ffffff !important; font-size: 1rem !important; font-weight: 600 !important;">${game.awaySpread}</span>
                             </button>
                             <span class="vs">@</span>
-                            <button type="button" class="team-btn home-btn" data-game="${game.id}" data-team="${game.home}" ${isLocked ? 'disabled' : ''} style="border-color: ${isHomeSelected ? '#10b981' : '#3f3f46'}; background-color: ${isHomeSelected ? '#064e3b' : '#27272a'} !important;">
+                            <button type="button" class="team-btn home-btn" data-game="${game.id}" data-team="${game.home}" ${isDisabled ? 'disabled' : ''} style="border-color: ${isHomeSelected ? '#10b981' : '#3f3f46'}; background-color: ${isHomeSelected ? '#064e3b' : '#27272a'} !important;">
                                 <span class="team-name" style="color: #ffffff !important; font-size: 1.1rem !important; font-weight: bold !important;">${game.home}</span>
                                 <span class="spread" style="color: #ffffff !important; font-size: 1rem !important; font-weight: 600 !important;">${game.homeSpread}</span>
                             </button>
                         </div>
-                        <div class="pick-feedback ${isLocked ? 'locked-text' : ''}" id="feedback-${game.id}">
+                        <div class="pick-feedback ${feedbackClass}" id="feedback-${game.id}">
                             ${feedbackText}
                         </div>
                     `;
@@ -298,8 +422,6 @@ const pathPrefix = '/my-sports-blog';
                     btn.addEventListener('click', async (e) => {
                         if (!currentUser) return;
                         const target = e.currentTarget as HTMLButtonElement;
-                        
-                        // Failsafe: Do not allow click if button is somehow disabled
                         if (target.disabled) return;
                         
                         const gameId = target.getAttribute('data-game')!;
@@ -318,7 +440,7 @@ const pathPrefix = '/my-sports-blog';
                         const feedbackEl = document.getElementById(`feedback-${gameId}`);
                         if (feedbackEl) {
                             feedbackEl.textContent = 'Saving pick...';
-                            feedbackEl.classList.remove('locked-text');
+                            feedbackEl.className = 'pick-feedback';
                         }
 
                         const { error } = await supabase
@@ -347,18 +469,14 @@ const pathPrefix = '/my-sports-blog';
                 const tbody = document.getElementById('leaderboard-body');
 
                 try {
-                    // 1. Fetch user picks
                     const { data: picksData, error: picksError } = await supabase
                         .from('user_picks')
                         .select('user_id, game_id, selected_team');
-
                     if (picksError) throw picksError;
 
-                    // 2. Fetch all usernames mapping from the new public profiles table
                     const { data: profilesData, error: profilesError } = await supabase
                         .from('profiles')
                         .select('id, username');
-                        
                     if (profilesError) throw profilesError;
 
                     const usernameMap: { [key: string]: string } = {};
@@ -366,30 +484,13 @@ const pathPrefix = '/my-sports-blog';
                         usernameMap[profile.id] = profile.username || 'Anonymous Player';
                     });
 
-                    // 3. Fetch live scores
-                    let liveScores: { [key: string]: number } = {};
-                    try {
-                        const espnRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=1');
-                        const espnData = await espnRes.json();
-                        
-                        espnData.events.forEach((event: any) => {
-                            if (event.status.type.completed) {
-                                const comp = event.competitions[0];
-                                const homeTeam = comp.competitors.find((c: any) => c.homeAway === 'home');
-                                const awayTeam = comp.competitors.find((c: any) => c.homeAway === 'away');
-                                
-                                liveScores[homeTeam.team.displayName] = parseInt(homeTeam.score);
-                                liveScores[awayTeam.team.displayName] = parseInt(awayTeam.score);
-                            }
-                        });
-                    } catch (apiErr) {
-                        console.error('Failed to fetch live ESPN scores:', apiErr);
-                    }
-
-                    // 4. Grade picks
+                    // Evaluate strictly against the games for the selected week
                     const userStats: { [key: string]: { total: number, graded: number, correct: number } } = {};
                     
                     picksData?.forEach((row: any) => {
+                        const game = currentGames.find(g => g.id === row.game_id);
+                        if (!game) return; // Ignores picks from other weeks
+
                         const uid = row.user_id;
                         if (!userStats[uid]) {
                             userStats[uid] = { total: 0, graded: 0, correct: 0 };
@@ -397,10 +498,9 @@ const pathPrefix = '/my-sports-blog';
                         
                         userStats[uid].total++;
                         
-                        const game = week1Games.find(g => g.id === row.game_id);
-                        if (game && liveScores[game.home] !== undefined && liveScores[game.away] !== undefined) {
-                            const homeScore = liveScores[game.home];
-                            const awayScore = liveScores[game.away];
+                        if (game.completed && game.awaySpread !== 'TBD' && game.homeSpread !== 'TBD') {
+                            const homeScore = game.homeScore;
+                            const awayScore = game.awayScore;
                             
                             let pickWon = false;
                             let push = false;
@@ -422,7 +522,6 @@ const pathPrefix = '/my-sports-blog';
                         }
                     });
 
-                    // 5. Sort & Apply Usernames
                     const sortedUsers = Object.entries(userStats).map(([uid, stats]) => {
                         const percent = stats.graded > 0 ? (stats.correct / stats.graded) * 100 : 0;
                         const displayUsername = usernameMap[uid] || `Player (${uid.substring(0, 5)}...)`;
@@ -433,11 +532,10 @@ const pathPrefix = '/my-sports-blog';
                         return b.total - a.total;
                     });
 
-                    // 6. Render with inline text alignment
                     if (tbody) {
                         tbody.innerHTML = '';
                         if (sortedUsers.length === 0) {
-                            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #a1a1aa;">No picks recorded yet. Make yours above!</td></tr>`;
+                            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #a1a1aa;">No picks recorded yet for Week ${currentWeek}. Make yours above!</td></tr>`;
                         } else {
                             sortedUsers.forEach((user, index) => {
                                 const tr = document.createElement('tr');

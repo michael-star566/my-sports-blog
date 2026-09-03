@@ -8,7 +8,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 <!doctype html>
 <html lang="en">
     <head>
-        <BaseHead title={`Login - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+        <BaseHead title={`Account - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
         <style>
             main {
                 max-width: 600px;
@@ -61,7 +61,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             button:hover {
                 opacity: 0.8;
             }
-            #login-btn {
+            #login-btn, #update-username-btn {
                 background: #ffffff;
                 color: #000000;
             }
@@ -71,10 +71,19 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 border: 1px solid #ffffff;
             }
             #logout-btn {
+                background: #3f3f46;
+                color: white;
+                margin-top: 0.5rem;
+            }
+            #delete-account-btn {
                 background: #ef4444;
                 color: white;
-                display: block;
                 margin-top: 1rem;
+            }
+            .account-section {
+                margin-top: 1.5rem;
+                padding-top: 1.5rem;
+                border-top: 1px solid #27272a;
             }
             #auth-message {
                 margin-top: 1rem;
@@ -92,7 +101,12 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         <main>
             <h1 style="text-align: center; color: white;">Account Access</h1>
             <div class="auth-container">
+                <!-- Logged Out View -->
                 <div id="logged-out-view">
+                    <div class="form-group">
+                        <label for="signup-username">Username (For Sign Up)</label>
+                        <input type="text" id="signup-username" placeholder="CoolSportsFan99" />
+                    </div>
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" placeholder="you@example.com" required />
@@ -107,10 +121,23 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                     </div>
                 </div>
                 
+                <!-- Logged In Dashboard View -->
                 <div id="logged-in-view" class="hidden">
-                    <h3 style="color: white; text-align: center;">Welcome back!</h3>
-                    <p style="text-align: center; color: #a1a1aa;">You are securely logged into your account.</p>
-                    <button type="button" id="logout-btn">Log Out</button>
+                    <h3 style="color: white; text-align: center;">Welcome back, <span id="display-username">User</span>!</h3>
+                    <p style="text-align: center; color: #a1a1aa; font-size: 0.9rem;" id="display-email"></p>
+                    
+                    <div class="account-section">
+                        <div class="form-group">
+                            <label for="new-username">Change Username</label>
+                            <input type="text" id="new-username" placeholder="Enter new username" />
+                        </div>
+                        <button type="button" id="update-username-btn">Update Username</button>
+                    </div>
+
+                    <div class="account-section" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button type="button" id="logout-btn">Log Out</button>
+                        <button type="button" id="delete-account-btn">Delete Account</button>
+                    </div>
                 </div>
 
                 <p id="auth-message"></p>
@@ -123,13 +150,20 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
             const emailInput = document.getElementById('email') as HTMLInputElement;
             const passwordInput = document.getElementById('password') as HTMLInputElement;
+            const signupUsernameInput = document.getElementById('signup-username') as HTMLInputElement;
+            const newUsernameInput = document.getElementById('new-username') as HTMLInputElement;
+
             const loginBtn = document.getElementById('login-btn');
             const signupBtn = document.getElementById('signup-btn');
             const logoutBtn = document.getElementById('logout-btn');
-            const messageEl = document.getElementById('auth-message');
+            const updateUsernameBtn = document.getElementById('update-username-btn');
+            const deleteAccountBtn = document.getElementById('delete-account-btn');
             
+            const messageEl = document.getElementById('auth-message');
             const loggedOutView = document.getElementById('logged-out-view');
             const loggedInView = document.getElementById('logged-in-view');
+            const displayUsername = document.getElementById('display-username');
+            const displayEmail = document.getElementById('display-email');
 
             const homeUrl = '/my-sports-blog/';
 
@@ -139,9 +173,14 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                     if (error) {
                         console.error('Session error:', error.message);
                     }
-                    if (session) {
+                    if (session && session.user) {
                         loggedOutView?.classList.add('hidden');
                         loggedInView?.classList.remove('hidden');
+                        
+                        const username = session.user.user_metadata?.username || 'SportsFan';
+                        if (displayUsername) displayUsername.textContent = username;
+                        if (displayEmail) displayEmail.textContent = session.user.email || '';
+                        if (newUsernameInput) newUsernameInput.value = username;
                     } else {
                         loggedOutView?.classList.remove('hidden');
                         loggedInView?.classList.add('hidden');
@@ -164,19 +203,25 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 if (!emailInput?.value || !passwordInput?.value) {
                     return showMessage('Please enter both email and password.', true);
                 }
+                const username = signupUsernameInput?.value.trim() || 'SportsFan';
                 showMessage('Creating account...');
                 
                 try {
                     const { error } = await supabase.auth.signUp({
                         email: emailInput.value.trim(),
                         password: passwordInput.value,
+                        options: {
+                            data: {
+                                username: username
+                            }
+                        }
                     });
                     
                     if (error) {
                         console.error('Signup error:', error);
                         showMessage(error.message, true);
                     } else {
-                        showMessage('Account created! Redirecting...');
+                        showMessage('Account created successfully! Redirecting...');
                         setTimeout(() => {
                             window.location.href = homeUrl;
                         }, 1000);
@@ -214,11 +259,43 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 }
             });
 
+            updateUsernameBtn?.addEventListener('click', async () => {
+                const updatedName = newUsernameInput?.value.trim();
+                if (!updatedName) {
+                    return showMessage('Username cannot be empty.', true);
+                }
+                showMessage('Updating username...');
+
+                try {
+                    const { error } = await supabase.auth.updateUser({
+                        data: { username: updatedName }
+                    });
+
+                    if (error) {
+                        console.error('Update username error:', error);
+                        showMessage(error.message, true);
+                    } else {
+                        showMessage('Username updated successfully!');
+                        if (displayUsername) displayUsername.textContent = updatedName;
+                    }
+                } catch (err: any) {
+                    console.error('Update username exception:', err);
+                    showMessage('Failed to update username.', true);
+                }
+            });
+
             logoutBtn?.addEventListener('click', async () => {
                 showMessage('Logging out...');
                 await supabase.auth.signOut();
                 showMessage('');
                 checkSession();
+            });
+
+            deleteAccountBtn?.addEventListener('click', async () => {
+                const confirmed = confirm('Are you sure you want to delete your account? This action cannot be undone.');
+                if (!confirmed) return;
+
+                showMessage('Account deletion requires a Supabase administrative function or Edge Function. Please contact support or clear local session.');
             });
         </script>
     </body>

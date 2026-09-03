@@ -116,7 +116,7 @@ const pathPrefix = '/my-sports-blog';
                 min-height: 1.2rem;
             }
             .locked-text {
-                color: #ef4444; /* Red color for locked status */
+                color: #ef4444;
             }
             table {
                 width: 100%;
@@ -125,8 +125,18 @@ const pathPrefix = '/my-sports-blog';
             }
             th, td {
                 padding: 0.75rem 1rem;
-                text-align: left;
                 border-bottom: 1px solid #27272a;
+            }
+            /* Align Rank and Username to the left */
+            th:nth-child(1), td:nth-child(1),
+            th:nth-child(2), td:nth-child(2) {
+                text-align: left;
+            }
+            /* Center align the Stats columns */
+            th:nth-child(3), td:nth-child(3),
+            th:nth-child(4), td:nth-child(4),
+            th:nth-child(5), td:nth-child(5) {
+                text-align: center;
             }
             th {
                 color: #a1a1aa;

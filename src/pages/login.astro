@@ -3,8 +3,6 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-
-const pathPrefix = '/my-sports-blog';
 ---
 
 <!doctype html>
@@ -82,6 +80,7 @@ const pathPrefix = '/my-sports-blog';
                 margin-top: 1rem;
                 text-align: center;
                 font-weight: bold;
+                word-break: break-word;
             }
             .hidden {
                 display: none !important;
@@ -136,7 +135,10 @@ const pathPrefix = '/my-sports-blog';
 
             async function checkSession() {
                 try {
-                    const { data: { session } } = await supabase.auth.getSession();
+                    const { data: { session }, error } = await supabase.auth.getSession();
+                    if (error) {
+                        console.error('Session error:', error.message);
+                    }
                     if (session) {
                         loggedOutView?.classList.add('hidden');
                         loggedInView?.classList.remove('hidden');
@@ -145,7 +147,7 @@ const pathPrefix = '/my-sports-blog';
                         loggedInView?.classList.add('hidden');
                     }
                 } catch (err) {
-                    console.error('Session check error:', err);
+                    console.error('Session check network exception:', err);
                 }
             }
 
@@ -164,19 +166,32 @@ const pathPrefix = '/my-sports-blog';
                 }
                 showMessage('Creating account...');
                 
-                const { error } = await supabase.auth.signUp({
-                    email: emailInput.value.trim(),
-                    password: passwordInput.value,
-                });
-                
-                if (error) {
-                    console.error('Signup error:', error);
-                    showMessage(error.message, true);
-                } else {
-                    showMessage('Account created! Redirecting...');
-                    setTimeout(() => {
-                        window.location.href = homeUrl;
-                    }, 1000);
+                try {
+                    // Add a 10-second timeout wrapper so it never hangs infinitely
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Request timed out. Check your network or Supabase settings.')), 10000)
+                    );
+
+                    const authPromise = supabase.auth.signUp({
+                        email: emailInput.value.trim(),
+                        password: passwordInput.value,
+                    });
+
+                    const res: any = await Promise.race([authPromise, timeoutPromise]);
+                    const error = res?.error;
+                    
+                    if (error) {
+                        console.error('Signup error:', error);
+                        showMessage(error.message, true);
+                    } else {
+                        showMessage('Account created! Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = homeUrl;
+                        }, 1000);
+                    }
+                } catch (err: any) {
+                    console.error('Signup exception:', err);
+                    showMessage(err.message || 'An unexpected error occurred during sign up.', true);
                 }
             });
 
@@ -186,19 +201,32 @@ const pathPrefix = '/my-sports-blog';
                 }
                 showMessage('Logging in...');
                 
-                const { error } = await supabase.auth.signInWithPassword({
-                    email: emailInput.value.trim(),
-                    password: passwordInput.value,
-                });
-                
-                if (error) {
-                    console.error('Login error:', error);
-                    showMessage(error.message, true);
-                } else {
-                    showMessage('Success! Redirecting...');
-                    setTimeout(() => {
-                        window.location.href = homeUrl;
-                    }, 800);
+                try {
+                    // Add a 10-second timeout wrapper so it never hangs infinitely
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Request timed out. Check your network or Supabase settings.')), 10000)
+                    );
+
+                    const authPromise = supabase.auth.signInWithPassword({
+                        email: emailInput.value.trim(),
+                        password: passwordInput.value,
+                    });
+
+                    const res: any = await Promise.race([authPromise, timeoutPromise]);
+                    const error = res?.error;
+                    
+                    if (error) {
+                        console.error('Login error:', error);
+                        showMessage(error.message, true);
+                    } else {
+                        showMessage('Success! Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = homeUrl;
+                        }, 800);
+                    }
+                } catch (err: any) {
+                    console.error('Login exception:', err);
+                    showMessage(err.message || 'An unexpected error occurred during login.', true);
                 }
             });
 

@@ -2,7 +2,6 @@
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
 
-// Explicitly use your absolute repository subpath to prevent relative stacking errors
 const pathPrefix = '/my-sports-blog';
 ---
 
@@ -12,7 +11,7 @@ const pathPrefix = '/my-sports-blog';
 		<div class="internal-links">
 			<HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
 			<HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
-			<HeaderLink href={`${pathPrefix}/discussion/`}>Discussion</HeaderLink>
+			<HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
 			<HeaderLink href={`${pathPrefix}/about/`}>About</HeaderLink>
 		</div>
 		<div class="auth-link-container">

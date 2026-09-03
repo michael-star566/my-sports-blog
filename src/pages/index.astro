@@ -32,6 +32,34 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
       .blog-grid a:hover h4 {
         text-decoration: underline;
       }
+      .pickem-guide {
+        background: #111111;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        margin-top: 3rem;
+        color: white;
+      }
+      .pickem-guide h2 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
+      }
+      .pickem-guide h3 {
+        color: #38bdf8;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+      }
+      .pickem-guide p, .pickem-guide li {
+        color: #d4d4d8;
+        line-height: 1.6;
+      }
+      .pickem-guide ul {
+        padding-left: 1.2rem;
+        margin-top: 0.5rem;
+      }
     </style>
   </head>
   <body>
@@ -65,6 +93,39 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
               </a>
             </li>
           ))}
+        </ul>
+      </section>
+
+      <hr />
+
+      <!-- Pick'em Challenge Guide Section -->
+      <section class="pickem-guide">
+        <h2>Pick'em Challenge</h2>
+        <p>Whether you are here for bragging rights or just to test your football knowledge, playing is simple. Here is a quick guide on how to set up your account and lock in your selections.</p>
+
+        <h3>Step 1: Create Your Account</h3>
+        <p>To participate and save your selections, you need a registered account.</p>
+        <ul>
+          <li>Navigate to the login page and sign up with your email.</li>
+          <li>Choose a custom username to represent yourself on the global leaderboard.</li>
+          <li>Once logged in, your profile is permanently linked to your weekly picks, ensuring your data is securely saved.</li>
+        </ul>
+
+        <h3>Step 2: Make Your Selections</h3>
+        <p>We play <strong>Against the Spread (ATS)</strong>, which means you aren't just picking who will win the game outright. Instead, you are predicting whether a team will cover the assigned point spread.</p>
+        <ul>
+          <li>Select the current NFL week from the dropdown menu to load the upcoming schedule and live odds.</li>
+          <li>Click the box of the team you believe will cover the spread.</li>
+          <li>Your pick will immediately highlight in green, indicating it is locked and saved.</li>
+          <li><strong>Important:</strong> All game boxes automatically lock at the exact time of kickoff. Once a game has started, the buttons disable, and no further changes can be made. If Vegas hasn't released a spread yet, the game will display as "TBD" until the line is live.</li>
+        </ul>
+
+        <h3>Step 3: Climb the Leaderboard</h3>
+        <p>Your goal is to make the most accurate picks over the course of the season.</p>
+        <ul>
+          <li>The community leaderboard ranks players by their total Win % Against the Spread for the selected week.</li>
+          <li>As games finish in real-time, the system automatically grades your locked picks and updates the standings.</li>
+          <li>A tied outcome against the spread (a "push") is ignored and will not negatively impact your graded win percentage.</li>
         </ul>
       </section>
     </main>

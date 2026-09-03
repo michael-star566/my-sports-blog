@@ -71,7 +71,7 @@ const pathPrefix = '/my-sports-blog';
             }
             .team-btn {
                 flex: 1;
-                background: #27272a;
+                background-color: #27272a !important;
                 border: 2px solid #3f3f46;
                 border-radius: 6px;
                 padding: 1rem 0.75rem;
@@ -79,6 +79,7 @@ const pathPrefix = '/my-sports-blog';
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                justify-content: center;
                 gap: 0.4rem;
                 transition: all 0.2s;
             }
@@ -86,20 +87,20 @@ const pathPrefix = '/my-sports-blog';
                 border-color: #ffffff;
             }
             .team-name {
-                font-weight: bold;
-                font-size: 1.05rem;
-                color: #ffffff;
+                font-weight: bold !important;
+                font-size: 1.1rem !important;
+                color: #ffffff !important;
                 text-align: center;
             }
             .spread {
-                font-size: 0.95rem;
-                color: #ffffff;
-                font-weight: 600;
+                font-size: 1rem !important;
+                color: #ffffff !important;
+                font-weight: 600 !important;
             }
             .vs {
                 font-weight: bold;
                 color: #a1a1aa;
-                font-size: 0.95rem;
+                font-size: 1rem;
                 padding: 0 0.5rem;
             }
             .pick-feedback {
@@ -254,26 +255,20 @@ const pathPrefix = '/my-sports-blog';
                     card.innerHTML = `
                         <span class="game-info">${game.time}</span>
                         <div class="teams-row">
-                            <button type="button" class="team-btn away-btn" data-game="${game.id}" data-team="${game.away}" style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background: ${isAwaySelected ? '#064e3b' : '#27272a'};">
-                                <span class="team-name">${game.away}</span>
-                                <span class="spread">${game.awaySpread}</span>
+                            <button type="button" class="team-btn away-btn" data-game="${game.id}" data-team="${game.away}" style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background-color: ${isAwaySelected ? '#064e3b' : '#27272a'} !important;">
+                                <span class="team-name" style="color: #ffffff !important; font-size: 1.1rem !important; font-weight: bold !important;">${game.away}</span>
+                                <span class="spread" style="color: #ffffff !important; font-size: 1rem !important; font-weight: 600 !important;">${game.awaySpread}</span>
                             </button>
                             <span class="vs">@</span>
-                            <button type="button" class="team-btn home-btn" data-game="${game.id}" data-team="${game.home}">
-                                <span class="team-name">${game.home}</span>
-                                <span class="spread">${game.homeSpread}</span>
+                            <button type="button" class="team-btn home-btn" data-game="${game.id}" data-team="${game.home}" style="border-color: ${isHomeSelected ? '#10b981' : '#3f3f46'}; background-color: ${isHomeSelected ? '#064e3b' : '#27272a'} !important;">
+                                <span class="team-name" style="color: #ffffff !important; font-size: 1.1rem !important; font-weight: bold !important;">${game.home}</span>
+                                <span class="spread" style="color: #ffffff !important; font-size: 1rem !important; font-weight: 600 !important;">${game.homeSpread}</span>
                             </button>
                         </div>
                         <div class="pick-feedback" id="feedback-${game.id}">
                             ${userPicks[game.id] ? `Locked Pick: ${userPicks[game.id]}` : ''}
                         </div>
                     `;
-
-                    const homeBtn = card.querySelector('.home-btn') as HTMLElement;
-                    if (homeBtn) {
-                        homeBtn.style.borderColor = isHomeSelected ? '#10b981' : '#3f3f46';
-                        homeBtn.style.background = isHomeSelected ? '#064e3b' : '#27272a';
-                    }
 
                     gamesContainer.appendChild(card);
                 });
@@ -290,10 +285,10 @@ const pathPrefix = '/my-sports-blog';
                         const cardElement = target.closest('.matchup-card')!;
                         cardElement.querySelectorAll('.team-btn').forEach((b) => {
                             (b as HTMLElement).style.borderColor = '#3f3f46';
-                            (b as HTMLElement).style.background = '#27272a';
+                            (b as HTMLElement).style.backgroundColor = '#27272a';
                         });
                         target.style.borderColor = '#10b981';
-                        target.style.background = '#064e3b';
+                        target.style.backgroundColor = '#064e3b';
 
                         const feedbackEl = document.getElementById(`feedback-${gameId}`);
                         if (feedbackEl) feedbackEl.textContent = 'Saving pick...';

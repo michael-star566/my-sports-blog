@@ -9,7 +9,6 @@ const pathPrefix = '/my-sports-blog';
     <nav>
         <h2><a href={`${pathPrefix}/`}>{SITE_TITLE}</a></h2>
         
-        <!-- Mobile Menu Toggle Button -->
         <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle Menu">
             ☰
         </button>
@@ -19,8 +18,8 @@ const pathPrefix = '/my-sports-blog';
                 <HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
                 <HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
                 <HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
+                <HeaderLink href={`${pathPrefix}/power-rankings/`}>Power Rankings</HeaderLink>
                 
-                <!-- Pick'em Dropdown Menu -->
                 <div class="dropdown">
                     <button class="dropbtn">Pick'em ▾</button>
                     <div class="dropdown-content">
@@ -41,7 +40,6 @@ const pathPrefix = '/my-sports-blog';
 <script>
     import { supabase } from '../utils/supabase';
 
-    // Toggle Mobile Menu Open/Close
     const mobileToggle = document.getElementById('mobile-menu-toggle');
     const navContainer = document.getElementById('nav-links-container');
 
@@ -133,7 +131,6 @@ const pathPrefix = '/my-sports-blog';
         align-items: center;
     }
 
-    /* Hamburger Button Hidden on Desktop */
     .mobile-menu-btn {
         display: none;
         background: none;
@@ -143,7 +140,6 @@ const pathPrefix = '/my-sports-blog';
         cursor: pointer;
     }
 
-    /* Dropdown Styles */
     .dropdown {
         position: relative;
         display: inline-block;
@@ -175,8 +171,7 @@ const pathPrefix = '/my-sports-blog';
         display: block;
     }
 
-    /* MOBILE RESPONSIVENESS (Screens under 850px wide) */
-    @media (max-width: 850px) {
+    @media (max-width: 900px) {
         .mobile-menu-btn {
             display: block;
         }
@@ -209,7 +204,6 @@ const pathPrefix = '/my-sports-blog';
             text-align: left;
             padding: 0.75rem 0.5rem;
         }
-        /* Make dropdown expand inline nicely on mobile */
         .dropdown {
             width: 100%;
         }

@@ -1,0 +1,136 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+// Preseason power rankings with Trend first, then Rank, then Team
+const rankings = [
+  { trend: "N/A", rank: 1, team: "LA Rams" },
+  { trend: "N/A", rank: 2, team: "Jacksonville Jaguars" },
+  { trend: "N/A", rank: 3, team: "Seattle Seahawks" },
+  { trend: "N/A", rank: 4, team: "New England Patriots" },
+  { trend: "N/A", rank: 5, team: "Detroit Lions" },
+  { trend: "N/A", rank: 6, team: "Denver Broncos" },
+  { trend: "N/A", rank: 7, team: "Baltimore Ravens" },
+  { trend: "N/A", rank: 8, team: "San Francisco 49ers" },
+  { trend: "N/A", rank: 9, team: "LA Chargers" },
+  { trend: "N/A", rank: 10, team: "Cincinnati Bengals" },
+  { trend: "N/A", rank: 11, team: "Chicago Bears" },
+  { trend: "N/A", rank: 12, team: "Kansas City Chiefs" },
+  { trend: "N/A", rank: 13, team: "Buffalo Bills" },
+  { trend: "N/A", rank: 14, team: "Green Bay Packers" },
+  { trend: "N/A", rank: 15, team: "Houston Texans" },
+  { trend: "N/A", rank: 16, team: "New York Giants" },
+  { trend: "N/A", rank: 17, team: "Dallas Cowboys" },
+  { trend: "N/A", rank: 18, team: "Minnesota Vikings" },
+  { trend: "N/A", rank: 19, team: "Indianapolis Colts" },
+  { trend: "N/A", rank: 20, team: "Philadelphia Eagles" },
+  { trend: "N/A", rank: 21, team: "New Orleans Saints" },
+  { trend: "N/A", rank: 22, team: "Carolina Panthers" },
+  { trend: "N/A", rank: 23, team: "Tampa Bay Buccaneers" },
+  { trend: "N/A", rank: 24, team: "Las Vegas Raiders" },
+  { trend: "N/A", rank: 25, team: "Washington Commanders" },
+  { trend: "N/A", rank: 26, team: "Pittsburgh Steelers" },
+  { trend: "N/A", rank: 27, team: "Tennessee Titans" },
+  { trend: "N/A", rank: 28, team: "Cleveland Browns" },
+  { trend: "N/A", rank: 29, team: "Atlanta Falcons" },
+  { trend: "N/A", rank: 30, team: "Miami Dolphins" },
+  { trend: "N/A", rank: 31, team: "New York Jets" },
+  { trend: "N/A", rank: 32, team: "Arizona Cardinals" }
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Preseason Power Rankings - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+    <style>
+      main {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 3em 1em;
+        color: white;
+      }
+      .rankings-container {
+        background: #111111;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 0.5rem;
+      }
+      .subtitle {
+        text-align: center;
+        color: #a1a1aa;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+      th, td {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid #27272a;
+      }
+      th {
+        color: #38bdf8;
+        font-weight: bold;
+        background: #18181b;
+      }
+      tr:hover {
+        background: #18181b;
+      }
+      .col-trend {
+        width: 25%;
+        text-align: center;
+        font-weight: bold;
+        color: #a1a1aa;
+      }
+      .col-rank {
+        width: 15%;
+        text-align: center;
+        font-weight: bold;
+      }
+      .col-team {
+        width: 60%;
+        font-weight: bold;
+        font-size: 1.05rem;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <div class="rankings-container">
+        <h1>Preseason Power Rankings</h1>
+        <p class="subtitle">Initial league hierarchy heading into the new season.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="col-trend">Trend</th>
+              <th class="col-rank">Rank</th>
+              <th class="col-team">Team</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rankings.map((item) => (
+              <tr>
+                <td class="col-trend">{item.trend}</td>
+                <td class="col-rank">{item.rank}</td>
+                <td class="col-team">{item.team}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

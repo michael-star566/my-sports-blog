@@ -1,8 +1,8 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
-const base = import.meta.env.BASE_URL;
-const cleanBase = base.endsWith('/') ? base : base + '/';
+const rawBase = import.meta.env.BASE_URL || '/';
+const cleanBase = '/' + rawBase.split('/').filter(Boolean).join('/') + '/';
 const loginPath = `${cleanBase}login/`;
 ---
 
@@ -12,6 +12,7 @@ const loginPath = `${cleanBase}login/`;
 		<div class="internal-links">
 			<HeaderLink href={cleanBase}>Home</HeaderLink>
 			<HeaderLink href={`${cleanBase}blog`}>Blog</HeaderLink>
+			<HeaderLink href={`${cleanBase}discussion`}>Discussion</HeaderLink>
 			<HeaderLink href={`${cleanBase}about`}>About</HeaderLink>
 		</div>
 		<div class="auth-link-container">
@@ -28,8 +29,8 @@ const loginPath = `${cleanBase}login/`;
 		if (!navAuthLink) return;
 
 		const { data: { session } } = await supabase.auth.getSession();
-		const base = import.meta.env.BASE_URL;
-		const cleanBase = base.endsWith('/') ? base : base + '/';
+		const rawBase = import.meta.env.BASE_URL || '/';
+		const cleanBase = '/' + rawBase.split('/').filter(Boolean).join('/') + '/';
 		const loginPath = `${cleanBase}login/`;
 
 		if (session) {

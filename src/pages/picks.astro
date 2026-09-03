@@ -1,0 +1,324 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+const pathPrefix = '/my-sports-blog';
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <BaseHead title={`Picks & Leaderboard - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+        <style>
+            main {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 3em 1em;
+                color: white;
+            }
+            .section-box {
+                background: #111111;
+                border: 1px solid #222222;
+                border-radius: 8px;
+                padding: 2rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+                margin-bottom: 2.5rem;
+            }
+            .widget-subtitle {
+                color: #a1a1aa;
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+            .warning-box {
+                background: #27272a;
+                padding: 1rem;
+                border-radius: 4px;
+                text-align: center;
+                color: #e4e4e7;
+            }
+            .warning-box a {
+                color: #38bdf8;
+                text-decoration: underline;
+            }
+            .matchup-card {
+                background: #18181b;
+                border: 1px solid #27272a;
+                border-radius: 6px;
+                padding: 1.2rem;
+                text-align: center;
+            }
+            .game-info {
+                font-size: 0.8rem;
+                color: #a1a1aa;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+            .teams {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+            .team-btn {
+                flex: 1;
+                background: #27272a;
+                border: 1px solid #3f3f46;
+                border-radius: 6px;
+                padding: 1rem;
+                color: white;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.3rem;
+                transition: all 0.2s;
+            }
+            .team-btn:hover {
+                border-color: #ffffff;
+            }
+            .team-name {
+                font-weight: bold;
+            }
+            .spread {
+                font-size: 0.85rem;
+                color: #a1a1aa;
+            }
+            .vs {
+                font-weight: bold;
+                color: #52525b;
+            }
+            #pick-status {
+                margin-top: 1rem;
+                text-align: center;
+                font-size: 0.9rem;
+                font-weight: bold;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 1rem;
+            }
+            th, td {
+                padding: 0.75rem 1rem;
+                text-align: left;
+                border-bottom: 1px solid #27272a;
+            }
+            th {
+                color: #a1a1aa;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+            }
+            tr:hover {
+                background: #18181b;
+            }
+            .loading {
+                text-align: center;
+                color: #a1a1aa;
+                padding: 2rem;
+            }
+            .hidden {
+                display: none !important;
+            }
+        </style>
+    </head>
+    <body>
+        <Header />
+        <main>
+            <h1 style="text-align: center; margin-bottom: 0.5rem;">Weekly Pick'em & Standings</h1>
+            <p style="text-align: center; color: #a1a1aa; margin-bottom: 2rem;">Make your featured game prediction and track community leaderboard points.</p>
+
+            <!-- Pick'em Minigame Section -->
+            <div class="section-box">
+                <h2>Weekly Matchup Minigame</h2>
+                <p class="widget-subtitle">Lock in your selection for this week's featured game.</p>
+
+                <div id="auth-warning" class="warning-box">
+                    Please <a href={`${pathPrefix}/login/`}>log in</a> to submit and lock in your picks!
+                </div>
+
+                <div id="pick-form-container" class="hidden">
+                    <div class="matchup-card">
+                        <span class="game-info">Featured Matchup • Sunday 4:15 PM</span>
+                        <div class="teams">
+                            <button type="button" class="team-btn" data-team="Chiefs">
+                                <span class="team-name">Kansas City Chiefs</span>
+                                <span class="spread">-3.5</span>
+                            </button>
+                            <span class="vs">VS</span>
+                            <button type="button" class="team-btn" data-team="Ravens">
+                                <span class="team-name">Baltimore Ravens</span>
+                                <span class="spread">+3.5</span>
+                            </button>
+                        </div>
+                    </div>
+                    <p id="pick-status"></p>
+                </div>
+            </div>
+
+            <!-- Leaderboard Section -->
+            <div class="section-box">
+                <h2>Community Leaderboard</h2>
+                <p class="widget-subtitle">Global standings based on user picks.</p>
+
+                <div id="loading-view" class="loading">Loading standings...</div>
+                <table id="leaderboard-table" class="hidden">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Total Picks Made</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Populated via script -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <Footer />
+
+        <script>
+            import { supabase } from '../utils/supabase';
+
+            const authWarning = document.getElementById('auth-warning');
+            const pickFormContainer = document.getElementById('pick-form-container');
+            const teamButtons = document.querySelectorAll('.team-btn');
+            const statusEl = document.getElementById('pick-status');
+
+            let selectedTeam: string | null = null;
+            let currentUser: any = null;
+
+            async function initWidget() {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session && session.user) {
+                    currentUser = session.user;
+                    authWarning?.classList.add('hidden');
+                    pickFormContainer?.classList.remove('hidden');
+                    await loadExistingPick();
+                } else {
+                    authWarning?.classList.remove('hidden');
+                    pickFormContainer?.classList.add('hidden');
+                }
+                await fetchLeaderboard();
+            }
+
+            async function loadExistingPick() {
+                if (!currentUser) return;
+                const { data } = await supabase
+                    .from('user_picks')
+                    .select('selected_team')
+                    .eq('user_id', currentUser.id)
+                    .eq('game_id', 'nfl_featured_game')
+                    .single();
+
+                if (data && data.selected_team) {
+                    selectedTeam = data.selected_team;
+                    highlightSelectedButton();
+                    if (statusEl) {
+                        statusEl.textContent = `Your locked pick: ${selectedTeam}`;
+                        statusEl.style.color = '#10b981';
+                    }
+                }
+            }
+
+            function highlightSelectedButton() {
+                teamButtons.forEach(btn => {
+                    if (btn.getAttribute('data-team') === selectedTeam) {
+                        (btn as HTMLElement).style.borderColor = '#10b981';
+                        (btn as HTMLElement).style.background = '#064e3b';
+                    } else {
+                        (btn as HTMLElement).style.borderColor = '#3f3f46';
+                        (btn as HTMLElement).style.background = '#27272a';
+                    }
+                });
+            }
+
+            teamButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    if (!currentUser) return;
+                    selectedTeam = button.getAttribute('data-team');
+                    highlightSelectedButton();
+
+                    if (statusEl) {
+                        statusEl.textContent = 'Saving pick...';
+                        statusEl.style.color = '#e4e4e7';
+                    }
+
+                    const { error } = await supabase
+                        .from('user_picks')
+                        .upsert({
+                            user_id: currentUser.id,
+                            game_id: 'nfl_featured_game',
+                            selected_team: selectedTeam,
+                            updated_at: new Date()
+                        }, { onConflict: 'user_id,game_id' });
+
+                    if (error) {
+                        console.error('Error saving pick:', error);
+                        if (statusEl) {
+                            statusEl.textContent = 'Failed to save pick. Try again.';
+                            statusEl.style.color = '#ef4444';
+                        }
+                    } else {
+                        if (statusEl) {
+                            statusEl.textContent = `Pick successfully saved: ${selectedTeam}!`;
+                            statusEl.style.color = '#10b981';
+                        }
+                        fetchLeaderboard();
+                    }
+                });
+            });
+
+            async function fetchLeaderboard() {
+                const loadingView = document.getElementById('loading-view');
+                const tableEl = document.getElementById('leaderboard-table');
+                const tbody = document.getElementById('leaderboard-body');
+
+                try {
+                    const { data, error } = await supabase
+                        .from('user_picks')
+                        .select('user_id, selected_team');
+
+                    if (error) throw error;
+
+                    const userCounts: { [key: string]: number } = {};
+                    data?.forEach((row: any) => {
+                        const uid = row.user_id;
+                        userCounts[uid] = (userCounts[uid] || 0) + 1;
+                    });
+
+                    const sortedUsers = Object.entries(userCounts).sort((a: any, b: any) => b[1] - a[1]);
+
+                    if (tbody) {
+                        tbody.innerHTML = '';
+                        if (sortedUsers.length === 0) {
+                            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #a1a1aa;">No picks recorded yet. Make yours above!</td></tr>`;
+                        } else {
+                            sortedUsers.forEach(([uid, count], index) => {
+                                const shortId = uid.substring(0, 8) + '...';
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                    <td>#${index + 1}</td>
+                                    <td>Player (${shortId})</td>
+                                    <td><strong>${count}</strong></td>
+                                `;
+                                tbody.appendChild(tr);
+                            });
+                        }
+                    }
+
+                    loadingView?.classList.add('hidden');
+                    tableEl?.classList.remove('hidden');
+                } catch (err) {
+                    console.error('Error loading leaderboard:', err);
+                    if (loadingView) loadingView.textContent = 'Failed to load standings.';
+                }
+            }
+
+            initWidget();
+        </script>
+    </body>
+</html>

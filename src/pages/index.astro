@@ -98,7 +98,7 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
         <h3>Step 2: Make Your Selections</h3>
         <p>We play <strong>Against the Spread (ATS)</strong>, which means you aren't just picking who will win the game outright. Instead, you are predicting whether a team will cover the assigned point spread.</p>
         <ul>
-          <li>Select the current NFL week from the dropdown menu to load the upcoming schedule and live odds.</li>
+          <li>Go to the <a href={`${basePath}/picks/`}>Weekly Picks page</a> and select your desired NFL week from the dropdown menu to load the schedule and live odds.</li>
           <li>Click the box of the team you believe will cover the spread.</li>
           <li>Your pick will immediately highlight in green, indicating it is locked and saved.</li>
           <li><strong>Important:</strong> All game boxes automatically lock at the exact time of kickoff. Once a game has started, the buttons disable, and no further changes can be made. If Vegas hasn't released a spread yet, the game will display as "TBD" until the line is live.</li>
@@ -108,7 +108,7 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
         <p>Your goal is to make the most accurate picks over the course of the season across multiple competitive tracks.</p>
         <ul>
           <li><strong>Weekly Standings:</strong> The weekly page ranks players by their total Win % Against the Spread for that specific week, with games graded automatically in real time.</li>
-          <li><strong>Season-Long Leaderboard:</strong> Check out the Season Leaderboard tab to track cumulative performance across all 18 weeks of the NFL season.</li>
+          <li><strong>Season-Long Leaderboard:</strong> Check out the <a href={`${basePath}/leaderboard/`}>Season Leaderboard</a> to track cumulative performance across all 18 weeks of the NFL season.</li>
           <li><strong>Push Handling:</strong> A tied outcome against the spread (a "push") is ignored and will not negatively impact your graded win percentage on either leaderboard.</li>
         </ul>
       </section>

@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import ShareButtons from '../components/ShareButtons.astro';
 import BackToTop from '../components/BackToTop.astro';
+import RelatedPosts from '../components/RelatedPosts.astro';
 import { getReadingTime } from '../utils/readingTime';
 
 type Props = CollectionEntry<'blog'>['data'] & {
@@ -102,6 +103,7 @@ const readingTime = body ? getReadingTime(body) : '';
                     </div>
                     <slot />
                     <ShareButtons title={title} />
+                    <RelatedPosts currentTitle={title} />
                 </div>
             </article>
         </main>

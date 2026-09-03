@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+    currentTitle: string;
+}
+
+const { currentTitle } = Astro.props;
+
+// Fetch all posts, sort by date (newest first)
+const allPosts = (await getCollection('blog')).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+// Filter out the current post so it doesn't recommend the one they just read, and grab the latest 3
+const relatedPosts = allPosts
+    .filter((post) => post.data.title !== currentTitle)
+    .slice(0, 3);
+
+const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
+---
+
+{relatedPosts.length > 0 && (
+    <div class="related-posts">
+        <h3>More Breakdowns</h3>
+        <div class="grid">
+            {relatedPosts.map((post) => (
+                <a href={`${basePath}/blog/${post.id}/`} class="card">
+                    {post.data.heroImage && (
+                        <img src={post.data.heroImage.src} alt="" />
+                    )}
+                    <div class="card-content">
+                        <h4>{post.data.title}</h4>
+                        <p class="date"><FormattedDate date={post.data.pubDate} /></p>
+                    </div>
+                </a>
+            ))}
+        </div>
+    </div>
+)}
+
+<style>
+    .related-posts {
+        margin-top: 4em;
+        padding-top: 2em;
+        border-top: 1px solid #222222;
+    }
+    .related-posts h3 {
+        margin-bottom: 1.5em;
+        color: #ffffff;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    .card {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        background: #111111;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-4px);
+        border-color: #555555;
+    }
+    .card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-bottom: 1px solid #222222;
+    }
+    .card-content {
+        padding: 1rem;
+    }
+    .card-content h4 {
+        margin: 0 0 0.5rem 0;
+        color: #ffffff;
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+    .card-content .date {
+        margin: 0;
+        color: #a1a1aa;
+        font-size: 0.85rem;
+    }
+</style>

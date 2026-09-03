@@ -161,16 +161,18 @@ const pathPrefix = '/my-sports-blog';
 
             <!-- Leaderboard Section -->
             <div class="section-box">
-                <h2>Community Leaderboard</h2>
-                <p class="widget-subtitle">Global standings ranked by total selections made.</p>
+                <h2>Live Community Leaderboard (ATS)</h2>
+                <p class="widget-subtitle">Standings ranked by total Win % Against the Spread.</p>
 
-                <div id="loading-view" class="loading">Loading standings...</div>
+                <div id="loading-view" class="loading">Fetching live scores and generating standings...</div>
                 <table id="leaderboard-table" class="hidden">
                     <thead>
                         <tr>
                             <th>Rank</th>
                             <th>Username</th>
-                            <th>Total Picks Made</th>
+                            <th>Correct Picks</th>
+                            <th>Total Picks</th>
+                            <th>% Correct</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body">
@@ -319,32 +321,97 @@ const pathPrefix = '/my-sports-blog';
                 const tbody = document.getElementById('leaderboard-body');
 
                 try {
+                    // 1. Fetch user picks from Supabase
                     const { data, error } = await supabase
                         .from('user_picks')
-                        .select('user_id, selected_team');
+                        .select('user_id, game_id, selected_team');
 
                     if (error) throw error;
 
-                    const userCounts: { [key: string]: number } = {};
+                    // 2. Automatically fetch live/completed game scores from ESPN public API
+                    let liveScores: { [key: string]: number } = {};
+                    try {
+                        const espnRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=1');
+                        const espnData = await espnRes.json();
+                        
+                        espnData.events.forEach((event: any) => {
+                            // Only grade picks if the game is completely finished
+                            if (event.status.type.completed) {
+                                const comp = event.competitions[0];
+                                const homeTeam = comp.competitors.find((c: any) => c.homeAway === 'home');
+                                const awayTeam = comp.competitors.find((c: any) => c.homeAway === 'away');
+                                
+                                liveScores[homeTeam.team.displayName] = parseInt(homeTeam.score);
+                                liveScores[awayTeam.team.displayName] = parseInt(awayTeam.score);
+                            }
+                        });
+                    } catch (apiErr) {
+                        console.error('Failed to fetch live ESPN scores:', apiErr);
+                    }
+
+                    // 3. Evaluate picks Against The Spread (ATS)
+                    const userStats: { [key: string]: { total: number, graded: number, correct: number } } = {};
+                    
                     data?.forEach((row: any) => {
                         const uid = row.user_id;
-                        userCounts[uid] = (userCounts[uid] || 0) + 1;
+                        if (!userStats[uid]) {
+                            userStats[uid] = { total: 0, graded: 0, correct: 0 };
+                        }
+                        
+                        userStats[uid].total++; // Total picks the user made
+                        
+                        const game = week1Games.find(g => g.id === row.game_id);
+                        if (game && liveScores[game.home] !== undefined && liveScores[game.away] !== undefined) {
+                            const homeScore = liveScores[game.home];
+                            const awayScore = liveScores[game.away];
+                            
+                            let pickWon = false;
+                            let push = false;
+
+                            // Calculate ATS Outcome
+                            if (row.selected_team === game.away) {
+                                const adjustedAway = awayScore + parseFloat(game.awaySpread);
+                                if (adjustedAway > homeScore) pickWon = true;
+                                else if (adjustedAway === homeScore) push = true;
+                            } else if (row.selected_team === game.home) {
+                                const adjustedHome = homeScore + parseFloat(game.homeSpread);
+                                if (adjustedHome > awayScore) pickWon = true;
+                                else if (adjustedHome === awayScore) push = true;
+                            }
+
+                            // If it's a push (tie against spread), we do not grade it as a win or a loss
+                            if (!push) {
+                                userStats[uid].graded++;
+                                if (pickWon) userStats[uid].correct++;
+                            }
+                        }
                     });
 
-                    const sortedUsers = Object.entries(userCounts).sort((a: any, b: any) => b[1] - a[1]);
+                    // 4. Calculate % Correct and Sort Leaderboard
+                    const sortedUsers = Object.entries(userStats).map(([uid, stats]) => {
+                        const percent = stats.graded > 0 ? (stats.correct / stats.graded) * 100 : 0;
+                        return { uid, ...stats, percent };
+                    }).sort((a, b) => {
+                        if (b.percent !== a.percent) return b.percent - a.percent; // 1st Sort: Win %
+                        if (b.correct !== a.correct) return b.correct - a.correct; // Tiebreaker: Total Correct
+                        return b.total - a.total;                                  // Tiebreaker 2: Total Made
+                    });
 
+                    // 5. Render to table
                     if (tbody) {
                         tbody.innerHTML = '';
                         if (sortedUsers.length === 0) {
-                            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #a1a1aa;">No picks recorded yet. Make yours above!</td></tr>`;
+                            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #a1a1aa;">No picks recorded yet. Make yours above!</td></tr>`;
                         } else {
-                            sortedUsers.forEach(([uid, count], index) => {
-                                const shortId = uid.substring(0, 8) + '...';
+                            sortedUsers.forEach((user, index) => {
+                                const shortId = user.uid.substring(0, 8) + '...';
                                 const tr = document.createElement('tr');
                                 tr.innerHTML = `
                                     <td>#${index + 1}</td>
                                     <td>Player (${shortId})</td>
-                                    <td><strong>${count}</strong></td>
+                                    <td style="color: #10b981; font-weight: bold;">${user.correct}</td>
+                                    <td>${user.total}</td>
+                                    <td><strong>${user.percent.toFixed(1)}%</strong></td>
                                 `;
                                 tbody.appendChild(tr);
                             });

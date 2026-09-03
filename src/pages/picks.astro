@@ -83,8 +83,12 @@ const pathPrefix = '/my-sports-blog';
                 gap: 0.4rem;
                 transition: all 0.2s;
             }
-            .team-btn:hover {
+            .team-btn:hover:not(:disabled) {
                 border-color: #ffffff;
+            }
+            .team-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
             }
             .team-name {
                 font-weight: bold !important;
@@ -110,6 +114,9 @@ const pathPrefix = '/my-sports-blog';
                 color: #10b981;
                 font-weight: bold;
                 min-height: 1.2rem;
+            }
+            .locked-text {
+                color: #ef4444; /* Red color for locked status */
             }
             table {
                 width: 100%;
@@ -186,23 +193,24 @@ const pathPrefix = '/my-sports-blog';
         <script>
             import { supabase } from '../utils/supabase';
 
+            // NFL Kickoffs added using strictly typed UTC timestamps for time-gating
             const week1Games = [
-                { id: 'w1_01', time: 'Wed, Sep 9 • 8:20 PM ET', away: 'New England Patriots', awaySpread: '+3.5', home: 'Seattle Seahawks', homeSpread: '-3.5' },
-                { id: 'w1_02', time: 'Thu, Sep 10 • 8:35 PM ET', away: 'San Francisco 49ers', awaySpread: '+3.5', home: 'Los Angeles Rams', homeSpread: '-3.5' },
-                { id: 'w1_03', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Chicago Bears', awaySpread: '-2.5', home: 'Carolina Panthers', homeSpread: '+2.5' },
-                { id: 'w1_04', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Tampa Bay Buccaneers', awaySpread: '+3.5', home: 'Cincinnati Bengals', homeSpread: '-3.5' },
-                { id: 'w1_05', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'New Orleans Saints', awaySpread: '+6.5', home: 'Detroit Lions', homeSpread: '-6.5' },
-                { id: 'w1_06', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Buffalo Bills', awaySpread: '-1.5', home: 'Houston Texans', homeSpread: '+1.5' },
-                { id: 'w1_07', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Baltimore Ravens', awaySpread: '-3.5', home: 'Indianapolis Colts', homeSpread: '+3.5' },
-                { id: 'w1_08', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Cleveland Browns', awaySpread: '+7.5', home: 'Jacksonville Jaguars', homeSpread: '-7.5' },
-                { id: 'w1_09', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Atlanta Falcons', awaySpread: '+3.0', home: 'Pittsburgh Steelers', homeSpread: '-3.0' },
-                { id: 'w1_10', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'New York Jets', awaySpread: '+2.5', home: 'Tennessee Titans', homeSpread: '-2.5' },
-                { id: 'w1_11', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Arizona Cardinals', awaySpread: '+9.5', home: 'Los Angeles Chargers', homeSpread: '-9.5' },
-                { id: 'w1_12', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Miami Dolphins', awaySpread: '+3.5', home: 'Las Vegas Raiders', homeSpread: '-3.5' },
-                { id: 'w1_13', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Green Bay Packers', awaySpread: '+1.5', home: 'Minnesota Vikings', homeSpread: '-1.5' },
-                { id: 'w1_14', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Washington Commanders', awaySpread: '+5.5', home: 'Philadelphia Eagles', homeSpread: '-5.5' },
-                { id: 'w1_15', time: 'Sun, Sep 13 • 8:20 PM ET', away: 'Dallas Cowboys', awaySpread: '-2.5', home: 'New York Giants', homeSpread: '+2.5' },
-                { id: 'w1_16', time: 'Mon, Sep 14 • 8:15 PM ET', away: 'Denver Broncos', awaySpread: '+2.5', home: 'Kansas City Chiefs', homeSpread: '-2.5' }
+                { id: 'w1_01', time: 'Wed, Sep 9 • 8:20 PM ET', kickoff: '2026-09-09T20:20:00-04:00', away: 'New England Patriots', awaySpread: '+3.5', home: 'Seattle Seahawks', homeSpread: '-3.5' },
+                { id: 'w1_02', time: 'Thu, Sep 10 • 8:35 PM ET', kickoff: '2026-09-10T20:35:00-04:00', away: 'San Francisco 49ers', awaySpread: '+3.5', home: 'Los Angeles Rams', homeSpread: '-3.5' },
+                { id: 'w1_03', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Chicago Bears', awaySpread: '-2.5', home: 'Carolina Panthers', homeSpread: '+2.5' },
+                { id: 'w1_04', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Tampa Bay Buccaneers', awaySpread: '+3.5', home: 'Cincinnati Bengals', homeSpread: '-3.5' },
+                { id: 'w1_05', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'New Orleans Saints', awaySpread: '+6.5', home: 'Detroit Lions', homeSpread: '-6.5' },
+                { id: 'w1_06', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Buffalo Bills', awaySpread: '-1.5', home: 'Houston Texans', homeSpread: '+1.5' },
+                { id: 'w1_07', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Baltimore Ravens', awaySpread: '-3.5', home: 'Indianapolis Colts', homeSpread: '+3.5' },
+                { id: 'w1_08', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Cleveland Browns', awaySpread: '+7.5', home: 'Jacksonville Jaguars', homeSpread: '-7.5' },
+                { id: 'w1_09', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'Atlanta Falcons', awaySpread: '+3.0', home: 'Pittsburgh Steelers', homeSpread: '-3.0' },
+                { id: 'w1_10', time: 'Sun, Sep 13 • 1:00 PM ET', kickoff: '2026-09-13T13:00:00-04:00', away: 'New York Jets', awaySpread: '+2.5', home: 'Tennessee Titans', homeSpread: '-2.5' },
+                { id: 'w1_11', time: 'Sun, Sep 13 • 4:25 PM ET', kickoff: '2026-09-13T16:25:00-04:00', away: 'Arizona Cardinals', awaySpread: '+9.5', home: 'Los Angeles Chargers', homeSpread: '-9.5' },
+                { id: 'w1_12', time: 'Sun, Sep 13 • 4:25 PM ET', kickoff: '2026-09-13T16:25:00-04:00', away: 'Miami Dolphins', awaySpread: '+3.5', home: 'Las Vegas Raiders', homeSpread: '-3.5' },
+                { id: 'w1_13', time: 'Sun, Sep 13 • 4:25 PM ET', kickoff: '2026-09-13T16:25:00-04:00', away: 'Green Bay Packers', awaySpread: '+1.5', home: 'Minnesota Vikings', homeSpread: '-1.5' },
+                { id: 'w1_14', time: 'Sun, Sep 13 • 4:25 PM ET', kickoff: '2026-09-13T16:25:00-04:00', away: 'Washington Commanders', awaySpread: '+5.5', home: 'Philadelphia Eagles', homeSpread: '-5.5' },
+                { id: 'w1_15', time: 'Sun, Sep 13 • 8:20 PM ET', kickoff: '2026-09-13T20:20:00-04:00', away: 'Dallas Cowboys', awaySpread: '-2.5', home: 'New York Giants', homeSpread: '+2.5' },
+                { id: 'w1_16', time: 'Mon, Sep 14 • 8:15 PM ET', kickoff: '2026-09-14T20:15:00-04:00', away: 'Denver Broncos', awaySpread: '+2.5', home: 'Kansas City Chiefs', homeSpread: '-2.5' }
             ];
 
             const authWarning = document.getElementById('auth-warning');
@@ -246,6 +254,7 @@ const pathPrefix = '/my-sports-blog';
             function renderGames() {
                 if (!gamesContainer) return;
                 gamesContainer.innerHTML = '';
+                const now = new Date(); // Current time on user's device
 
                 week1Games.forEach(game => {
                     const card = document.createElement('div');
@@ -253,22 +262,33 @@ const pathPrefix = '/my-sports-blog';
 
                     const isAwaySelected = userPicks[game.id] === game.away;
                     const isHomeSelected = userPicks[game.id] === game.home;
+                    
+                    // Evaluate if kickoff time has passed
+                    const gameKickoffTime = new Date(game.kickoff);
+                    const isLocked = now > gameKickoffTime;
+
+                    let feedbackText = '';
+                    if (isLocked) {
+                        feedbackText = userPicks[game.id] ? `Locked In: ${userPicks[game.id]} (Game Started)` : 'Game Started - Picks Locked';
+                    } else if (userPicks[game.id]) {
+                        feedbackText = `Locked Pick: ${userPicks[game.id]}`;
+                    }
 
                     card.innerHTML = `
                         <span class="game-info">${game.time}</span>
                         <div class="teams-row">
-                            <button type="button" class="team-btn away-btn" data-game="${game.id}" data-team="${game.away}" style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background-color: ${isAwaySelected ? '#064e3b' : '#27272a'} !important;">
+                            <button type="button" class="team-btn away-btn" data-game="${game.id}" data-team="${game.away}" ${isLocked ? 'disabled' : ''} style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background-color: ${isAwaySelected ? '#064e3b' : '#27272a'} !important;">
                                 <span class="team-name" style="color: #ffffff !important; font-size: 1.1rem !important; font-weight: bold !important;">${game.away}</span>
                                 <span class="spread" style="color: #ffffff !important; font-size: 1rem !important; font-weight: 600 !important;">${game.awaySpread}</span>
                             </button>
                             <span class="vs">@</span>
-                            <button type="button" class="team-btn home-btn" data-game="${game.id}" data-team="${game.home}" style="border-color: ${isHomeSelected ? '#10b981' : '#3f3f46'}; background-color: ${isHomeSelected ? '#064e3b' : '#27272a'} !important;">
+                            <button type="button" class="team-btn home-btn" data-game="${game.id}" data-team="${game.home}" ${isLocked ? 'disabled' : ''} style="border-color: ${isHomeSelected ? '#10b981' : '#3f3f46'}; background-color: ${isHomeSelected ? '#064e3b' : '#27272a'} !important;">
                                 <span class="team-name" style="color: #ffffff !important; font-size: 1.1rem !important; font-weight: bold !important;">${game.home}</span>
                                 <span class="spread" style="color: #ffffff !important; font-size: 1rem !important; font-weight: 600 !important;">${game.homeSpread}</span>
                             </button>
                         </div>
-                        <div class="pick-feedback" id="feedback-${game.id}">
-                            ${userPicks[game.id] ? `Locked Pick: ${userPicks[game.id]}` : ''}
+                        <div class="pick-feedback ${isLocked ? 'locked-text' : ''}" id="feedback-${game.id}">
+                            ${feedbackText}
                         </div>
                     `;
 
@@ -278,7 +298,11 @@ const pathPrefix = '/my-sports-blog';
                 document.querySelectorAll('.team-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         if (!currentUser) return;
-                        const target = e.currentTarget as HTMLElement;
+                        const target = e.currentTarget as HTMLButtonElement;
+                        
+                        // Failsafe: Do not allow click if button is somehow disabled
+                        if (target.disabled) return;
+                        
                         const gameId = target.getAttribute('data-game')!;
                         const selectedTeam = target.getAttribute('data-team')!;
 
@@ -293,7 +317,10 @@ const pathPrefix = '/my-sports-blog';
                         target.style.backgroundColor = '#064e3b';
 
                         const feedbackEl = document.getElementById(`feedback-${gameId}`);
-                        if (feedbackEl) feedbackEl.textContent = 'Saving pick...';
+                        if (feedbackEl) {
+                            feedbackEl.textContent = 'Saving pick...';
+                            feedbackEl.classList.remove('locked-text');
+                        }
 
                         const { error } = await supabase
                             .from('user_picks')
@@ -321,21 +348,32 @@ const pathPrefix = '/my-sports-blog';
                 const tbody = document.getElementById('leaderboard-body');
 
                 try {
-                    // 1. Fetch user picks from Supabase
-                    const { data, error } = await supabase
+                    // 1. Fetch user picks
+                    const { data: picksData, error: picksError } = await supabase
                         .from('user_picks')
                         .select('user_id, game_id, selected_team');
 
-                    if (error) throw error;
+                    if (picksError) throw picksError;
 
-                    // 2. Automatically fetch live/completed game scores from ESPN public API
+                    // 2. Fetch all usernames mapping from the new public profiles table
+                    const { data: profilesData, error: profilesError } = await supabase
+                        .from('profiles')
+                        .select('id, username');
+                        
+                    if (profilesError) throw profilesError;
+
+                    const usernameMap: { [key: string]: string } = {};
+                    profilesData?.forEach((profile: any) => {
+                        usernameMap[profile.id] = profile.username || 'Anonymous Player';
+                    });
+
+                    // 3. Fetch live scores
                     let liveScores: { [key: string]: number } = {};
                     try {
                         const espnRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=1');
                         const espnData = await espnRes.json();
                         
                         espnData.events.forEach((event: any) => {
-                            // Only grade picks if the game is completely finished
                             if (event.status.type.completed) {
                                 const comp = event.competitions[0];
                                 const homeTeam = comp.competitors.find((c: any) => c.homeAway === 'home');
@@ -349,16 +387,16 @@ const pathPrefix = '/my-sports-blog';
                         console.error('Failed to fetch live ESPN scores:', apiErr);
                     }
 
-                    // 3. Evaluate picks Against The Spread (ATS)
+                    // 4. Grade picks
                     const userStats: { [key: string]: { total: number, graded: number, correct: number } } = {};
                     
-                    data?.forEach((row: any) => {
+                    picksData?.forEach((row: any) => {
                         const uid = row.user_id;
                         if (!userStats[uid]) {
                             userStats[uid] = { total: 0, graded: 0, correct: 0 };
                         }
                         
-                        userStats[uid].total++; // Total picks the user made
+                        userStats[uid].total++;
                         
                         const game = week1Games.find(g => g.id === row.game_id);
                         if (game && liveScores[game.home] !== undefined && liveScores[game.away] !== undefined) {
@@ -368,7 +406,6 @@ const pathPrefix = '/my-sports-blog';
                             let pickWon = false;
                             let push = false;
 
-                            // Calculate ATS Outcome
                             if (row.selected_team === game.away) {
                                 const adjustedAway = awayScore + parseFloat(game.awaySpread);
                                 if (adjustedAway > homeScore) pickWon = true;
@@ -379,7 +416,6 @@ const pathPrefix = '/my-sports-blog';
                                 else if (adjustedHome === awayScore) push = true;
                             }
 
-                            // If it's a push (tie against spread), we do not grade it as a win or a loss
                             if (!push) {
                                 userStats[uid].graded++;
                                 if (pickWon) userStats[uid].correct++;
@@ -387,28 +423,28 @@ const pathPrefix = '/my-sports-blog';
                         }
                     });
 
-                    // 4. Calculate % Correct and Sort Leaderboard
+                    // 5. Sort & Apply Usernames
                     const sortedUsers = Object.entries(userStats).map(([uid, stats]) => {
                         const percent = stats.graded > 0 ? (stats.correct / stats.graded) * 100 : 0;
-                        return { uid, ...stats, percent };
+                        const displayUsername = usernameMap[uid] || `Player (${uid.substring(0, 5)}...)`;
+                        return { uid, displayUsername, ...stats, percent };
                     }).sort((a, b) => {
-                        if (b.percent !== a.percent) return b.percent - a.percent; // 1st Sort: Win %
-                        if (b.correct !== a.correct) return b.correct - a.correct; // Tiebreaker: Total Correct
-                        return b.total - a.total;                                  // Tiebreaker 2: Total Made
+                        if (b.percent !== a.percent) return b.percent - a.percent;
+                        if (b.correct !== a.correct) return b.correct - a.correct;
+                        return b.total - a.total;
                     });
 
-                    // 5. Render to table
+                    // 6. Render
                     if (tbody) {
                         tbody.innerHTML = '';
                         if (sortedUsers.length === 0) {
                             tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #a1a1aa;">No picks recorded yet. Make yours above!</td></tr>`;
                         } else {
                             sortedUsers.forEach((user, index) => {
-                                const shortId = user.uid.substring(0, 8) + '...';
                                 const tr = document.createElement('tr');
                                 tr.innerHTML = `
                                     <td>#${index + 1}</td>
-                                    <td>Player (${shortId})</td>
+                                    <td><strong>${user.displayUsername}</strong></td>
                                     <td style="color: #10b981; font-weight: bold;">${user.correct}</td>
                                     <td>${user.total}</td>
                                     <td><strong>${user.percent.toFixed(1)}%</strong></td>

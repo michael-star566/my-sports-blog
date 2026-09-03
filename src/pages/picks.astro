@@ -13,7 +13,7 @@ const pathPrefix = '/my-sports-blog';
         <BaseHead title={`Picks & Leaderboard - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
         <style>
             main {
-                max-width: 900px;
+                max-width: 800px;
                 margin: 0 auto;
                 padding: 3em 1em;
                 color: white;
@@ -42,44 +42,45 @@ const pathPrefix = '/my-sports-blog';
                 color: #38bdf8;
                 text-decoration: underline;
             }
-            .games-grid {
+            .games-list {
                 display: flex;
                 flex-direction: column;
-                gap: 1.2rem;
+                gap: 1.5rem;
             }
             .matchup-card {
                 background: #18181b;
                 border: 1px solid #27272a;
-                border-radius: 6px;
-                padding: 1.2rem;
+                border-radius: 8px;
+                padding: 1.25rem;
             }
             .game-info {
                 font-size: 0.8rem;
                 color: #38bdf8;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.75rem;
                 display: block;
                 font-weight: bold;
+                text-align: center;
             }
-            .teams {
+            .teams-row {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                gap: 1rem;
+                gap: 0.75rem;
             }
             .team-btn {
                 flex: 1;
                 background: #27272a;
                 border: 1px solid #3f3f46;
                 border-radius: 6px;
-                padding: 0.85rem;
+                padding: 0.9rem 0.5rem;
                 color: white;
                 cursor: pointer;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 0.2rem;
+                gap: 0.3rem;
                 transition: all 0.2s;
             }
             .team-btn:hover {
@@ -87,7 +88,8 @@ const pathPrefix = '/my-sports-blog';
             }
             .team-name {
                 font-weight: bold;
-                font-size: 0.95rem;
+                font-size: 0.9rem;
+                text-align: center;
             }
             .spread {
                 font-size: 0.8rem;
@@ -97,14 +99,14 @@ const pathPrefix = '/my-sports-blog';
                 font-weight: bold;
                 color: #52525b;
                 font-size: 0.85rem;
+                padding: 0 0.25rem;
             }
             .pick-feedback {
-                margin-top: 0.6rem;
-                font-size: 0.8rem;
-                text-align: right;
+                margin-top: 0.75rem;
+                font-size: 0.85rem;
+                text-align: center;
                 color: #10b981;
                 font-weight: bold;
-                min-height: 1.2rem;
             }
             table {
                 width: 100%;
@@ -143,13 +145,13 @@ const pathPrefix = '/my-sports-blog';
             <!-- Pick'em Minigame Section -->
             <div class="section-box">
                 <h2>Week 1 Matchup Predictions</h2>
-                <p class="widget-subtitle">Click a team to lock in your pick for each game.</p>
+                <p class="widget-subtitle">Click a team card to lock in your pick for each matchup.</p>
 
                 <div id="auth-warning" class="warning-box">
-                    Please <a href={`${pathPrefix}/login/`}>log in</a> to submit and lock in your weekly picks!
+                    Please <a href={`${pathPrefix}/login/`}>log in</a> to submit and save your weekly picks!
                 </div>
 
-                <div id="games-container" class="games-grid hidden">
+                <div id="games-container" class="games-list hidden">
                     <!-- Populated dynamically via script -->
                 </div>
             </div>
@@ -157,7 +159,7 @@ const pathPrefix = '/my-sports-blog';
             <!-- Leaderboard Section -->
             <div class="section-box">
                 <h2>Community Leaderboard</h2>
-                <p class="widget-subtitle">Global standings ranked by total correct selections made.</p>
+                <p class="widget-subtitle">Global standings ranked by total selections made.</p>
 
                 <div id="loading-view" class="loading">Loading standings...</div>
                 <table id="leaderboard-table" class="hidden">
@@ -180,22 +182,22 @@ const pathPrefix = '/my-sports-blog';
             import { supabase } from '../utils/supabase';
 
             const week1Games = [
-                { id: 'nfl_w1_01', time: 'Wed, Sep 9 • 8:20 PM ET', away: 'New England Patriots', home: 'Seattle Seahawks', awaySpread: '+3.5', homeSpread: '-3.5' },
-                { id: 'nfl_w1_02', time: 'Thu, Sep 10 • 8:35 PM ET', away: 'San Francisco 49ers', home: 'Los Angeles Rams', awaySpread: '-2.5', homeSpread: '+2.5' },
-                { id: 'nfl_w1_03', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Chicago Bears', home: 'Carolina Panthers', awaySpread: '-3.0', homeSpread: '+3.0' },
-                { id: 'nfl_w1_04', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Tampa Bay Buccaneers', home: 'Cincinnati Bengals', awaySpread: '+4.5', homeSpread: '-4.5' },
-                { id: 'nfl_w1_05', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'New Orleans Saints', home: 'Detroit Lions', awaySpread: '+6.5', homeSpread: '-6.5' },
-                { id: 'nfl_w1_06', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Buffalo Bills', home: 'Houston Texans', awaySpread: '-2.0', homeSpread: '+2.0' },
-                { id: 'nfl_w1_07', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Baltimore Ravens', home: 'Indianapolis Colts', awaySpread: '-3.5', homeSpread: '+3.5' },
-                { id: 'nfl_w1_08', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Cleveland Browns', home: 'Jacksonville Jaguars', awaySpread: '+1.5', homeSpread: '-1.5' },
-                { id: 'nfl_w1_09', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Atlanta Falcons', home: 'Pittsburgh Steelers', awaySpread: '+3.0', homeSpread: '-3.0' },
-                { id: 'nfl_w1_10', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'New York Jets', home: 'Tennessee Titans', awaySpread: '-2.5', homeSpread: '+2.5' },
-                { id: 'nfl_w1_11', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Arizona Cardinals', home: 'Los Angeles Chargers', awaySpread: '+3.5', homeSpread: '-3.5' },
-                { id: 'nfl_w1_12', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Miami Dolphins', home: 'Las Vegas Raiders', awaySpread: '-1.0', homeSpread: '+1.0' },
-                { id: 'nfl_w1_13', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Green Bay Packers', home: 'Minnesota Vikings', awaySpread: '-2.5', homeSpread: '+2.5' },
-                { id: 'nfl_w1_14', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Washington Commanders', home: 'Philadelphia Eagles', awaySpread: '+6.0', homeSpread: '-6.0' },
-                { id: 'nfl_w1_15', time: 'Sun, Sep 13 • 8:20 PM ET', away: 'Dallas Cowboys', home: 'New York Giants', awaySpread: '-4.0', homeSpread: '+4.0' },
-                { id: 'nfl_w1_16', time: 'Mon, Sep 14 • 8:15 PM ET', away: 'Denver Broncos', home: 'Kansas City Chiefs', awaySpread: '+7.5', homeSpread: '-7.5' }
+                { id: 'w1_01', time: 'Wed, Sep 9 • 8:20 PM ET', away: 'New England Patriots', awaySpread: '+3.5', home: 'Seattle Seahawks', homeSpread: '-3.5' },
+                { id: 'w1_02', time: 'Thu, Sep 10 • 8:35 PM ET', away: 'San Francisco 49ers', awaySpread: '+2.5', home: 'Los Angeles Rams', homeSpread: '-2.5' },
+                { id: 'w1_03', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Chicago Bears', awaySpread: '-2.5', home: 'Carolina Panthers', homeSpread: '+2.5' },
+                { id: 'w1_04', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Tampa Bay Buccaneers', awaySpread: '+3.5', home: 'Cincinnati Bengals', homeSpread: '-3.5' },
+                { id: 'w1_05', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'New Orleans Saints', awaySpread: '+7.0', home: 'Detroit Lions', homeSpread: '-7.0' },
+                { id: 'w1_06', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Buffalo Bills', awaySpread: '-1.5', home: 'Houston Texans', homeSpread: '+1.5' },
+                { id: 'w1_07', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Baltimore Ravens', awaySpread: '-3.5', home: 'Indianapolis Colts', homeSpread: '+3.5' },
+                { id: 'w1_08', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Cleveland Browns', awaySpread: '+7.0', home: 'Jacksonville Jaguars', homeSpread: '-7.0' },
+                { id: 'w1_09', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'Atlanta Falcons', awaySpread: '+3.0', home: 'Pittsburgh Steelers', homeSpread: '-3.0' },
+                { id: 'w1_10', time: 'Sun, Sep 13 • 1:00 PM ET', away: 'New York Jets', awaySpread: '+3.0', home: 'Tennessee Titans', homeSpread: '-3.0' },
+                { id: 'w1_11', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Arizona Cardinals', awaySpread: '+11.5', home: 'Los Angeles Chargers', homeSpread: '-11.5' },
+                { id: 'w1_12', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Miami Dolphins', awaySpread: '+3.0', home: 'Las Vegas Raiders', homeSpread: '-3.0' },
+                { id: 'w1_13', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Green Bay Packers', awaySpread: '-1.5', home: 'Minnesota Vikings', homeSpread: '+1.5' },
+                { id: 'w1_14', time: 'Sun, Sep 13 • 4:25 PM ET', away: 'Washington Commanders', awaySpread: '+5.5', home: 'Philadelphia Eagles', homeSpread: '-5.5' },
+                { id: 'w1_15', time: 'Sun, Sep 13 • 8:20 PM ET', away: 'Dallas Cowboys', awaySpread: '-2.5', home: 'New York Giants', homeSpread: '+2.5' },
+                { id: 'w1_16', time: 'Mon, Sep 14 • 8:15 PM ET', away: 'Denver Broncos', awaySpread: '+2.5', home: 'Kansas City Chiefs', homeSpread: '-2.5' }
             ];
 
             const authWarning = document.getElementById('auth-warning');
@@ -245,13 +247,13 @@ const pathPrefix = '/my-sports-blog';
 
                     card.innerHTML = `
                         <span class="game-info">${game.time}</span>
-                        <div class="teams">
-                            <button type="button" class="team-btn away-btn" data-game="${game.id}" data-team="${game.away}" style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background: ${isAwaySelected ? '#064e3b' : '#27272a'};">
+                        <div class="teams-row">
+                            <button type="button" class="team-btn" data-game="${game.id}" data-team="${game.away}" style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background: ${isAwaySelected ? '#064e3b' : '#27272a'};">
                                 <span class="team-name">${game.away}</span>
                                 <span class="spread">${game.awaySpread}</span>
                             </button>
                             <span class="vs">@</span>
-                            <button type="button" class="team-btn home-btn" data-game="${game.id}" data-team="${game.home}" style="border-color: ${isHomeSelected ? '#10b981' : '#3f3f46'}; background: ${isHomeSelected ? '#064e3b' : '#27272a'};">
+                            <button type="button" class="team-btn" data-game="${game.id}" data-team="${game.home}" style="border-color: ${isHomeSelected ? '#10b981' : '#3f3f46'}; background: ${isHomeSelected ? '#064e3b' : '#27272a'};">
                                 <span class="team-name">${game.home}</span>
                                 <span class="spread">${game.homeSpread}</span>
                             </button>
@@ -263,7 +265,6 @@ const pathPrefix = '/my-sports-blog';
                     gamesContainer.appendChild(card);
                 });
 
-                // Attach click listeners to all team buttons
                 document.querySelectorAll('.team-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         if (!currentUser) return;
@@ -273,7 +274,6 @@ const pathPrefix = '/my-sports-blog';
 
                         userPicks[gameId] = selectedTeam;
                         
-                        // Update visual states immediately
                         const cardElement = target.closest('.matchup-card')!;
                         cardElement.querySelectorAll('.team-btn').forEach((b) => {
                             (b as HTMLElement).style.borderColor = '#3f3f46';

@@ -13,7 +13,7 @@ const pathPrefix = '/my-sports-blog';
         <BaseHead title={`Picks & Leaderboard - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
         <style>
             main {
-                max-width: 800px;
+                max-width: 850px;
                 margin: 0 auto;
                 padding: 3em 1em;
                 color: white;
@@ -28,7 +28,7 @@ const pathPrefix = '/my-sports-blog';
             }
             .widget-subtitle {
                 color: #a1a1aa;
-                font-size: 0.9rem;
+                font-size: 0.95rem;
                 margin-bottom: 1.5rem;
             }
             .warning-box {
@@ -54,7 +54,7 @@ const pathPrefix = '/my-sports-blog';
                 padding: 1.25rem;
             }
             .game-info {
-                font-size: 0.8rem;
+                font-size: 0.85rem;
                 color: #38bdf8;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
@@ -67,20 +67,19 @@ const pathPrefix = '/my-sports-blog';
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                gap: 0.75rem;
+                gap: 1rem;
             }
             .team-btn {
                 flex: 1;
                 background: #27272a;
-                border: 1px solid #3f3f46;
+                border: 2px solid #3f3f46;
                 border-radius: 6px;
-                padding: 0.9rem 0.5rem;
-                color: white;
+                padding: 1rem 0.75rem;
                 cursor: pointer;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 0.3rem;
+                gap: 0.4rem;
                 transition: all 0.2s;
             }
             .team-btn:hover {
@@ -88,25 +87,28 @@ const pathPrefix = '/my-sports-blog';
             }
             .team-name {
                 font-weight: bold;
-                font-size: 0.9rem;
+                font-size: 1.05rem;
+                color: #ffffff;
                 text-align: center;
             }
             .spread {
-                font-size: 0.8rem;
-                color: #a1a1aa;
+                font-size: 0.95rem;
+                color: #ffffff;
+                font-weight: 600;
             }
             .vs {
                 font-weight: bold;
-                color: #52525b;
-                font-size: 0.85rem;
-                padding: 0 0.25rem;
+                color: #a1a1aa;
+                font-size: 0.95rem;
+                padding: 0 0.5rem;
             }
             .pick-feedback {
                 margin-top: 0.75rem;
-                font-size: 0.85rem;
+                font-size: 0.9rem;
                 text-align: center;
                 color: #10b981;
                 font-weight: bold;
+                min-height: 1.2rem;
             }
             table {
                 width: 100%;
@@ -145,7 +147,7 @@ const pathPrefix = '/my-sports-blog';
             <!-- Pick'em Minigame Section -->
             <div class="section-box">
                 <h2>Week 1 Matchup Predictions</h2>
-                <p class="widget-subtitle">Click a team card to lock in your pick for each matchup.</p>
+                <p class="widget-subtitle">Click a team box to lock in your pick for each matchup.</p>
 
                 <div id="auth-warning" class="warning-box">
                     Please <a href={`${pathPrefix}/login/`}>log in</a> to submit and save your weekly picks!
@@ -222,10 +224,14 @@ const pathPrefix = '/my-sports-blog';
 
             async function loadUserPicks() {
                 if (!currentUser) return;
-                const { data } = await supabase
+                const { data, error } = await supabase
                     .from('user_picks')
                     .select('game_id, selected_team')
                     .eq('user_id', currentUser.id);
+
+                if (error) {
+                    console.error('Error loading user picks:', error.message);
+                }
 
                 if (data) {
                     data.forEach((row: any) => {
@@ -248,12 +254,12 @@ const pathPrefix = '/my-sports-blog';
                     card.innerHTML = `
                         <span class="game-info">${game.time}</span>
                         <div class="teams-row">
-                            <button type="button" class="team-btn" data-game="${game.id}" data-team="${game.away}" style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background: ${isAwaySelected ? '#064e3b' : '#27272a'};">
+                            <button type="button" class="team-btn away-btn" data-game="${game.id}" data-team="${game.away}" style="border-color: ${isAwaySelected ? '#10b981' : '#3f3f46'}; background: ${isAwaySelected ? '#064e3b' : '#27272a'};">
                                 <span class="team-name">${game.away}</span>
                                 <span class="spread">${game.awaySpread}</span>
                             </button>
                             <span class="vs">@</span>
-                            <button type="button" class="team-btn" data-game="${game.id}" data-team="${game.home}" style="border-color: ${isHomeSelected ? '#10b981' : '#3f3f46'}; background: ${isHomeSelected ? '#064e3b' : '#27272a'};">
+                            <button type="button" class="team-btn home-btn" data-game="${game.id}" data-team="${game.home}">
                                 <span class="team-name">${game.home}</span>
                                 <span class="spread">${game.homeSpread}</span>
                             </button>
@@ -262,6 +268,13 @@ const pathPrefix = '/my-sports-blog';
                             ${userPicks[game.id] ? `Locked Pick: ${userPicks[game.id]}` : ''}
                         </div>
                     `;
+
+                    const homeBtn = card.querySelector('.home-btn') as HTMLElement;
+                    if (homeBtn) {
+                        homeBtn.style.borderColor = isHomeSelected ? '#10b981' : '#3f3f46';
+                        homeBtn.style.background = isHomeSelected ? '#064e3b' : '#27272a';
+                    }
+
                     gamesContainer.appendChild(card);
                 });
 
@@ -296,7 +309,7 @@ const pathPrefix = '/my-sports-blog';
 
                         if (error) {
                             console.error('Error saving pick:', error);
-                            if (feedbackEl) feedbackEl.textContent = 'Failed to save pick.';
+                            if (feedbackEl) feedbackEl.textContent = `Failed to save pick: ${error.message}`;
                         } else {
                             if (feedbackEl) feedbackEl.textContent = `Locked Pick: ${selectedTeam}`;
                             fetchLeaderboard();

@@ -2,22 +2,21 @@
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
 
-const base = import.meta.env.BASE_URL;
-const normalizedBase = base.endsWith('/') ? base : base + '/';
-const loginPath = `${normalizedBase}login/`;
+// Explicitly use your absolute repository subpath to prevent relative stacking errors
+const pathPrefix = '/my-sports-blog';
 ---
 
 <header>
 	<nav>
-		<h2><a href={normalizedBase}>{SITE_TITLE}</a></h2>
+		<h2><a href={`${pathPrefix}/`}>{SITE_TITLE}</a></h2>
 		<div class="internal-links">
-			<HeaderLink href={normalizedBase}>Home</HeaderLink>
-			<HeaderLink href={`${normalizedBase}blog/`}>Blog</HeaderLink>
-			<HeaderLink href={`${normalizedBase}discussion/`}>Discussion</HeaderLink>
-			<HeaderLink href={`${normalizedBase}about/`}>About</HeaderLink>
+			<HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
+			<HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
+			<HeaderLink href={`${pathPrefix}/discussion/`}>Discussion</HeaderLink>
+			<HeaderLink href={`${pathPrefix}/about/`}>About</HeaderLink>
 		</div>
 		<div class="auth-link-container">
-			<a href={loginPath} id="nav-auth-link" class="auth-btn">Log In</a>
+			<a href={`${pathPrefix}/login/`} id="nav-auth-link" class="auth-btn">Log In</a>
 		</div>
 	</nav>
 </header>
@@ -30,9 +29,8 @@ const loginPath = `${normalizedBase}login/`;
 		if (!navAuthLink) return;
 
 		const { data: { session } } = await supabase.auth.getSession();
-		const base = import.meta.env.BASE_URL;
-		const normalizedBase = base.endsWith('/') ? base : base + '/';
-		const loginPath = `${normalizedBase}login/`;
+		const pathPrefix = '/my-sports-blog';
+		const loginPath = `${pathPrefix}/login/`;
 
 		if (session) {
 			navAuthLink.textContent = 'Account';

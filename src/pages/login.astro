@@ -167,18 +167,10 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 showMessage('Creating account...');
                 
                 try {
-                    // Add a 10-second timeout wrapper so it never hangs infinitely
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Request timed out. Check your network or Supabase settings.')), 10000)
-                    );
-
-                    const authPromise = supabase.auth.signUp({
+                    const { error } = await supabase.auth.signUp({
                         email: emailInput.value.trim(),
                         password: passwordInput.value,
                     });
-
-                    const res: any = await Promise.race([authPromise, timeoutPromise]);
-                    const error = res?.error;
                     
                     if (error) {
                         console.error('Signup error:', error);
@@ -202,18 +194,10 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 showMessage('Logging in...');
                 
                 try {
-                    // Add a 10-second timeout wrapper so it never hangs infinitely
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Request timed out. Check your network or Supabase settings.')), 10000)
-                    );
-
-                    const authPromise = supabase.auth.signInWithPassword({
+                    const { error } = await supabase.auth.signInWithPassword({
                         email: emailInput.value.trim(),
                         password: passwordInput.value,
                     });
-
-                    const res: any = await Promise.race([authPromise, timeoutPromise]);
-                    const error = res?.error;
                     
                     if (error) {
                         console.error('Login error:', error);

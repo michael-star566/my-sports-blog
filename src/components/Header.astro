@@ -2,16 +2,17 @@
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
 const base = import.meta.env.BASE_URL;
-const loginPath = `${base.endsWith('/') ? base : base + '/'}login/`;
+const cleanBase = base.endsWith('/') ? base : base + '/';
+const loginPath = `${cleanBase}login/`;
 ---
 
 <header>
 	<nav>
-		<h2><a href={`${base}`}>{SITE_TITLE}</a></h2>
+		<h2><a href={cleanBase}>{SITE_TITLE}</a></h2>
 		<div class="internal-links">
-			<HeaderLink href={`${base}`}>Home</HeaderLink>
-			<HeaderLink href={`${base}blog`}>Blog</HeaderLink>
-			<HeaderLink href={`${base}about`}>About</HeaderLink>
+			<HeaderLink href={cleanBase}>Home</HeaderLink>
+			<HeaderLink href={`${cleanBase}blog`}>Blog</HeaderLink>
+			<HeaderLink href={`${cleanBase}about`}>About</HeaderLink>
 		</div>
 		<div class="auth-link-container">
 			<a href={loginPath} id="nav-auth-link">Log In</a>
@@ -28,7 +29,8 @@ const loginPath = `${base.endsWith('/') ? base : base + '/'}login/`;
 
 		const { data: { session } } = await supabase.auth.getSession();
 		const base = import.meta.env.BASE_URL;
-		const loginPath = `${base.endsWith('/') ? base : base + '/'}login/`;
+		const cleanBase = base.endsWith('/') ? base : base + '/';
+		const loginPath = `${cleanBase}login/`;
 
 		if (session) {
 			navAuthLink.textContent = 'Account';

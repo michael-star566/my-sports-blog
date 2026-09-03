@@ -12,8 +12,16 @@ const pathPrefix = '/my-sports-blog';
             <HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
             <HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
             <HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
-            <HeaderLink href={`${pathPrefix}/picks/`}>User Picks+Leaderboard</HeaderLink>
-            <HeaderLink href={`${pathPrefix}/leaderboard/`}>Season Leaderboard</HeaderLink>
+            
+            <!-- Pick'em Dropdown Menu -->
+            <div class="dropdown">
+                <button class="dropbtn">Pick'em ▾</button>
+                <div class="dropdown-content">
+                    <a href={`${pathPrefix}/picks/`}>Weekly Picks</a>
+                    <a href={`${pathPrefix}/leaderboard/`}>Season Standings</a>
+                </div>
+            </div>
+
             <HeaderLink href={`${pathPrefix}/about/`}>About</HeaderLink>
         </div>
         <div class="auth-link-container">
@@ -74,23 +82,62 @@ const pathPrefix = '/my-sports-blog';
         align-items: center;
         justify-content: space-between;
     }
-    nav a {
+    nav a, .dropbtn {
         padding: 1em 0.5em;
         color: #e4e4e7;
         border-bottom: 2px solid transparent;
         text-decoration: none;
+        background: none;
+        border: none;
+        font-family: inherit;
+        font-size: 1rem;
+        cursor: pointer;
     }
     nav a:hover,
-    nav a.active {
+    nav a.active,
+    .dropdown:hover .dropbtn {
         color: white;
         border-bottom-color: #ffffff;
     }
     .internal-links {
         display: flex;
         gap: 0.5em;
+        align-items: center;
     }
     .auth-link-container {
         display: flex;
         align-items: center;
+    }
+
+    /* Dropdown Styles */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #18181b;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px rgba(0,0,0,0.4);
+        border: 1px solid #27272a;
+        border-radius: 6px;
+        z-index: 1000;
+        top: 100%;
+        left: 0;
+    }
+    .dropdown-content a {
+        color: #e4e4e7;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        border-bottom: none !important;
+    }
+    .dropdown-content a:hover {
+        background-color: #27272a;
+        color: white;
+    }
+    .dropdown:hover .dropdown-content {
+        display: block;
     }
 </style>

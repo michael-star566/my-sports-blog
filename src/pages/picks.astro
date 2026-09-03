@@ -127,17 +127,6 @@ const pathPrefix = '/my-sports-blog';
                 padding: 0.75rem 1rem;
                 border-bottom: 1px solid #27272a;
             }
-            /* Align Rank and Username to the left */
-            th:nth-child(1), td:nth-child(1),
-            th:nth-child(2), td:nth-child(2) {
-                text-align: left;
-            }
-            /* Center align the Stats columns */
-            th:nth-child(3), td:nth-child(3),
-            th:nth-child(4), td:nth-child(4),
-            th:nth-child(5), td:nth-child(5) {
-                text-align: center;
-            }
             th {
                 color: #a1a1aa;
                 font-size: 0.85rem;
@@ -185,11 +174,11 @@ const pathPrefix = '/my-sports-blog';
                 <table id="leaderboard-table" class="hidden">
                     <thead>
                         <tr>
-                            <th>Rank</th>
-                            <th>Username</th>
-                            <th>Correct Picks</th>
-                            <th>Total Picks</th>
-                            <th>% Correct</th>
+                            <th style="text-align: left;">Rank</th>
+                            <th style="text-align: left;">Username</th>
+                            <th style="text-align: center;">Correct Picks</th>
+                            <th style="text-align: center;">Total Picks</th>
+                            <th style="text-align: center;">% Correct</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body">
@@ -444,7 +433,7 @@ const pathPrefix = '/my-sports-blog';
                         return b.total - a.total;
                     });
 
-                    // 6. Render
+                    // 6. Render with inline text alignment
                     if (tbody) {
                         tbody.innerHTML = '';
                         if (sortedUsers.length === 0) {
@@ -453,11 +442,11 @@ const pathPrefix = '/my-sports-blog';
                             sortedUsers.forEach((user, index) => {
                                 const tr = document.createElement('tr');
                                 tr.innerHTML = `
-                                    <td>#${index + 1}</td>
-                                    <td><strong>${user.displayUsername}</strong></td>
-                                    <td style="color: #10b981; font-weight: bold;">${user.correct}</td>
-                                    <td>${user.total}</td>
-                                    <td><strong>${user.percent.toFixed(1)}%</strong></td>
+                                    <td style="text-align: left;">#${index + 1}</td>
+                                    <td style="text-align: left;"><strong>${user.displayUsername}</strong></td>
+                                    <td style="text-align: center; color: #10b981; font-weight: bold;">${user.correct}</td>
+                                    <td style="text-align: center;">${user.total}</td>
+                                    <td style="text-align: center;"><strong>${user.percent.toFixed(1)}%</strong></td>
                                 `;
                                 tbody.appendChild(tr);
                             });

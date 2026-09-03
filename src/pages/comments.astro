@@ -2,64 +2,268 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { SITE_TITLE } from '../consts';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+const pathPrefix = '/my-sports-blog';
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={`Comments | ${SITE_TITLE}`} description="Join the discussion and share your thoughts on our data-driven NFL analytics." />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>Community Discussion</h1>
-			<p>
-				Welcome to the community! Feel free to ask questions, debate projections, drop a compliment, or share your thoughts on the latest NFL chaos below.
-			</p>
-			
-			<div class="giscus-wrapper">
-				<script src="https://giscus.app/client.js"
-					data-repo="michael-star566/my-sports-blog"
-					data-repo-id="R_kgDOUIHP9w"
-					data-category="General"
-					data-category-id="DIC_kwDOUIHP984DEuJP"
-					data-mapping="pathname"
-					data-strict="0"
-					data-reactions-enabled="1"
-					data-emit-metadata="0"
-					data-input-position="bottom"
-					data-theme="dark"
-					data-lang="en"
-					crossorigin="anonymous"
-					async>
-				</script>
-			</div>
-		</main>
-		<Footer />
-	</body>
-</html>
+    <head>
+        <BaseHead title={`Community Discussion - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+        <style>
+            main {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 3em 1em;
+                color: white;
+            }
+            .section-box {
+                background: #111111;
+                border: 1px solid #222222;
+                border-radius: 8px;
+                padding: 2rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+                margin-bottom: 2rem;
+            }
+            .warning-box {
+                background: #27272a;
+                padding: 1rem;
+                border-radius: 4px;
+                text-align: center;
+                color: #e4e4e7;
+                margin-bottom: 2rem;
+            }
+            .warning-box a {
+                color: #38bdf8;
+                text-decoration: underline;
+            }
+            .comment-form {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                margin-bottom: 2.5rem;
+            }
+            textarea {
+                width: 100%;
+                min-height: 100px;
+                padding: 0.75rem;
+                background: #27272a;
+                border: 1px solid #3f3f46;
+                color: white;
+                border-radius: 6px;
+                font-family: inherit;
+                resize: vertical;
+                box-sizing: border-box;
+            }
+            textarea:focus {
+                outline: 2px solid #38bdf8;
+                border-color: transparent;
+            }
+            .submit-btn {
+                align-self: flex-end;
+                padding: 0.75rem 1.5rem;
+                background: #ffffff;
+                color: #000000;
+                font-weight: bold;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: opacity 0.2s;
+            }
+            .submit-btn:hover {
+                opacity: 0.8;
+            }
+            .comments-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1.2rem;
+            }
+            .comment-card {
+                background: #18181b;
+                border: 1px solid #27272a;
+                border-radius: 6px;
+                padding: 1.25rem;
+            }
+            .comment-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
+            }
+            .comment-author {
+                font-weight: bold;
+                color: #38bdf8;
+            }
+            .comment-date {
+                font-size: 0.8rem;
+                color: #a1a1aa;
+            }
+            .comment-body {
+                color: #e4e4e7;
+                line-height: 1.5;
+                word-break: break-word;
+            }
+            .loading {
+                text-align: center;
+                color: #a1a1aa;
+                padding: 2rem;
+            }
+            .hidden {
+                display: none !important;
+            }
+        </style>
+    </head>
+    <body>
+        <Header />
+        <main>
+            <h1 style="text-align: center; margin-bottom: 0.5rem;">Community Discussion</h1>
+            <p style="text-align: center; color: #a1a1aa; margin-bottom: 2rem;">Talk picks, breakdown strategy, and chat with other members.</p>
 
-<style>
-	main {
-		width: 960px;
-		max-width: calc(100% - 2em);
-		margin: auto;
-		padding: 3em 1em;
-	}
-	h1 {
-		margin-bottom: 0.25em;
-		color: #ffffff;
-	}
-	p {
-		color: #a1a1aa;
-		margin-bottom: 2em;
-		font-size: 1.1em;
-		line-height: 1.6;
-	}
-	.giscus-wrapper {
-		margin-top: 3em;
-		padding-top: 2em;
-		border-top: 1px solid #222222;
-	}
-</style>
+            <div class="section-box">
+                <!-- Logged Out Warning -->
+                <div id="auth-warning" class="warning-box hidden">
+                    Please <a href={`${pathPrefix}/login/`}>log in</a> to post comments using your site username!
+                </div>
+
+                <!-- Comment Input Form -->
+                <form id="comment-form" class="comment-form hidden">
+                    <label for="comment-input" style="font-weight: bold; color: #e4e4e7;">Leave a comment:</label>
+                    <textarea id="comment-input" placeholder="What do you think about this week's slate?" required></textarea>
+                    <button type="submit" class="submit-btn" id="submit-btn">Post Comment</button>
+                </form>
+
+                <!-- Comments Feed -->
+                <div id="loading-comments" class="loading">Loading community comments...</div>
+                <div id="comments-container" class="comments-list hidden">
+                    <!-- Populated dynamically via script -->
+                </div>
+            </div>
+        </main>
+        <Footer />
+
+        <script>
+            import { supabase } from '../utils/supabase';
+
+            const authWarning = document.getElementById('auth-warning');
+            const commentForm = document.getElementById('comment-form') as HTMLFormElement;
+            const commentInput = document.getElementById('comment-input') as HTMLTextAreaElement;
+            const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+            const loadingEl = document.getElementById('loading-comments');
+            const commentsContainer = document.getElementById('comments-container');
+
+            let currentUser: any = null;
+
+            async function init() {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session && session.user) {
+                    currentUser = session.user;
+                    authWarning?.classList.add('hidden');
+                    commentForm?.classList.remove('hidden');
+                } else {
+                    authWarning?.classList.remove('hidden');
+                    commentForm?.classList.add('hidden');
+                }
+
+                await fetchComments();
+
+                commentForm?.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!currentUser) return;
+                    
+                    const content = commentInput.value.trim();
+                    if (!content) return;
+
+                    submitBtn.textContent = 'Posting...';
+                    submitBtn.disabled = true;
+
+                    const { error } = await supabase
+                        .from('site_comments')
+                        .insert({
+                            user_id: currentUser.id,
+                            content: content
+                        });
+
+                    if (error) {
+                        console.error('Error posting comment:', error);
+                        alert(`Failed to post comment: ${error.message}`);
+                    } else {
+                        commentInput.value = '';
+                        await fetchComments();
+                    }
+
+                    submitBtn.textContent = 'Post Comment';
+                    submitBtn.disabled = false;
+                });
+            }
+
+            async function fetchComments() {
+                try {
+                    // 1. Fetch comments
+                    const { data: commentsData, error: commentsError } = await supabase
+                        .from('site_comments')
+                        .select('id, user_id, content, created_at')
+                        .order('created_at', { ascending: false });
+
+                    if (commentsError) throw commentsError;
+
+                    // 2. Fetch profiles for username matching
+                    const { data: profilesData, error: profilesError } = await supabase
+                        .from('profiles')
+                        .select('id, username');
+
+                    if (profilesError) throw profilesError;
+
+                    const usernameMap: { [key: string]: string } = {};
+                    profilesData?.forEach((p: any) => {
+                        usernameMap[p.id] = p.username || 'Anonymous Player';
+                    });
+
+                    if (commentsContainer) {
+                        commentsContainer.innerHTML = '';
+                        if (!commentsData || commentsData.length === 0) {
+                            commentsContainer.innerHTML = '<div style="text-align: center; color: #a1a1aa; padding: 1rem;">No comments yet. Be the first to start the conversation!</div>';
+                        } else {
+                            commentsData.forEach((comment: any) => {
+                                const username = usernameMap[comment.user_id] || 'SportsFan';
+                                const dateObj = new Date(comment.created_at);
+                                const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+                                const card = document.createElement('div');
+                                card.className = 'comment-card';
+                                card.innerHTML = `
+                                    <div class="comment-header">
+                                        <span class="comment-author">${username}</span>
+                                        <span class="comment-date">${formattedDate}</span>
+                                    </div>
+                                    <div class="comment-body">${escapeHtml(comment.content)}</div>
+                                `;
+                                commentsContainer.appendChild(card);
+                            });
+                        }
+                    }
+
+                    loadingEl?.classList.add('hidden');
+                    commentsContainer?.classList.remove('hidden');
+                } catch (err) {
+                    console.error('Error loading comments:', err);
+                    if (loadingEl) loadingEl.textContent = 'Failed to load comments.';
+                }
+            }
+
+            // Simple HTML escape helper to prevent script injection
+            function escapeHtml(text: string) {
+                const map: { [key: string]: string } = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            }
+
+            init();
+        </script>
+    </body>
+</html>

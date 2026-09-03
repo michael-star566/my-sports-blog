@@ -1,0 +1,257 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+const pathPrefix = '/my-sports-blog';
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <BaseHead title={`Season Leaderboard - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+        <style>
+            main {
+                max-width: 850px;
+                margin: 0 auto;
+                padding: 3em 1em;
+                color: white;
+            }
+            .section-box {
+                background: #111111;
+                border: 1px solid #222222;
+                border-radius: 8px;
+                padding: 2rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+                margin-bottom: 2.5rem;
+            }
+            .widget-subtitle {
+                color: #a1a1aa;
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 1rem;
+            }
+            th, td {
+                padding: 0.75rem 1rem;
+                border-bottom: 1px solid #27272a;
+            }
+            th {
+                color: #a1a1aa;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+            }
+            tr:hover {
+                background: #18181b;
+            }
+            .loading {
+                text-align: center;
+                color: #a1a1aa;
+                padding: 2rem;
+                font-size: 1.1rem;
+            }
+            .hidden {
+                display: none !important;
+            }
+        </style>
+    </head>
+    <body>
+        <Header />
+        <main>
+            <h1 style="text-align: center; margin-bottom: 0.5rem;">2026 Season-Long Standings</h1>
+            <p style="text-align: center; color: #a1a1aa; margin-bottom: 2rem;">Cumulative Win % Against the Spread (ATS) across all 18 NFL weeks.</p>
+
+            <div class="section-box">
+                <h2>Global Season Leaderboard</h2>
+                <p class="widget-subtitle">Ranked by total correct picks and overall season win percentage.</p>
+
+                <div id="loading-view" class="loading">Aggregating season-long results across all weeks...</div>
+                <table id="leaderboard-table" class="hidden">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">Rank</th>
+                            <th style="text-align: left;">Username</th>
+                            <th style="text-align: center;">Correct Picks</th>
+                            <th style="text-align: center;">Total Graded</th>
+                            <th style="text-align: center;">Season %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Populated via script -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <Footer />
+
+        <script>
+            import { supabase } from '../utils/supabase';
+
+            async function fetchYearlyLeaderboard() {
+                const loadingView = document.getElementById('loading-view');
+                const tableEl = document.getElementById('leaderboard-table');
+                const tbody = document.getElementById('leaderboard-body');
+
+                try {
+                    // 1. Fetch all user picks across all weeks from Supabase
+                    const { data: picksData, error: picksError } = await supabase
+                        .from('user_picks')
+                        .select('user_id, game_id, selected_team');
+                    if (picksError) throw picksError;
+
+                    // 2. Fetch all usernames mapping
+                    const { data: profilesData, error: profilesError } = await supabase
+                        .from('profiles')
+                        .select('id, username');
+                    if (profilesError) throw profilesError;
+
+                    const usernameMap: { [key: string]: string } = {};
+                    profilesData?.forEach((profile: any) => {
+                        usernameMap[profile.id] = profile.username || 'Anonymous Player';
+                    });
+
+                    // 3. Loop through all 18 weeks and fetch ESPN scores/odds concurrently
+                    const gameMasterMap: { [key: string]: any } = {};
+                    
+                    const weekPromises = [];
+                    for (let w = 1; w <= 18; w++) {
+                        weekPromises.push(
+                            fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=${w}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    data.events?.forEach((event: any) => {
+                                        const comp = event.competitions[0];
+                                        const homeTeamInfo = comp.competitors.find((c: any) => c.homeAway === 'home');
+                                        const awayTeamInfo = comp.competitors.find((c: any) => c.homeAway === 'away');
+                                        
+                                        let homeSpread = 'TBD';
+                                        let awaySpread = 'TBD';
+                                        
+                                        if (comp.odds && comp.odds.length > 0) {
+                                            const details = comp.odds[0].details || '';
+                                            if (details.toUpperCase() === 'EVEN') {
+                                                homeSpread = '+0';
+                                                awaySpread = '+0';
+                                            } else {
+                                                const parts = details.split(' ');
+                                                if (parts.length >= 2) {
+                                                    const favAbbrev = parts[0];
+                                                    const val = parseFloat(parts[1]); 
+                                                    const oppositeVal = val > 0 ? `-${val}` : `+${Math.abs(val)}`;
+                                                    const currentValStr = val > 0 ? `+${val}` : `${val}`;
+                                                    
+                                                    if (homeTeamInfo.team.abbreviation === favAbbrev) {
+                                                        homeSpread = currentValStr;
+                                                        awaySpread = oppositeVal;
+                                                    } else if (awayTeamInfo.team.abbreviation === favAbbrev) {
+                                                        awaySpread = currentValStr;
+                                                        homeSpread = oppositeVal;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        gameMasterMap[event.id] = {
+                                            away: awayTeamInfo.team.displayName,
+                                            awaySpread: awaySpread,
+                                            awayScore: parseInt(awayTeamInfo.score) || 0,
+                                            home: homeTeamInfo.team.displayName,
+                                            homeSpread: homeSpread,
+                                            homeScore: parseInt(homeTeamInfo.score) || 0,
+                                            completed: event.status.type.completed
+                                        };
+                                    });
+                                })
+                                .catch(() => {
+                                    // Ignore ungenerated weeks
+                                })
+                        );
+                    }
+
+                    await Promise.all(weekPromises);
+
+                    // 4. Grade all user picks across the whole season
+                    const userStats: { [key: string]: { total: number, graded: number, correct: number } } = {};
+                    
+                    picksData?.forEach((row: any) => {
+                        const game = gameMasterMap[row.game_id];
+                        if (!game) return;
+
+                        const uid = row.user_id;
+                        if (!userStats[uid]) {
+                            userStats[uid] = { total: 0, graded: 0, correct: 0 };
+                        }
+                        
+                        userStats[uid].total++;
+                        
+                        if (game.completed && game.awaySpread !== 'TBD' && game.homeSpread !== 'TBD') {
+                            const homeScore = game.homeScore;
+                            const awayScore = game.awayScore;
+                            
+                            let pickWon = false;
+                            let push = false;
+
+                            if (row.selected_team === game.away) {
+                                const adjustedAway = awayScore + parseFloat(game.awaySpread);
+                                if (adjustedAway > homeScore) pickWon = true;
+                                else if (adjustedAway === homeScore) push = true;
+                            } else if (row.selected_team === game.home) {
+                                const adjustedHome = homeScore + parseFloat(game.homeSpread);
+                                if (adjustedHome > awayScore) pickWon = true;
+                                else if (adjustedHome === homeScore) push = true;
+                            }
+
+                            if (!push) {
+                                userStats[uid].graded++;
+                                if (pickWon) userStats[uid].correct++;
+                            }
+                        }
+                    });
+
+                    // 5. Sort yearly leaderboard by Win % and Tiebreakers
+                    const sortedUsers = Object.entries(userStats).map(([uid, stats]) => {
+                        const percent = stats.graded > 0 ? (stats.correct / stats.graded) * 100 : 0;
+                        const displayUsername = usernameMap[uid] || `Player (${uid.substring(0, 5)}...)`;
+                        return { uid, displayUsername, ...stats, percent };
+                    }).sort((a, b) => {
+                        if (b.percent !== a.percent) return b.percent - a.percent;
+                        if (b.correct !== a.correct) return b.correct - a.correct;
+                        return b.total - a.total;
+                    });
+
+                    // 6. Render table rows
+                    if (tbody) {
+                        tbody.innerHTML = '';
+                        if (sortedUsers.length === 0) {
+                            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #a1a1aa;">No season picks recorded yet!</td></tr>`;
+                        } else {
+                            sortedUsers.forEach((user, index) => {
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                    <td style="text-align: left;">#${index + 1}</td>
+                                    <td style="text-align: left;"><strong>${user.displayUsername}</strong></td>
+                                    <td style="text-align: center; color: #10b981; font-weight: bold;">${user.correct}</td>
+                                    <td style="text-align: center;">${user.graded}</td>
+                                    <td style="text-align: center;"><strong>${user.percent.toFixed(1)}%</strong></td>
+                                `;
+                                tbody.appendChild(tr);
+                            });
+                        }
+                    }
+
+                    loadingView?.classList.add('hidden');
+                    tableEl?.classList.remove('hidden');
+                } catch (err) {
+                    console.error('Error loading yearly leaderboard:', err);
+                    if (loadingView) loadingView.textContent = 'Failed to load season standings.';
+                }
+            }
+
+            fetchYearlyLeaderboard();
+        </script>
+    </body>
+</html>

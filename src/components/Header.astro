@@ -6,90 +6,91 @@ const pathPrefix = '/my-sports-blog';
 ---
 
 <header>
-	<nav>
-		<h2><a href={`${pathPrefix}/`}>{SITE_TITLE}</a></h2>
-		<div class="internal-links">
-			<HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
-			<HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
-			<HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
-			<HeaderLink href={`${pathPrefix}/picks/`}>User Picks+Leaderboard</HeaderLink>
-			<HeaderLink href={`${pathPrefix}/about/`}>About</HeaderLink>
-		</div>
-		<div class="auth-link-container">
-			<a href={`${pathPrefix}/login/`} id="nav-auth-link" class="auth-btn">Log In</a>
-		</div>
-	</nav>
+    <nav>
+        <h2><a href={`${pathPrefix}/`}>{SITE_TITLE}</a></h2>
+        <div class="internal-links">
+            <HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
+            <HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
+            <HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
+            <HeaderLink href={`${pathPrefix}/picks/`}>User Picks+Leaderboard</HeaderLink>
+            <HeaderLink href={`${pathPrefix}/leaderboard/`}>Season Leaderboard</HeaderLink>
+            <HeaderLink href={`${pathPrefix}/about/`}>About</HeaderLink>
+        </div>
+        <div class="auth-link-container">
+            <a href={`${pathPrefix}/login/`} id="nav-auth-link" class="auth-btn">Log In</a>
+        </div>
+    </nav>
 </header>
 
 <script>
-	import { supabase } from '../utils/supabase';
+    import { supabase } from '../utils/supabase';
 
-	async function updateHeaderAuth() {
-		const navAuthLink = document.getElementById('nav-auth-link') as HTMLAnchorElement;
-		if (!navAuthLink) return;
+    async function updateHeaderAuth() {
+        const navAuthLink = document.getElementById('nav-auth-link') as HTMLAnchorElement;
+        if (!navAuthLink) return;
 
-		const { data: { session } } = await supabase.auth.getSession();
-		const pathPrefix = '/my-sports-blog';
-		const loginPath = `${pathPrefix}/login/`;
+        const { data: { session } } = await supabase.auth.getSession();
+        const pathPrefix = '/my-sports-blog';
+        const loginPath = `${pathPrefix}/login/`;
 
-		if (session) {
-			navAuthLink.textContent = 'Account';
-			navAuthLink.href = loginPath;
-			navAuthLink.style.border = '1px solid #10b981';
-			navAuthLink.style.padding = '0.3em 0.8em';
-			navAuthLink.style.borderRadius = '4px';
-			navAuthLink.style.color = '#10b981';
-		} else {
-			navAuthLink.textContent = 'Log In';
-			navAuthLink.href = loginPath;
-			navAuthLink.style.border = 'none';
-			navAuthLink.style.padding = '1em 0.5em';
-			navAuthLink.style.color = '#e4e4e7';
-		}
-	}
+        if (session) {
+            navAuthLink.textContent = 'Account';
+            navAuthLink.href = loginPath;
+            navAuthLink.style.border = '1px solid #10b981';
+            navAuthLink.style.padding = '0.3em 0.8em';
+            navAuthLink.style.borderRadius = '4px';
+            navAuthLink.style.color = '#10b981';
+        } else {
+            navAuthLink.textContent = 'Log In';
+            navAuthLink.href = loginPath;
+            navAuthLink.style.border = 'none';
+            navAuthLink.style.padding = '1em 0.5em';
+            navAuthLink.style.color = '#e4e4e7';
+        }
+    }
 
-	updateHeaderAuth();
+    updateHeaderAuth();
 </script>
 
 <style>
-	header {
-		margin: 0;
-		padding: 0 1em;
-		background: #111111;
-		border-bottom: 1px solid #222222;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-	}
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
-	h2 a,
-	h2 a.active {
-		text-decoration: none;
-		color: white;
-	}
-	nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	nav a {
-		padding: 1em 0.5em;
-		color: #e4e4e7;
-		border-bottom: 2px solid transparent;
-		text-decoration: none;
-	}
-	nav a:hover,
-	nav a.active {
-		color: white;
-		border-bottom-color: #ffffff;
-	}
-	.internal-links {
-		display: flex;
-		gap: 0.5em;
-	}
-	.auth-link-container {
-		display: flex;
-		align-items: center;
-	}
+    header {
+        margin: 0;
+        padding: 0 1em;
+        background: #111111;
+        border-bottom: 1px solid #222222;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    h2 {
+        margin: 0;
+        font-size: 1em;
+    }
+    h2 a,
+    h2 a.active {
+        text-decoration: none;
+        color: white;
+    }
+    nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    nav a {
+        padding: 1em 0.5em;
+        color: #e4e4e7;
+        border-bottom: 2px solid transparent;
+        text-decoration: none;
+    }
+    nav a:hover,
+    nav a.active {
+        color: white;
+        border-bottom-color: #ffffff;
+    }
+    .internal-links {
+        display: flex;
+        gap: 0.5em;
+    }
+    .auth-link-container {
+        display: flex;
+        align-items: center;
+    }
 </style>

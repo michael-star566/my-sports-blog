@@ -4,8 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
-const base = import.meta.env.BASE_URL;
-const normalizedBase = base.endsWith('/') ? base : base + '/';
+const pathPrefix = '/my-sports-blog';
 ---
 
 <!doctype html>
@@ -120,10 +119,6 @@ const normalizedBase = base.endsWith('/') ? base : base + '/';
         </main>
         <Footer />
 
-        <script define:vars={{ normalizedBase }}>
-            window.SITE_BASE = normalizedBase;
-        </script>
-
         <script>
             import { supabase } from '../utils/supabase';
 
@@ -137,7 +132,7 @@ const normalizedBase = base.endsWith('/') ? base : base + '/';
             const loggedOutView = document.getElementById('logged-out-view');
             const loggedInView = document.getElementById('logged-in-view');
 
-            const siteBase = (window as any).SITE_BASE || '/my-sports-blog/';
+            const homeUrl = '/my-sports-blog/';
 
             async function checkSession() {
                 try {
@@ -180,7 +175,7 @@ const normalizedBase = base.endsWith('/') ? base : base + '/';
                 } else {
                     showMessage('Account created! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = siteBase;
+                        window.location.href = homeUrl;
                     }, 1000);
                 }
             });
@@ -202,7 +197,7 @@ const normalizedBase = base.endsWith('/') ? base : base + '/';
                 } else {
                     showMessage('Success! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = siteBase;
+                        window.location.href = homeUrl;
                     }, 800);
                 }
             });

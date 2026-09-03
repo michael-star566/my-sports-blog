@@ -75,11 +75,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 color: white;
                 margin-top: 0.5rem;
             }
-            #delete-account-btn {
-                background: #ef4444;
-                color: white;
-                margin-top: 1rem;
-            }
             .account-section {
                 margin-top: 1.5rem;
                 padding-top: 1.5rem;
@@ -136,7 +131,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
                     <div class="account-section" style="display: flex; flex-direction: column; gap: 0.5rem;">
                         <button type="button" id="logout-btn">Log Out</button>
-                        <button type="button" id="delete-account-btn">Delete Account</button>
                     </div>
                 </div>
 
@@ -157,7 +151,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             const signupBtn = document.getElementById('signup-btn');
             const logoutBtn = document.getElementById('logout-btn');
             const updateUsernameBtn = document.getElementById('update-username-btn');
-            const deleteAccountBtn = document.getElementById('delete-account-btn');
             
             const messageEl = document.getElementById('auth-message');
             const loggedOutView = document.getElementById('logged-out-view');
@@ -289,13 +282,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 await supabase.auth.signOut();
                 showMessage('');
                 checkSession();
-            });
-
-            deleteAccountBtn?.addEventListener('click', async () => {
-                const confirmed = confirm('Are you sure you want to delete your account? This action cannot be undone.');
-                if (!confirmed) return;
-
-                showMessage('Account deletion requires a Supabase administrative function or Edge Function. Please contact support or clear local session.');
             });
         </script>
     </body>

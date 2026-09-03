@@ -1,6 +1,7 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
+
 const rawBase = import.meta.env.BASE_URL || '/';
 const cleanBase = '/' + rawBase.split('/').filter(Boolean).join('/') + '/';
 const loginPath = `${cleanBase}login/`;
@@ -11,12 +12,12 @@ const loginPath = `${cleanBase}login/`;
 		<h2><a href={cleanBase}>{SITE_TITLE}</a></h2>
 		<div class="internal-links">
 			<HeaderLink href={cleanBase}>Home</HeaderLink>
-			<HeaderLink href={`${cleanBase}blog`}>Blog</HeaderLink>
-			<HeaderLink href={`${cleanBase}discussion`}>Discussion</HeaderLink>
-			<HeaderLink href={`${cleanBase}about`}>About</HeaderLink>
+			<HeaderLink href={`${cleanBase}blog/`}>Blog</HeaderLink>
+			<HeaderLink href={`${cleanBase}discussion/`}>Discussion</HeaderLink>
+			<HeaderLink href={`${cleanBase}about/`}>About</HeaderLink>
 		</div>
 		<div class="auth-link-container">
-			<a href={loginPath} id="nav-auth-link">Log In</a>
+			<a href={loginPath} id="nav-auth-link" class="auth-btn">Log In</a>
 		</div>
 	</nav>
 </header>
@@ -43,6 +44,9 @@ const loginPath = `${cleanBase}login/`;
 		} else {
 			navAuthLink.textContent = 'Log In';
 			navAuthLink.href = loginPath;
+			navAuthLink.style.border = 'none';
+			navAuthLink.style.padding = '1em 0.5em';
+			navAuthLink.style.color = '#e4e4e7';
 		}
 	}
 

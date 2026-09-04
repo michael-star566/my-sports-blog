@@ -66,8 +66,29 @@ const rankings = [
       .subtitle {
         text-align: center;
         color: #a1a1aa;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         font-size: 0.95rem;
+      }
+      .dropdown-container {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      select {
+        background: #18181b;
+        color: white;
+        border: 1px solid #27272a;
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        outline: none;
+      }
+      select:focus {
+        border-color: #38bdf8;
+      }
+      select option:disabled {
+        color: #52525b;
+        font-style: italic;
       }
       table {
         width: 100%;
@@ -111,6 +132,30 @@ const rankings = [
         <h1>Preseason Power Rankings</h1>
         <p class="subtitle">My NFL power rankings going into week 1</p>
 
+        <div class="dropdown-container">
+          <select id="week-selector">
+            <option value="preseason" selected>Preseason Rankings</option>
+            <option value="week1" disabled>Week 1 (TBD)</option>
+            <option value="week2" disabled>Week 2 (TBD)</option>
+            <option value="week3" disabled>Week 3 (TBD)</option>
+            <option value="week4" disabled>Week 4 (TBD)</option>
+            <option value="week5" disabled>Week 5 (TBD)</option>
+            <option value="week6" disabled>Week 6 (TBD)</option>
+            <option value="week7" disabled>Week 7 (TBD)</option>
+            <option value="week8" disabled>Week 8 (TBD)</option>
+            <option value="week9" disabled>Week 9 (TBD)</option>
+            <option value="week10" disabled>Week 10 (TBD)</option>
+            <option value="week11" disabled>Week 11 (TBD)</option>
+            <option value="week12" disabled>Week 12 (TBD)</option>
+            <option value="week13" disabled>Week 13 (TBD)</option>
+            <option value="week14" disabled>Week 14 (TBD)</option>
+            <option value="week15" disabled>Week 15 (TBD)</option>
+            <option value="week16" disabled>Week 16 (TBD)</option>
+            <option value="week17" disabled>Week 17 (TBD)</option>
+            <option value="week18" disabled>Week 18 (TBD)</option>
+          </select>
+        </div>
+
         <table>
           <thead>
             <tr>
@@ -132,5 +177,28 @@ const rankings = [
       </div>
     </main>
     <Footer />
+
+    <script>
+      // Cast the element to HTMLSelectElement so TypeScript knows it has a .value property
+      const selector = document.getElementById('week-selector') as HTMLSelectElement | null;
+      
+      if (selector) {
+        // Drop the event parameter entirely and just read directly from selector.value
+        selector.addEventListener('change', () => {
+          const selectedValue = selector.value;
+          
+          // Once you create specific pages for future weeks, 
+          // you can uncomment the routing logic below to activate the dropdown.
+          
+          // window.location.href = `/power-rankings/${selectedValue}/`;
+          
+          if (selectedValue !== 'preseason') {
+             // Fallback safeguard to reset the dropdown if a user somehow bypasses the disabled state
+             alert('Rankings for ' + selectedValue + ' are currently TBD!');
+             selector.value = 'preseason'; 
+          }
+        });
+      }
+    </script>
   </body>
 </html>

@@ -46,11 +46,17 @@ const rankings = [
   <head>
     <BaseHead title={`Preseason Power Rankings - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
     <style>
+      /* Enforce strict box modeling so padding never expands the container width */
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
       main {
         max-width: 700px;
+        width: 100%;
         margin: 0 auto;
         padding: 3em 1em;
         color: white;
+        overflow-x: hidden;
       }
       .rankings-container {
         background: #111111;
@@ -58,6 +64,7 @@ const rankings = [
         border-radius: 8px;
         padding: 2rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        width: 100%;
       }
       h1 {
         text-align: center;
@@ -82,6 +89,7 @@ const rankings = [
         font-size: 1rem;
         cursor: pointer;
         outline: none;
+        max-width: 100%;
       }
       select:focus {
         border-color: #38bdf8;
@@ -90,7 +98,6 @@ const rankings = [
         color: #52525b;
         font-style: italic;
       }
-      /* New wrapper to handle horizontal scrolling */
       .table-responsive {
         width: 100%;
         overflow-x: auto;
@@ -100,7 +107,6 @@ const rankings = [
         width: 100%;
         border-collapse: collapse;
         text-align: left;
-        min-width: 450px; /* Prevents text from squishing too tightly before scroll kicks in */
       }
       th, td {
         padding: 0.85rem 1rem;
@@ -133,15 +139,18 @@ const rankings = [
       
       /* Mobile responsiveness adjustments */
       @media (max-width: 600px) {
+        main {
+          padding: 2em 0.5em; 
+        }
         .rankings-container {
-          padding: 1.5rem 1rem;
+          padding: 1.5rem 0.5rem;
         }
         th, td {
-          padding: 0.75rem 0.5rem;
-          font-size: 0.9rem;
+          padding: 0.6rem 0.25rem; 
+          font-size: 0.85rem;
         }
         .col-team {
-          font-size: 0.95rem;
+          font-size: 0.9rem;
         }
       }
     </style>

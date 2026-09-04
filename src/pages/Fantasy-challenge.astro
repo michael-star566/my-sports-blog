@@ -3,7 +3,11 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import RosterBoard from '../components/RosterBoard.astro';
+import SpinWheel from '../components/SpinWheel.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+// Import our flawlessly formatted JSON dataset directly!
+import stats from '../data/fantasy-stats.json';
 ---
 
 <!doctype html>
@@ -30,16 +34,14 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         font-size: 1.1rem;
       }
       
-      /* Game Container Layout */
       .game-container {
         display: flex;
         flex-direction: column;
-        gap: 3rem;
+        gap: 4rem;
         align-items: center;
       }
       
-      /* Desktop Layout: Side by Side */
-      @media (min-width: 850px) {
+      @media (min-width: 900px) {
         .game-container {
           flex-direction: row;
           align-items: flex-start;
@@ -54,21 +56,104 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         justify-content: center;
       }
 
-      /* Temporary placeholder until we build the wheel component */
-      .wheel-placeholder {
-        width: 100%;
-        max-width: 420px;
-        aspect-ratio: 1 / 1;
-        background: #111111;
-        border: 2px dashed #38bdf8;
-        border-radius: 50%;
+      /* Draft Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .draft-modal-box {
+        background: #111111;
+        border: 2px solid #38bdf8;
+        border-radius: 8px;
+        padding: 2rem;
+        width: 90%;
+        max-width: 450px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+      .modal-overlay.active .draft-modal-box {
+        transform: translateY(0);
+      }
+      .draft-modal-box h3 {
+        margin: 0 0 0.5rem 0;
+        color: #f4f4f5;
+        font-size: 1.6rem;
+      }
+      .highlight-text {
+        color: #38bdf8;
+      }
+      .modal-sub {
         color: #a1a1aa;
-        font-size: 1.2rem;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+      }
+      select {
+        width: 100%;
+        padding: 0.85rem;
+        margin-bottom: 1.5rem;
+        background: #18181b;
+        color: white;
+        border: 1px solid #27272a;
+        border-radius: 6px;
+        font-size: 1.05rem;
+        outline: none;
+      }
+      select:focus {
+        border-color: #38bdf8;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 1rem;
+      }
+      .btn-draft {
+        flex: 1;
+        background: #38bdf8;
+        color: #111111;
+        border: none;
+        padding: 0.85rem;
+        font-weight: 800;
+        font-size: 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .btn-draft:hover:not(:disabled) {
+        background: #0ea5e9;
+      }
+      .btn-draft:disabled {
+        background: #52525b;
+        color: #a1a1aa;
+        cursor: not-allowed;
+      }
+      .btn-skip {
+        flex: 1;
+        background: transparent;
+        color: #a1a1aa;
+        border: 1px solid #52525b;
+        padding: 0.85rem;
         font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        font-size: 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-skip:hover {
+        background: #27272a;
+        color: white;
       }
     </style>
   </head>
@@ -79,21 +164,167 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
       <p class="subtitle">Spin the wheel. Draft your player. Build the ultimate roster.</p>
       
       <div class="game-container">
-        
         <!-- Left Side: The Wheel -->
         <div class="wheel-section">
-          <div class="wheel-placeholder">
-            Spinning Wheel Goes Here
-          </div>
+          <SpinWheel />
         </div>
 
         <!-- Right Side: The Roster Board -->
         <div class="roster-section">
           <RosterBoard />
         </div>
-
       </div>
     </main>
+
+    <!-- The Hidden Draft Modal -->
+    <div id="draft-modal" class="modal-overlay">
+      <div class="draft-modal-box">
+        <h3>Drafting from <span id="modal-team-name" class="highlight-text"></span></h3>
+        <p class="modal-sub">Select a player to fill an open roster spot.</p>
+
+        <select id="player-select">
+          <!-- Populated dynamically by JavaScript -->
+        </select>
+
+        <div class="modal-actions">
+          <button id="btn-skip" class="btn-skip">Skip Team</button>
+          <button id="btn-draft" class="btn-draft">Draft Player</button>
+        </div>
+      </div>
+    </div>
+
     <Footer />
+
+    <!-- The Game Engine -->
+    <script define:vars={{ stats }}>
+      // 1. Set up our empty state
+      const roster = {
+        QB: null,
+        RB1: null,
+        RB2: null,
+        WR1: null,
+        WR2: null,
+        TE: null,
+        FLEX: null
+      };
+
+      let currentDraftPool = [];
+
+      // 2. Listen for the wheel to stop spinning
+      document.addEventListener('teamDrafted', (e) => {
+        const team = e.detail;
+        const modal = document.getElementById('draft-modal');
+        const teamName = document.getElementById('modal-team-name');
+        const select = document.getElementById('player-select');
+        const btnDraft = document.getElementById('btn-draft');
+
+        // Filter players based on team, duplicates, and available slots
+        currentDraftPool = stats.filter(p => {
+          if (p.Team !== team) return false;
+          
+          const isDrafted = Object.values(roster).some(r => r && r.Player === p.Player);
+          if (isDrafted) return false;
+
+          if (p.Position === 'QB') return !roster.QB;
+          if (p.Position === 'RB') return !roster.RB1 || !roster.RB2 || !roster.FLEX;
+          if (p.Position === 'WR') return !roster.WR1 || !roster.WR2 || !roster.FLEX;
+          if (p.Position === 'TE') return !roster.TE || !roster.FLEX;
+          
+          return false;
+        });
+
+        // Sort highest scorers to the top of the dropdown
+        currentDraftPool.sort((a, b) => b.Points - a.Points);
+
+        teamName.textContent = team;
+        select.innerHTML = '';
+
+        // Handle empty pool scenarios
+        if (currentDraftPool.length === 0) {
+          const opt = document.createElement('option');
+          opt.text = 'No available players for your open slots';
+          opt.value = '';
+          select.appendChild(opt);
+          btnDraft.disabled = true;
+        } else {
+          currentDraftPool.forEach((p, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.text = `${p.Player} (${p.Position}) - ${p.Points} PPG`;
+            select.appendChild(opt);
+          });
+          btnDraft.disabled = false;
+        }
+
+        modal.classList.add('active');
+      });
+
+      // 3. Skip Button Logic
+      document.getElementById('btn-skip').addEventListener('click', () => {
+        document.getElementById('draft-modal').classList.remove('active');
+      });
+
+      // 4. Draft Button Logic
+      document.getElementById('btn-draft').addEventListener('click', () => {
+        const select = document.getElementById('player-select');
+        if (select.disabled || !select.value) return;
+
+        const player = currentDraftPool[select.value];
+        let assignedSlot = null;
+
+        // Slot prioritization logic (Main position first, then FLEX)
+        if (player.Position === 'QB') assignedSlot = 'QB';
+        else if (player.Position === 'RB') {
+          if (!roster.RB1) assignedSlot = 'RB1';
+          else if (!roster.RB2) assignedSlot = 'RB2';
+          else assignedSlot = 'FLEX';
+        }
+        else if (player.Position === 'WR') {
+          if (!roster.WR1) assignedSlot = 'WR1';
+          else if (!roster.WR2) assignedSlot = 'WR2';
+          else assignedSlot = 'FLEX';
+        }
+        else if (player.Position === 'TE') {
+          if (!roster.TE) assignedSlot = 'TE';
+          else assignedSlot = 'FLEX';
+        }
+
+        if (assignedSlot) {
+          roster[assignedSlot] = player;
+          
+          // Inject player data directly into the RosterBoard HTML
+          const slotEl = document.getElementById(`slot-${assignedSlot.toLowerCase()}`);
+          if (slotEl) {
+            slotEl.classList.remove('empty');
+            slotEl.querySelector('.player-name').textContent = player.Player;
+            slotEl.querySelector('.player-team').textContent = player.Team;
+            slotEl.querySelector('.slot-points').textContent = player.Points.toFixed(1);
+          }
+
+          // Calculate running total
+          let total = 0;
+          Object.values(roster).forEach(p => {
+            if (p) total += p.Points;
+          });
+          document.getElementById('roster-total').textContent = total.toFixed(1);
+        }
+
+        document.getElementById('draft-modal').classList.remove('active');
+
+        // Check Win Condition
+        const isFull = Object.values(roster).every(p => p !== null);
+        if (isFull) {
+          setTimeout(() => {
+            alert('Draft Complete! Your final roster averages ' + document.getElementById('roster-total').textContent + ' PPG.');
+            const spinBtn = document.getElementById('spin-btn');
+            if(spinBtn) {
+              spinBtn.disabled = true;
+              spinBtn.style.opacity = '0.5';
+              spinBtn.textContent = 'DONE';
+            }
+          }, 300);
+        }
+      });
+    </script>
   </body>
 </html>

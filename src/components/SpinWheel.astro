@@ -1,0 +1,193 @@
+---
+// src/components/SpinWheel.astro
+
+// All 32 NFL Teams
+const teams = [
+  "ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE", 
+  "DAL", "DEN", "DET", "GB", "HOU", "IND", "JAX", "KC", 
+  "LV", "LAC", "LAR", "MIA", "MIN", "NE", "NO", "NYG", 
+  "NYJ", "PHI", "PIT", "SF", "SEA", "TB", "TEN", "WAS"
+];
+
+// Calculate the precise angle for 32 slices
+const sliceAngle = 360 / 32;
+
+// Generate the CSS conic-gradient string dynamically to alternate colors
+let gradientStops = [];
+for (let i = 0; i < 32; i++) {
+  const color = i % 2 === 0 ? '#18181b' : '#27272a';
+  gradientStops.push(`${color} ${i * sliceAngle}deg ${(i + 1) * sliceAngle}deg`);
+}
+// Offsetting by half a slice perfectly centers the first team at 0 degrees
+const conicGradient = `conic-gradient(from -5.625deg, ${gradientStops.join(', ')})`;
+---
+
+<div class="spin-wheel-container">
+  <div class="pointer">▼</div>
+  
+  <div class="wheel-wrapper">
+    <div 
+      class="wheel" 
+      id="wheel" 
+      style={`background: ${conicGradient};`}
+      data-teams={JSON.stringify(teams)}
+    >
+      {teams.map((team, index) => (
+        <div 
+          class="slice" 
+          style={`transform: rotate(${index * sliceAngle}deg);`}
+        >
+          {team}
+        </div>
+      ))}
+    </div>
+    
+    <button id="spin-btn" class="spin-btn">SPIN</button>
+  </div>
+
+  <div class="output-container">
+    <div id="drafted-team" class="drafted-team">Ready to Draft</div>
+  </div>
+</div>
+
+<style>
+  .spin-wheel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .pointer {
+    font-size: 2.5rem;
+    color: #38bdf8;
+    margin-bottom: -15px;
+    z-index: 10;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  }
+  .wheel-wrapper {
+    position: relative;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    border: 4px solid #38bdf8;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  .wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    /* This cubic-bezier gives it that perfect fast-to-slow slot machine deceleration */
+    transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1);
+  }
+  .slice {
+    position: absolute;
+    top: calc(50% - 10px); /* Vertically center the 20px tall text */
+    left: 50%;
+    width: 50%;
+    height: 20px;
+    transform-origin: 0% 50%; /* Pin it to the exact center of the wheel */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #e4e4e7;
+    box-sizing: border-box;
+  }
+  .spin-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #111111;
+    border: 3px solid #38bdf8;
+    color: #38bdf8;
+    font-weight: 900;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
+  }
+  .spin-btn:hover {
+    background: #38bdf8;
+    color: #111111;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  .output-container {
+    margin-top: 2rem;
+    width: 100%;
+  }
+  .drafted-team {
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #a1a1aa;
+    transition: all 0.3s ease;
+  }
+  .drafted-team.highlight {
+    background: #38bdf8;
+    color: #111111;
+    border-color: #38bdf8;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+  }
+</style>
+
+<script>
+  const wheel = document.getElementById('wheel');
+  const spinBtn = document.getElementById('spin-btn');
+  const output = document.getElementById('drafted-team');
+  
+  if (wheel && spinBtn && output) {
+    const teams = JSON.parse(wheel.dataset.teams || '[]');
+    let currentRotation = 0;
+    let isSpinning = false;
+
+    spinBtn.addEventListener('click', () => {
+      if (isSpinning) return;
+      
+      isSpinning = true;
+      spinBtn.style.opacity = '0.5';
+      spinBtn.style.cursor = 'not-allowed';
+      output.textContent = "Spinning...";
+      output.classList.remove('highlight');
+
+      const targetTeamIndex = Math.floor(Math.random() * 32);
+      const spins = 5; // 5 full rotational spins before stopping
+      
+      // Calculate where the wheel currently is, add the extra spins, and calculate the perfect landing angle
+      const baseSpins = Math.ceil(currentRotation / 360) + spins;
+      const targetDegree = (baseSpins * 360) + 270 - (targetTeamIndex * (360 / 32));
+      
+      currentRotation = targetDegree;
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      // Wait for the 4-second CSS transition to finish
+      setTimeout(() => {
+        isSpinning = false;
+        spinBtn.style.opacity = '1';
+        spinBtn.style.cursor = 'pointer';
+        
+        const draftedTeam = teams[targetTeamIndex];
+        output.textContent = `You Drafted: ${draftedTeam}`;
+        output.classList.add('highlight');
+        
+        // Broadcast the result so the Roster Board can pick it up!
+        document.dispatchEvent(new CustomEvent('teamDrafted', { detail: draftedTeam }));
+        
+      }, 4000); 
+    });
+  }
+</script>

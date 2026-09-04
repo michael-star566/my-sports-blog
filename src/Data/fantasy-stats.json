@@ -7,7 +7,7 @@
   },
   {
     "Player": "Christian McCaffrey",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "RB",
     "Points": 24.5
   },
@@ -79,7 +79,7 @@
   },
   {
     "Player": "Drake Maye",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "QB",
     "Points": 20.7
   },
@@ -127,13 +127,13 @@
   },
   {
     "Player": "Josh Jacobs",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "RB",
     "Points": 15.8
   },
   {
     "Player": "Chris Olave",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "WR",
     "Points": 16.8
   },
@@ -169,7 +169,7 @@
   },
   {
     "Player": "Ashton Jeanty",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "RB",
     "Points": 14.4
   },
@@ -253,7 +253,7 @@
   },
   {
     "Player": "TreVeyon Henderson",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "RB",
     "Points": 12.1
   },
@@ -289,7 +289,7 @@
   },
   {
     "Player": "Hunter Henry",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "TE",
     "Points": 10.5
   },
@@ -301,19 +301,19 @@
   },
   {
     "Player": "Emeka Egbuka",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "WR",
     "Points": 11.5
   },
   {
     "Player": "Travis Kelce",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "TE",
     "Points": 11.4
   },
   {
     "Player": "Patrick Mahomes",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "QB",
     "Points": 20.4
   },
@@ -367,7 +367,7 @@
   },
   {
     "Player": "Brock Bowers",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "TE",
     "Points": 14.7
   },
@@ -385,7 +385,7 @@
   },
   {
     "Player": "Stefon Diggs",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "WR",
     "Points": 12.4
   },
@@ -433,19 +433,19 @@
   },
   {
     "Player": "George Kittle",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "TE",
     "Points": 14.7
   },
   {
     "Player": "Jauan Jennings",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "WR",
     "Points": 11.6
   },
   {
     "Player": "Baker Mayfield",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "QB",
     "Points": 16
   },
@@ -457,7 +457,7 @@
   },
   {
     "Player": "Jordan Love",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "QB",
     "Points": 15.7
   },
@@ -511,13 +511,13 @@
   },
   {
     "Player": "Brock Purdy",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "QB",
     "Points": 19.7
   },
   {
     "Player": "Geno Smith",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "QB",
     "Points": 11.6
   },
@@ -529,7 +529,7 @@
   },
   {
     "Player": "Tyler Shough",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "QB",
     "Points": 14.4
   },
@@ -547,7 +547,7 @@
   },
   {
     "Player": "Rhamondre Stevenson",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "RB",
     "Points": 12.8
   },
@@ -583,7 +583,7 @@
   },
   {
     "Player": "Mac Jones",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "QB",
     "Points": 11.8
   },
@@ -595,7 +595,7 @@
   },
   {
     "Player": "Kareem Hunt",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "RB",
     "Points": 8.6
   },
@@ -673,7 +673,7 @@
   },
   {
     "Player": "Romeo Doubs",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "WR",
     "Points": 10.3
   },
@@ -685,7 +685,7 @@
   },
   {
     "Player": "Bucky Irving",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "RB",
     "Points": 13.8
   },
@@ -697,7 +697,7 @@
   },
   {
     "Player": "Tre Tucker",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "WR",
     "Points": 9.5
   },
@@ -721,13 +721,13 @@
   },
   {
     "Player": "Juwan Johnson",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "TE",
     "Points": 10.6
   },
   {
     "Player": "Rachaad White",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "RB",
     "Points": 8.4
   },
@@ -757,7 +757,7 @@
   },
   {
     "Player": "Spencer Rattler",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "QB",
     "Points": 11
   },
@@ -769,13 +769,13 @@
   },
   {
     "Player": "Rashee Rice",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 18.8
   },
   {
     "Player": "Christian Watson",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "WR",
     "Points": 13.2
   },
@@ -811,7 +811,7 @@
   },
   {
     "Player": "Kayshon Boutte",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "WR",
     "Points": 8.9
   },
@@ -835,7 +835,7 @@
   },
   {
     "Player": "Marquise Brown",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 8.6
   },
@@ -871,7 +871,7 @@
   },
   {
     "Player": "Tucker Kraft",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "TE",
     "Points": 14.7
   },
@@ -895,7 +895,7 @@
   },
   {
     "Player": "Sean Tucker",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "RB",
     "Points": 5.4
   },
@@ -913,7 +913,7 @@
   },
   {
     "Player": "Emanuel Wilson",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "RB",
     "Points": 5.6
   },
@@ -1039,7 +1039,7 @@
   },
   {
     "Player": "Alvin Kamara",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "RB",
     "Points": 9.2
   },
@@ -1057,19 +1057,19 @@
   },
   {
     "Player": "Isiah Pacheco",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "RB",
     "Points": 6.7
   },
   {
     "Player": "Xavier Worthy",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 7.9
   },
   {
     "Player": "Mack Hollins",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "WR",
     "Points": 7.6
   },
@@ -1093,7 +1093,7 @@
   },
   {
     "Player": "DeMario Douglas",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "WR",
     "Points": 5.6
   },
@@ -1111,7 +1111,7 @@
   },
   {
     "Player": "Tez Johnson",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "WR",
     "Points": 5.8
   },
@@ -1129,7 +1129,7 @@
   },
   {
     "Player": "Cade Otton",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "TE",
     "Points": 7.6
   },
@@ -1147,7 +1147,7 @@
   },
   {
     "Player": "Tyquan Thornton",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 5.8
   },
@@ -1171,7 +1171,7 @@
   },
   {
     "Player": "Jake Tonges",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "TE",
     "Points": 5.5
   },
@@ -1207,13 +1207,13 @@
   },
   {
     "Player": "Kendrick Bourne",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "WR",
     "Points": 5.8
   },
   {
     "Player": "Mike Evans",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "WR",
     "Points": 10.6
   },
@@ -1225,7 +1225,7 @@
   },
   {
     "Player": "Brian Robinson Jr.",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "RB",
     "Points": 3.7
   },
@@ -1261,7 +1261,7 @@
   },
   {
     "Player": "Ricky Pearsall",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "WR",
     "Points": 9.8
   },
@@ -1279,7 +1279,7 @@
   },
   {
     "Player": "Malik Willis",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "QB",
     "Points": 12.8
   },
@@ -1291,7 +1291,7 @@
   },
   {
     "Player": "Chris Godwin",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "WR",
     "Points": 9.2
   },
@@ -1363,7 +1363,7 @@
   },
   {
     "Player": "Dontayvion Wicks",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "WR",
     "Points": 5.4
   },
@@ -1411,7 +1411,7 @@
   },
   {
     "Player": "Devin Neal",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "RB",
     "Points": 6
   },
@@ -1423,7 +1423,7 @@
   },
   {
     "Player": "Sterling Shepard",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "WR",
     "Points": 6.3
   },
@@ -1471,7 +1471,7 @@
   },
   {
     "Player": "Matthew Golden",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "WR",
     "Points": 5
   },
@@ -1489,13 +1489,13 @@
   },
   {
     "Player": "JuJu Smith-Schuster",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 4.3
   },
   {
     "Player": "Devaughn Vele",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "WR",
     "Points": 5.1
   },
@@ -1537,7 +1537,7 @@
   },
   {
     "Player": "Michael Mayer",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "TE",
     "Points": 5.7
   },
@@ -1561,19 +1561,19 @@
   },
   {
     "Player": "Kyle Williams",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "WR",
     "Points": 2.9
   },
   {
     "Player": "Austin Hooper",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "TE",
     "Points": 3.7
   },
   {
     "Player": "Brashard Smith",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "RB",
     "Points": 3.7
   },
@@ -1615,7 +1615,7 @@
   },
   {
     "Player": "Audric Estime",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "RB",
     "Points": 6.9
   },
@@ -1627,7 +1627,7 @@
   },
   {
     "Player": "Demarcus Robinson",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "WR",
     "Points": 4.2
   },
@@ -1645,7 +1645,7 @@
   },
   {
     "Player": "Kyle Juszczyk",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "FB",
     "Points": 3.4
   },
@@ -1687,7 +1687,7 @@
   },
   {
     "Player": "Taysom Hill",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "TE",
     "Points": 3.2
   },
@@ -1729,7 +1729,7 @@
   },
   {
     "Player": "Jayden Reed",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "WR",
     "Points": 6.9
   },
@@ -1783,7 +1783,7 @@
   },
   {
     "Player": "Kendre Miller",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "RB",
     "Points": 4.8
   },
@@ -1843,7 +1843,7 @@
   },
   {
     "Player": "Luke Musgrave",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "TE",
     "Points": 2.9
   },
@@ -1921,7 +1921,7 @@
   },
   {
     "Player": "Jack Bech",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "WR",
     "Points": 2.6
   },
@@ -1945,7 +1945,7 @@
   },
   {
     "Player": "Antonio Gibson",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "RB",
     "Points": 4.6
   },
@@ -1981,13 +1981,13 @@
   },
   {
     "Player": "Kevin Austin",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "WR",
     "Points": 4.1
   },
   {
     "Player": "Chris Brooks",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "RB",
     "Points": 1.9
   },
@@ -2029,7 +2029,7 @@
   },
   {
     "Player": "Luke Farrell",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "TE",
     "Points": 1.7
   },
@@ -2053,7 +2053,7 @@
   },
   {
     "Player": "Noah Gray",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "TE",
     "Points": 2.4
   },
@@ -2077,7 +2077,7 @@
   },
   {
     "Player": "Jalen McMillan",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "WR",
     "Points": 7.5
   },
@@ -2101,7 +2101,7 @@
   },
   {
     "Player": "Raheem Mostert",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "RB",
     "Points": 2.4
   },
@@ -2149,7 +2149,7 @@
   },
   {
     "Player": "Savion Williams",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "WR",
     "Points": 2.1
   },
@@ -2203,7 +2203,7 @@
   },
   {
     "Player": "Efton Chism",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "WR",
     "Points": 2.1
   },
@@ -2215,13 +2215,13 @@
   },
   {
     "Player": "Terrell Jennings",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "RB",
     "Points": 2.2
   },
   {
     "Player": "Kameron Johnson",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "WR",
     "Points": 1
   },
@@ -2251,7 +2251,7 @@
   },
   {
     "Player": "Dont'e Thornton",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "WR",
     "Points": 1.6
   },
@@ -2263,7 +2263,7 @@
   },
   {
     "Player": "John FitzPatrick",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "TE",
     "Points": 1.7
   },
@@ -2293,7 +2293,7 @@
   },
   {
     "Player": "Shedrick Jackson",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "WR",
     "Points": 3.2
   },
@@ -2335,25 +2335,25 @@
   },
   {
     "Player": "Chris Oladokun",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "QB",
     "Points": 3.7
   },
   {
     "Player": "Dante Pettis",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "WR",
     "Points": 2.5
   },
   {
     "Player": "Jack Stoll",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "TE",
     "Points": 1.1
   },
   {
     "Player": "Ian Thomas",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "TE",
     "Points": 1.6
   },
@@ -2407,7 +2407,7 @@
   },
   {
     "Player": "Skyy Moore",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "WR",
     "Points": 0.9
   },
@@ -2419,7 +2419,7 @@
   },
   {
     "Player": "Josh Whyle",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "TE",
     "Points": 1.8
   },
@@ -2455,7 +2455,7 @@
   },
   {
     "Player": "Malik Heath",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "WR",
     "Points": 1.3
   },
@@ -2473,7 +2473,7 @@
   },
   {
     "Player": "Ryan Miller",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "WR",
     "Points": 0.9
   },
@@ -2491,7 +2491,7 @@
   },
   {
     "Player": "Mason Tipton",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "WR",
     "Points": 1.5
   },
@@ -2515,7 +2515,7 @@
   },
   {
     "Player": "Ronnie Bell",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "WR",
     "Points": 5.2
   },
@@ -2551,7 +2551,7 @@
   },
   {
     "Player": "Kenny Pickett",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "QB",
     "Points": 1.3
   },
@@ -2569,7 +2569,7 @@
   },
   {
     "Player": "Devin Culp",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "TE",
     "Points": 0.6
   },
@@ -2647,13 +2647,13 @@
   },
   {
     "Player": "Foster Moreau",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "TE",
     "Points": 1.2
   },
   {
     "Player": "Zamir White",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "RB",
     "Points": 1.6
   },
@@ -2683,7 +2683,7 @@
   },
   {
     "Player": "Evan Hull",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "RB",
     "Points": 1.1
   },
@@ -2701,7 +2701,7 @@
   },
   {
     "Player": "Aidan O'Connell",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "QB",
     "Points": 4.8
   },
@@ -2755,7 +2755,7 @@
   },
   {
     "Player": "Shane Buechele",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "QB",
     "Points": 3.9
   },
@@ -2809,7 +2809,7 @@
   },
   {
     "Player": "Albert Okwuegbunam",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "TE",
     "Points": 8.6
   },
@@ -2839,7 +2839,7 @@
   },
   {
     "Player": "Teddy Bridgewater",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "QB",
     "Points": 0.7
   },
@@ -2917,7 +2917,7 @@
   },
   {
     "Player": "Nikko Remigio",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 0.3
   },
@@ -2941,7 +2941,7 @@
   },
   {
     "Player": "Jordan Watkins",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "WR",
     "Points": 1.1
   },
@@ -2971,13 +2971,13 @@
   },
   {
     "Player": "Joshua Dobbs",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "QB",
     "Points": 0.5
   },
   {
     "Player": "Clyde Edwards-Helaire",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "RB",
     "Points": 2.1
   },
@@ -3001,7 +3001,7 @@
   },
   {
     "Player": "Jakobie Keeney-James",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "WR",
     "Points": 3.5
   },
@@ -3055,7 +3055,7 @@
   },
   {
     "Player": "Clayton Tune",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "QB",
     "Points": 1
   },
@@ -3109,7 +3109,7 @@
   },
   {
     "Player": "Alex Bachman",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "WR",
     "Points": 0.2
   },
@@ -3127,7 +3127,7 @@
   },
   {
     "Player": "Payne Durham",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "TE",
     "Points": 0.1
   },
@@ -3163,7 +3163,7 @@
   },
   {
     "Player": "Dylan Laube",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "RB",
     "Points": 0.2
   },
@@ -3175,7 +3175,7 @@
   },
   {
     "Player": "Moliki Matavao",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "TE",
     "Points": 0.5
   },
@@ -3217,7 +3217,7 @@
   },
   {
     "Player": "Josh Williams",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "RB",
     "Points": 0.4
   },
@@ -3229,7 +3229,7 @@
   },
   {
     "Player": "Owen Wright",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "RB",
     "Points": 0.2
   },
@@ -3277,7 +3277,7 @@
   },
   {
     "Player": "Jason Brownlee",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 0
   },
@@ -3343,7 +3343,7 @@
   },
   {
     "Player": "Drake Dabney",
-    "Team": "GNB",
+    "Team": "GB",
     "Position": "TE",
     "Points": 0.7
   },
@@ -3361,7 +3361,7 @@
   },
   {
     "Player": "CJ Dippre",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "TE",
     "Points": 0
   },
@@ -3397,7 +3397,7 @@
   },
   {
     "Player": "Russell Gage",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "WR",
     "Points": 0
   },
@@ -3409,7 +3409,7 @@
   },
   {
     "Player": "Isaac Guerendo",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "RB",
     "Points": 0
   },
@@ -3421,7 +3421,7 @@
   },
   {
     "Player": "Jimmy Holiday",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 0
   },
@@ -3445,7 +3445,7 @@
   },
   {
     "Player": "Jordan James",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "RB",
     "Points": 0
   },
@@ -3487,7 +3487,7 @@
   },
   {
     "Player": "Ko Kieft",
-    "Team": "TAM",
+    "Team": "TB",
     "Position": "TE",
     "Points": 0
   },
@@ -3517,7 +3517,7 @@
   },
   {
     "Player": "Adrian Martinez",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "QB",
     "Points": -0.1
   },
@@ -3547,13 +3547,13 @@
   },
   {
     "Player": "Gardner Minshew II",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "QB",
     "Points": -0.1
   },
   {
     "Player": "Elijah Mitchell",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "RB",
     "Points": 0
   },
@@ -3625,7 +3625,7 @@
   },
   {
     "Player": "Jalen Royals",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "WR",
     "Points": 0.3
   },
@@ -3637,7 +3637,7 @@
   },
   {
     "Player": "Carter Runyon",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "TE",
     "Points": 0.1
   },
@@ -3667,7 +3667,7 @@
   },
   {
     "Player": "Justin Shorter",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "WR",
     "Points": 0
   },
@@ -3697,13 +3697,13 @@
   },
   {
     "Player": "Robert Tonyan",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "TE",
     "Points": 0.1
   },
   {
     "Player": "Samori Toure",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "WR",
     "Points": 1.3
   },
@@ -3721,13 +3721,13 @@
   },
   {
     "Player": "DJ Turner",
-    "Team": "LVR",
+    "Team": "LV",
     "Position": "WR",
     "Points": 0
   },
   {
     "Player": "Malik Turner",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "WR",
     "Points": 0
   },
@@ -3757,13 +3757,13 @@
   },
   {
     "Player": "Treyton Welch",
-    "Team": "NOR",
+    "Team": "NO",
     "Position": "TE",
     "Points": 0
   },
   {
     "Player": "Jack Westover",
-    "Team": "NWE",
+    "Team": "NE",
     "Position": "FB",
     "Points": 0.1
   },
@@ -3781,7 +3781,7 @@
   },
   {
     "Player": "Jared Wiley",
-    "Team": "KAN",
+    "Team": "KC",
     "Position": "TE",
     "Points": 0.3
   },
@@ -3793,7 +3793,7 @@
   },
   {
     "Player": "Brayden Willis",
-    "Team": "SFO",
+    "Team": "SF",
     "Position": "TE",
     "Points": 0
   },

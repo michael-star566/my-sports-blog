@@ -1,0 +1,201 @@
+---
+// src/components/RosterBoard.astro
+---
+
+<div class="roster-board">
+  <div class="roster-header">
+    <h2>My Fantasy Roster</h2>
+    <div class="total-score">
+      <span>Total PPG:</span>
+      <span id="roster-total">0.0</span>
+    </div>
+  </div>
+
+  <div class="roster-slots">
+    <!-- Quarterback -->
+    <div class="roster-slot empty" id="slot-qb" data-position="QB">
+      <div class="slot-pos qb-bg">QB</div>
+      <div class="slot-details">
+        <span class="player-name">Empty Slot</span>
+        <span class="player-team">--</span>
+      </div>
+      <div class="slot-points">0.0</div>
+    </div>
+
+    <!-- Running Back 1 -->
+    <div class="roster-slot empty" id="slot-rb1" data-position="RB">
+      <div class="slot-pos rb-bg">RB</div>
+      <div class="slot-details">
+        <span class="player-name">Empty Slot</span>
+        <span class="player-team">--</span>
+      </div>
+      <div class="slot-points">0.0</div>
+    </div>
+
+    <!-- Running Back 2 -->
+    <div class="roster-slot empty" id="slot-rb2" data-position="RB">
+      <div class="slot-pos rb-bg">RB</div>
+      <div class="slot-details">
+        <span class="player-name">Empty Slot</span>
+        <span class="player-team">--</span>
+      </div>
+      <div class="slot-points">0.0</div>
+    </div>
+
+    <!-- Wide Receiver 1 -->
+    <div class="roster-slot empty" id="slot-wr1" data-position="WR">
+      <div class="slot-pos wr-bg">WR</div>
+      <div class="slot-details">
+        <span class="player-name">Empty Slot</span>
+        <span class="player-team">--</span>
+      </div>
+      <div class="slot-points">0.0</div>
+    </div>
+
+    <!-- Wide Receiver 2 -->
+    <div class="roster-slot empty" id="slot-wr2" data-position="WR">
+      <div class="slot-pos wr-bg">WR</div>
+      <div class="slot-details">
+        <span class="player-name">Empty Slot</span>
+        <span class="player-team">--</span>
+      </div>
+      <div class="slot-points">0.0</div>
+    </div>
+
+    <!-- Tight End -->
+    <div class="roster-slot empty" id="slot-te" data-position="TE">
+      <div class="slot-pos te-bg">TE</div>
+      <div class="slot-details">
+        <span class="player-name">Empty Slot</span>
+        <span class="player-team">--</span>
+      </div>
+      <div class="slot-points">0.0</div>
+    </div>
+
+    <!-- Flex (RB/WR/TE) -->
+    <div class="roster-slot empty" id="slot-flex" data-position="FLEX">
+      <div class="slot-pos flex-bg">FLEX</div>
+      <div class="slot-details">
+        <span class="player-name">Empty Slot</span>
+        <span class="player-team">--</span>
+      </div>
+      <div class="slot-points">0.0</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .roster-board {
+    background: #111111;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    color: white;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .roster-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #27272a;
+    padding-bottom: 1rem;
+  }
+  .roster-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #f4f4f5;
+  }
+  .total-score {
+    background: #18181b;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #38bdf8;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+  #roster-total {
+    color: #38bdf8;
+    font-size: 1.25rem;
+    margin-left: 0.5rem;
+  }
+  .roster-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .roster-slot {
+    display: flex;
+    align-items: center;
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 6px;
+    padding: 0.6rem;
+    transition: all 0.2s ease;
+  }
+  /* The dashed styling for slots that haven't been drafted yet */
+  .roster-slot.empty {
+    border: 1px dashed #52525b;
+    background: transparent;
+  }
+  .roster-slot.empty .player-name {
+    color: #52525b;
+    font-style: italic;
+  }
+  .roster-slot.empty .slot-points {
+    color: #52525b;
+  }
+  .slot-pos {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    border-radius: 4px;
+    margin-right: 1rem;
+    color: #111111;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  
+  /* NFL Position Color Coding */
+  .qb-bg { background: #f87171; }   /* Red */
+  .rb-bg { background: #4ade80; }   /* Green */
+  .wr-bg { background: #60a5fa; }   /* Blue */
+  .te-bg { background: #facc15; }   /* Yellow */
+  .flex-bg { background: #c084fc; } /* Purple */
+
+  .slot-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .player-name {
+    font-weight: bold;
+    font-size: 1.05rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .player-team {
+    color: #a1a1aa;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-top: 0.1rem;
+  }
+  .slot-points {
+    font-weight: bold;
+    font-size: 1.15rem;
+    color: #e4e4e7;
+    padding-left: 1rem;
+    min-width: 50px;
+    text-align: right;
+  }
+</style>

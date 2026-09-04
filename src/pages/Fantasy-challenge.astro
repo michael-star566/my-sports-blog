@@ -1,0 +1,99 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RosterBoard from '../components/RosterBoard.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Fantasy Challenge - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+    <style>
+      main {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 3em 1em;
+        color: white;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-size: 2.5rem;
+      }
+      .subtitle {
+        text-align: center;
+        color: #a1a1aa;
+        margin-bottom: 3rem;
+        font-size: 1.1rem;
+      }
+      
+      /* Game Container Layout */
+      .game-container {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+        align-items: center;
+      }
+      
+      /* Desktop Layout: Side by Side */
+      @media (min-width: 850px) {
+        .game-container {
+          flex-direction: row;
+          align-items: flex-start;
+          justify-content: center;
+          gap: 5rem;
+        }
+      }
+
+      .wheel-section, .roster-section {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* Temporary placeholder until we build the wheel component */
+      .wheel-placeholder {
+        width: 100%;
+        max-width: 420px;
+        aspect-ratio: 1 / 1;
+        background: #111111;
+        border: 2px dashed #38bdf8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a1a1aa;
+        font-size: 1.2rem;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <h1>Fantasy Challenge</h1>
+      <p class="subtitle">Spin the wheel. Draft your player. Build the ultimate roster.</p>
+      
+      <div class="game-container">
+        
+        <!-- Left Side: The Wheel -->
+        <div class="wheel-section">
+          <div class="wheel-placeholder">
+            Spinning Wheel Goes Here
+          </div>
+        </div>
+
+        <!-- Right Side: The Roster Board -->
+        <div class="roster-section">
+          <RosterBoard />
+        </div>
+
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

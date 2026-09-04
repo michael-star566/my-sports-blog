@@ -6,8 +6,6 @@ author: "Michael"
 tags: ["NFL", "Predictions", "Week 1"]
 ---
 
-<h1 align="center">NFL Week 1 Predictions</h1>
-
 <p align="center" style="font-weight: bold; margin-bottom: 2rem; line-height: 2;">
   <a href="#ne-sea">NE @ SEA</a> &nbsp;|&nbsp; <a href="#sf-lar">SF @ LAR</a> &nbsp;|&nbsp; <a href="#cle-jax">CLE @ JAX</a> &nbsp;|&nbsp; <a href="#tb-cin">TB @ CIN</a><br/>
   <a href="#no-det">NO @ DET</a> &nbsp;|&nbsp; <a href="#nyj-ten">NYJ @ TEN</a> &nbsp;|&nbsp; <a href="#bal-ind">BAL @ IND</a> &nbsp;|&nbsp; <a href="#atl-pit">ATL @ PIT</a><br/>

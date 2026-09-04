@@ -90,10 +90,17 @@ const rankings = [
         color: #52525b;
         font-style: italic;
       }
+      /* New wrapper to handle horizontal scrolling */
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
       table {
         width: 100%;
         border-collapse: collapse;
         text-align: left;
+        min-width: 450px; /* Prevents text from squishing too tightly before scroll kicks in */
       }
       th, td {
         padding: 0.85rem 1rem;
@@ -122,6 +129,20 @@ const rankings = [
         width: 60%;
         font-weight: bold;
         font-size: 1.05rem;
+      }
+      
+      /* Mobile responsiveness adjustments */
+      @media (max-width: 600px) {
+        .rankings-container {
+          padding: 1.5rem 1rem;
+        }
+        th, td {
+          padding: 0.75rem 0.5rem;
+          font-size: 0.9rem;
+        }
+        .col-team {
+          font-size: 0.95rem;
+        }
       }
     </style>
   </head>
@@ -156,44 +177,38 @@ const rankings = [
           </select>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th class="col-trend">Trend</th>
-              <th class="col-rank">Rank</th>
-              <th class="col-team">Team</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rankings.map((item) => (
+        <div class="table-responsive">
+          <table>
+            <thead>
               <tr>
-                <td class="col-trend">{item.trend}</td>
-                <td class="col-rank">{item.rank}</td>
-                <td class="col-team">{item.team}</td>
+                <th class="col-trend">Trend</th>
+                <th class="col-rank">Rank</th>
+                <th class="col-team">Team</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rankings.map((item) => (
+                <tr>
+                  <td class="col-trend">{item.trend}</td>
+                  <td class="col-rank">{item.rank}</td>
+                  <td class="col-team">{item.team}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
     <Footer />
 
     <script>
-      // Cast the element to HTMLSelectElement so TypeScript knows it has a .value property
       const selector = document.getElementById('week-selector') as HTMLSelectElement | null;
       
       if (selector) {
-        // Drop the event parameter entirely and just read directly from selector.value
         selector.addEventListener('change', () => {
           const selectedValue = selector.value;
           
-          // Once you create specific pages for future weeks, 
-          // you can uncomment the routing logic below to activate the dropdown.
-          
-          // window.location.href = `/power-rankings/${selectedValue}/`;
-          
           if (selectedValue !== 'preseason') {
-             // Fallback safeguard to reset the dropdown if a user somehow bypasses the disabled state
              alert('Rankings for ' + selectedValue + ' are currently TBD!');
              selector.value = 'preseason'; 
           }

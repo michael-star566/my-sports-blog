@@ -89,11 +89,11 @@
     background: #111111;
     border: 1px solid #222222;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     color: white;
     width: 100%;
-    max-width: 450px;
+    max-width: 400px;
     margin: 0 auto;
     font-family: system-ui, -apple-system, sans-serif;
   }
@@ -101,33 +101,34 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
     border-bottom: 2px solid #27272a;
-    padding-bottom: 1rem;
+    padding-bottom: 0.75rem;
   }
   .roster-header h2 {
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 1.15rem;
     color: #f4f4f5;
   }
   .total-score {
     background: #18181b;
-    padding: 0.5rem 1rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 6px;
     border: 1px solid #38bdf8;
     font-weight: bold;
     display: flex;
     align-items: center;
+    font-size: 0.9rem;
   }
   #roster-total {
     color: #38bdf8;
-    font-size: 1.25rem;
-    margin-left: 0.5rem;
+    font-size: 1.1rem;
+    margin-left: 0.4rem;
   }
   .roster-slots {
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 0.4rem;
   }
   .roster-slot {
     display: flex;
@@ -135,10 +136,9 @@
     background: #18181b;
     border: 1px solid #27272a;
     border-radius: 6px;
-    padding: 0.6rem;
+    padding: 0.35rem 0.5rem;
     transition: all 0.2s ease;
   }
-  /* The dashed styling for slots that haven't been drafted yet */
   .roster-slot.empty {
     border: 1px dashed #52525b;
     background: transparent;
@@ -151,25 +151,24 @@
     color: #52525b;
   }
   .slot-pos {
-    width: 45px;
-    height: 45px;
+    width: 35px;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
     border-radius: 4px;
-    margin-right: 1rem;
+    margin-right: 0.75rem;
     color: #111111;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     flex-shrink: 0;
   }
   
-  /* NFL Position Color Coding */
-  .qb-bg { background: #f87171; }   /* Red */
-  .rb-bg { background: #4ade80; }   /* Green */
-  .wr-bg { background: #60a5fa; }   /* Blue */
-  .te-bg { background: #facc15; }   /* Yellow */
-  .flex-bg { background: #c084fc; } /* Purple */
+  .qb-bg { background: #f87171; }
+  .rb-bg { background: #4ade80; }
+  .wr-bg { background: #60a5fa; }
+  .te-bg { background: #facc15; }
+  .flex-bg { background: #c084fc; }
 
   .slot-details {
     flex-grow: 1;
@@ -179,23 +178,23 @@
   }
   .player-name {
     font-weight: bold;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .player-team {
     color: #a1a1aa;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     margin-top: 0.1rem;
   }
   .slot-points {
     font-weight: bold;
-    font-size: 1.15rem;
+    font-size: 1rem;
     color: #e4e4e7;
-    padding-left: 1rem;
-    min-width: 50px;
+    padding-left: 0.5rem;
+    min-width: 45px;
     text-align: right;
   }
 </style>

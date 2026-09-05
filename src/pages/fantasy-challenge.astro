@@ -134,7 +134,7 @@ import stats from '../data/fantasy-stats.json';
         display: flex;
         gap: 1rem;
       }
-      .btn-draft, .btn-skip {
+      .btn-draft, .btn-respin {
         flex: 1;
         padding: 0.75rem;
         font-weight: 800;
@@ -156,14 +156,18 @@ import stats from '../data/fantasy-stats.json';
         color: #a1a1aa;
         cursor: not-allowed;
       }
-      .btn-skip {
+      .btn-respin {
         background: transparent;
-        color: #a1a1aa;
-        border: 1px solid #52525b;
+        color: #38bdf8;
+        border: 1px solid #38bdf8;
       }
-      .btn-skip:hover {
-        background: #27272a;
-        color: white;
+      .btn-respin:hover:not(:disabled) {
+        background: rgba(56, 189, 248, 0.1);
+      }
+      .btn-respin:disabled {
+        border-color: #52525b;
+        color: #52525b;
+        cursor: not-allowed;
       }
 
       /* Results Panel */
@@ -193,7 +197,7 @@ import stats from '../data/fantasy-stats.json';
         color: #38bdf8;
       }
       .game-over-banner p {
-        margin: 0 0 0.5rem 0;
+        margin: 0 0 0.75rem 0;
         font-size: 1.1rem;
         font-weight: bold;
       }
@@ -201,6 +205,22 @@ import stats from '../data/fantasy-stats.json';
         font-size: 0.85rem;
         color: #a1a1aa;
         font-style: italic;
+        margin-bottom: 0.75rem;
+      }
+      .btn-play-again {
+        background: #38bdf8;
+        color: #111111;
+        border: none;
+        width: 100%;
+        padding: 0.75rem;
+        font-weight: 800;
+        font-size: 0.95rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .btn-play-again:hover {
+        background: #0ea5e9;
       }
 
       .tabs-nav {
@@ -289,7 +309,7 @@ import stats from '../data/fantasy-stats.json';
             <select id="slot-select"></select>
 
             <div class="draft-actions">
-              <button id="btn-skip" class="btn-skip">Skip Team</button>
+              <button id="btn-respin" class="btn-respin">Respin (1x)</button>
               <button id="btn-draft" class="btn-draft">Draft Player</button>
             </div>
           </div>
@@ -306,6 +326,7 @@ import stats from '../data/fantasy-stats.json';
               <h3>Draft Complete!</h3>
               <p>Final Score: <span id="final-score-text">0.0</span> PPG</p>
               <div id="auth-status-message" class="auth-message"></div>
+              <button id="btn-play-again" class="btn-play-again">Play Again</button>
             </div>
 
             <div class="tabs-nav">
@@ -364,6 +385,7 @@ import stats from '../data/fantasy-stats.json';
       const roster: RosterState = { QB: null, RB1: null, RB2: null, WR1: null, WR2: null, TE: null, FLEX: null, SUPERFLEX: null };
       
       let currentDraftPool: Player[] = [];
+      let hasRespun = false; // Tracks the 1-time respin usage per game
 
       const wheelContainer = document.getElementById('wheel-container') as HTMLElement;
       const draftContainer = document.getElementById('draft-container') as HTMLElement;
@@ -375,7 +397,7 @@ import stats from '../data/fantasy-stats.json';
       const scoreHistoryList = document.getElementById('score-history-list') as HTMLUListElement;
       const leaderboardList = document.getElementById('leaderboard-list') as HTMLUListElement;
 
-      // --- LOCAL HISTORY ---
+      // --- LOCAL HISTORY (Capped at last 5) ---
       function loadHistory(): number[] {
         const saved = localStorage.getItem('fantasyHistory');
         return saved ? JSON.parse(saved) : [];
@@ -385,9 +407,9 @@ import stats from '../data/fantasy-stats.json';
         const scores = loadHistory();
         scores.push(score);
         scores.sort((a, b) => b - a); 
-        const top10 = scores.slice(0, 10);
-        localStorage.setItem('fantasyHistory', JSON.stringify(top10));
-        return top10;
+        const top5 = scores.slice(0, 5); // Capped at top 5
+        localStorage.setItem('fantasyHistory', JSON.stringify(top5));
+        return top5;
       }
       
       function renderHistory(scores: number[], newestScore: number | null = null) {
@@ -412,13 +434,13 @@ import stats from '../data/fantasy-stats.json';
         });
       }
 
-      // --- SUPABASE LEADERBOARD ---
-      async function loadGlobalLeaderboard() {
+      // --- SUPABASE LEADERBOARD (Capped at top 5) ---
+      async function loadGlobalLeaderboard(): Promise<LeaderboardEntry[]> {
         const { data, error } = await supabase
           .from('fantasy_leaderboard')
           .select('player_name, score')
           .order('score', { ascending: false })
-          .limit(10);
+          .limit(5); // Capped at top 5
           
         if (error) {
           console.error("Error fetching leaderboard:", error);
@@ -470,7 +492,7 @@ import stats from '../data/fantasy-stats.json';
         contentHistory.classList.remove('active');
       });
 
-      // --- NEW: DYNAMIC SLOT CALCULATION ---
+      // --- DYNAMIC SLOT CALCULATION ---
       function getAvailableSlots(position: string): string[] {
         const slots: string[] = [];
         if (position === 'QB' && !roster.QB) slots.push('QB');
@@ -492,7 +514,6 @@ import stats from '../data/fantasy-stats.json';
           if (!roster.FLEX) slots.push('FLEX');
         }
         
-        // Superflex applies to all positions
         if (!roster.SUPERFLEX) slots.push('SUPERFLEX');
         
         return slots;
@@ -533,7 +554,6 @@ import stats from '../data/fantasy-stats.json';
         }
       }
 
-      // Listen for player selection changes to update the slot dropdown
       (document.getElementById('player-select') as HTMLSelectElement).addEventListener('change', updateSlotDropdown);
 
       // --- GAMEPLAY LOGIC ---
@@ -545,6 +565,16 @@ import stats from '../data/fantasy-stats.json';
         const playerSelect = document.getElementById('player-select') as HTMLSelectElement;
         const slotSelect = document.getElementById('slot-select') as HTMLSelectElement;
         const btnDraft = document.getElementById('btn-draft') as HTMLButtonElement;
+        const btnRespin = document.getElementById('btn-respin') as HTMLButtonElement;
+
+        // Configure Respin button state
+        if (hasRespun) {
+          btnRespin.disabled = true;
+          btnRespin.textContent = 'Respin Used';
+        } else {
+          btnRespin.disabled = false;
+          btnRespin.textContent = 'Respin (1x)';
+        }
 
         currentDraftPool = stats.filter((p: Player) => {
           if (p.Team !== team) return false;
@@ -585,18 +615,27 @@ import stats from '../data/fantasy-stats.json';
           });
           playerSelect.disabled = false;
           playerSelect.selectedIndex = 0;
-          updateSlotDropdown(); // Automatically calculate slots for the first player
+          updateSlotDropdown();
         }
         
         wheelContainer.style.display = 'none';
         draftContainer.style.display = 'flex';
       });
 
-      (document.getElementById('btn-skip') as HTMLButtonElement).addEventListener('click', () => {
+      // 1-Time Respin Button Logic
+      (document.getElementById('btn-respin') as HTMLButtonElement).addEventListener('click', () => {
+        if (hasRespun) return;
+        hasRespun = true;
+        
         draftContainer.style.display = 'none';
         wheelContainer.style.display = 'block';
+        
+        // Automatically trigger a second spin event
+        const spinBtn = document.getElementById('spin-btn') as HTMLButtonElement;
+        if (spinBtn) spinBtn.click();
       });
 
+      // Draft Button Logic
       (document.getElementById('btn-draft') as HTMLButtonElement).addEventListener('click', async () => {
         const playerSelect = document.getElementById('player-select') as HTMLSelectElement;
         const slotSelect = document.getElementById('slot-select') as HTMLSelectElement;
@@ -606,11 +645,9 @@ import stats from '../data/fantasy-stats.json';
         const player = currentDraftPool[parseInt(playerSelect.value)];
         const assignedSlot = slotSelect.value;
 
-        // Apply Player to Roster
         roster[assignedSlot] = player;
         const slotEl = document.getElementById(`slot-${assignedSlot.toLowerCase()}`) as HTMLElement;
         
-        // Handle UI update and 2x Points Multiplier
         const displayPoints = assignedSlot === 'SUPERFLEX' ? (player.Points * 2) : player.Points;
 
         if (slotEl) {
@@ -659,8 +696,8 @@ import stats from '../data/fantasy-stats.json';
               
               if (error) {
                 console.error("Error saving to global leaderboard:", error);
-                authMessageEl.textContent = "Error communicating with leaderboard. Check your Supabase SQL policies.";
-                authMessageEl.style.color = '#f87171'; // Red error text
+                authMessageEl.textContent = "Error communicating with leaderboard.";
+                authMessageEl.style.color = '#f87171';
               } else {
                 const updatedBoard = await loadGlobalLeaderboard();
                 renderGlobalLeaderboard(updatedBoard);
@@ -678,6 +715,11 @@ import stats from '../data/fantasy-stats.json';
             banner.style.display = 'block';
           }, 300);
         }
+      });
+
+      // Play Again Button Logic
+      (document.getElementById('btn-play-again') as HTMLButtonElement).addEventListener('click', () => {
+        window.location.reload();
       });
     </script>
   </body>

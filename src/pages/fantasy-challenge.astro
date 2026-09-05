@@ -88,10 +88,19 @@ import stats from '../data/fantasy-stats.json';
       .draft-sub {
         color: #a1a1aa;
         font-size: 0.9rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
         text-align: center;
       }
       
+      .draft-field-label {
+        display: block;
+        color: #a1a1aa;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+
       select {
         width: 100%;
         background: #18181b;
@@ -100,9 +109,15 @@ import stats from '../data/fantasy-stats.json';
         border-radius: 6px;
         font-size: 1rem;
         outline: none;
-        margin-bottom: 1.5rem;
         padding: 0.5rem;
       }
+      #player-select {
+        margin-bottom: 1rem;
+      }
+      #slot-select {
+        margin-bottom: 1.5rem;
+      }
+
       select:focus {
         border-color: #38bdf8;
       }
@@ -265,8 +280,14 @@ import stats from '../data/fantasy-stats.json';
 
           <div id="draft-container">
             <h3>Drafting from <span id="draft-team-name" class="highlight-text"></span></h3>
-            <p class="draft-sub">Select a player to fill an open roster spot.</p>
-            <select id="player-select" size="8"></select>
+            <p class="draft-sub">Select a player and assign them to an open slot.</p>
+            
+            <label class="draft-field-label">1. Select Player</label>
+            <select id="player-select" size="5"></select>
+
+            <label class="draft-field-label">2. Assign to Slot</label>
+            <select id="slot-select"></select>
+
             <div class="draft-actions">
               <button id="btn-skip" class="btn-skip">Skip Team</button>
               <button id="btn-draft" class="btn-draft">Draft Player</button>
@@ -340,7 +361,6 @@ import stats from '../data/fantasy-stats.json';
         [key: string]: Player | null;
       }
       
-      // SUPERFLEX ADDED TO STATE
       const roster: RosterState = { QB: null, RB1: null, RB2: null, WR1: null, WR2: null, TE: null, FLEX: null, SUPERFLEX: null };
       
       let currentDraftPool: Player[] = [];
@@ -355,7 +375,7 @@ import stats from '../data/fantasy-stats.json';
       const scoreHistoryList = document.getElementById('score-history-list') as HTMLUListElement;
       const leaderboardList = document.getElementById('leaderboard-list') as HTMLUListElement;
 
-      // --- LOCAL HISTORY (Personal browser tracking) ---
+      // --- LOCAL HISTORY ---
       function loadHistory(): number[] {
         const saved = localStorage.getItem('fantasyHistory');
         return saved ? JSON.parse(saved) : [];
@@ -392,7 +412,7 @@ import stats from '../data/fantasy-stats.json';
         });
       }
 
-      // --- SUPABASE GLOBAL LEADERBOARD ---
+      // --- SUPABASE LEADERBOARD ---
       async function loadGlobalLeaderboard() {
         const { data, error } = await supabase
           .from('fantasy_leaderboard')
@@ -431,7 +451,7 @@ import stats from '../data/fantasy-stats.json';
         });
       }
 
-      // Initialize both scoreboards on page load
+      // Initialize
       renderHistory(loadHistory());
       loadGlobalLeaderboard().then(renderGlobalLeaderboard);
 
@@ -450,50 +470,124 @@ import stats from '../data/fantasy-stats.json';
         contentHistory.classList.remove('active');
       });
 
+      // --- NEW: DYNAMIC SLOT CALCULATION ---
+      function getAvailableSlots(position: string): string[] {
+        const slots: string[] = [];
+        if (position === 'QB' && !roster.QB) slots.push('QB');
+        
+        if (position === 'RB') {
+          if (!roster.RB1) slots.push('RB1');
+          if (!roster.RB2) slots.push('RB2');
+          if (!roster.FLEX) slots.push('FLEX');
+        }
+        
+        if (position === 'WR') {
+          if (!roster.WR1) slots.push('WR1');
+          if (!roster.WR2) slots.push('WR2');
+          if (!roster.FLEX) slots.push('FLEX');
+        }
+        
+        if (position === 'TE') {
+          if (!roster.TE) slots.push('TE');
+          if (!roster.FLEX) slots.push('FLEX');
+        }
+        
+        // Superflex applies to all positions
+        if (!roster.SUPERFLEX) slots.push('SUPERFLEX');
+        
+        return slots;
+      }
+
+      function updateSlotDropdown() {
+        const playerSelect = document.getElementById('player-select') as HTMLSelectElement;
+        const slotSelect = document.getElementById('slot-select') as HTMLSelectElement;
+        const btnDraft = document.getElementById('btn-draft') as HTMLButtonElement;
+        
+        slotSelect.innerHTML = '';
+        
+        if (playerSelect.disabled || playerSelect.value === '') {
+          slotSelect.disabled = true;
+          btnDraft.disabled = true;
+          return;
+        }
+
+        const player = currentDraftPool[parseInt(playerSelect.value)];
+        const availableSlots = getAvailableSlots(player.Position);
+
+        if (availableSlots.length === 0) {
+          const opt = document.createElement('option');
+          opt.text = 'No valid slots available';
+          opt.value = '';
+          slotSelect.appendChild(opt);
+          slotSelect.disabled = true;
+          btnDraft.disabled = true;
+        } else {
+          availableSlots.forEach(slot => {
+            const opt = document.createElement('option');
+            opt.value = slot;
+            opt.text = slot === 'SUPERFLEX' ? 'SUPERFLEX (2x Points)' : slot;
+            slotSelect.appendChild(opt);
+          });
+          slotSelect.disabled = false;
+          btnDraft.disabled = false;
+        }
+      }
+
+      // Listen for player selection changes to update the slot dropdown
+      (document.getElementById('player-select') as HTMLSelectElement).addEventListener('change', updateSlotDropdown);
+
       // --- GAMEPLAY LOGIC ---
       document.addEventListener('teamDrafted', (e: Event) => {
         const customEvent = e as CustomEvent;
         const team = customEvent.detail;
         
         const teamName = document.getElementById('draft-team-name') as HTMLElement;
-        const select = document.getElementById('player-select') as HTMLSelectElement;
+        const playerSelect = document.getElementById('player-select') as HTMLSelectElement;
+        const slotSelect = document.getElementById('slot-select') as HTMLSelectElement;
         const btnDraft = document.getElementById('btn-draft') as HTMLButtonElement;
 
-        // Draft Pool Filter updated to include SUPERFLEX availability
         currentDraftPool = stats.filter((p: Player) => {
           if (p.Team !== team) return false;
           
           const isDrafted = Object.values(roster).some(r => r && r.Player === p.Player);
           if (isDrafted) return false;
           
-          if (p.Position === 'QB') return !roster.QB || !roster.SUPERFLEX;
-          if (p.Position === 'RB') return !roster.RB1 || !roster.RB2 || !roster.FLEX || !roster.SUPERFLEX;
-          if (p.Position === 'WR') return !roster.WR1 || !roster.WR2 || !roster.FLEX || !roster.SUPERFLEX;
-          if (p.Position === 'TE') return !roster.TE || !roster.FLEX || !roster.SUPERFLEX;
-          
-          return false;
+          const validSlots = getAvailableSlots(p.Position);
+          return validSlots.length > 0;
         });
 
         currentDraftPool.sort((a, b) => b.Points - a.Points);
         teamName.textContent = team;
-        select.innerHTML = '';
+        playerSelect.innerHTML = '';
 
         if (currentDraftPool.length === 0) {
           const opt = document.createElement('option');
           opt.text = 'No available players for open slots';
           opt.value = '';
           opt.disabled = true;
-          select.appendChild(opt);
+          playerSelect.appendChild(opt);
+          playerSelect.disabled = true;
+          
+          slotSelect.innerHTML = '';
+          const slotOpt = document.createElement('option');
+          slotOpt.text = '-';
+          slotOpt.value = '';
+          slotSelect.appendChild(slotOpt);
+          slotSelect.disabled = true;
+          
           btnDraft.disabled = true;
         } else {
           currentDraftPool.forEach((p, idx) => {
             const opt = document.createElement('option');
             opt.value = idx.toString();
             opt.text = `${p.Player} (${p.Position}) - ${p.Points} PPG`;
-            select.appendChild(opt);
+            playerSelect.appendChild(opt);
           });
-          btnDraft.disabled = false;
+          playerSelect.disabled = false;
+          playerSelect.selectedIndex = 0;
+          updateSlotDropdown(); // Automatically calculate slots for the first player
         }
+        
         wheelContainer.style.display = 'none';
         draftContainer.style.display = 'flex';
       });
@@ -504,58 +598,35 @@ import stats from '../data/fantasy-stats.json';
       });
 
       (document.getElementById('btn-draft') as HTMLButtonElement).addEventListener('click', async () => {
-        const select = document.getElementById('player-select') as HTMLSelectElement;
-        if (select.disabled || !select.value) return;
+        const playerSelect = document.getElementById('player-select') as HTMLSelectElement;
+        const slotSelect = document.getElementById('slot-select') as HTMLSelectElement;
+        
+        if (playerSelect.disabled || !playerSelect.value || slotSelect.disabled || !slotSelect.value) return;
 
-        const player = currentDraftPool[parseInt(select.value)];
-        let assignedSlot: string | null = null;
+        const player = currentDraftPool[parseInt(playerSelect.value)];
+        const assignedSlot = slotSelect.value;
 
-        // Assignment Hierarchy: Standard -> Flex -> Superflex
-        if (player.Position === 'QB') {
-          if (!roster.QB) assignedSlot = 'QB';
-          else assignedSlot = 'SUPERFLEX';
-        }
-        else if (player.Position === 'RB') {
-          if (!roster.RB1) assignedSlot = 'RB1';
-          else if (!roster.RB2) assignedSlot = 'RB2';
-          else if (!roster.FLEX) assignedSlot = 'FLEX';
-          else assignedSlot = 'SUPERFLEX';
-        }
-        else if (player.Position === 'WR') {
-          if (!roster.WR1) assignedSlot = 'WR1';
-          else if (!roster.WR2) assignedSlot = 'WR2';
-          else if (!roster.FLEX) assignedSlot = 'FLEX';
-          else assignedSlot = 'SUPERFLEX';
-        }
-        else if (player.Position === 'TE') {
-          if (!roster.TE) assignedSlot = 'TE';
-          else if (!roster.FLEX) assignedSlot = 'FLEX';
-          else assignedSlot = 'SUPERFLEX';
+        // Apply Player to Roster
+        roster[assignedSlot] = player;
+        const slotEl = document.getElementById(`slot-${assignedSlot.toLowerCase()}`) as HTMLElement;
+        
+        // Handle UI update and 2x Points Multiplier
+        const displayPoints = assignedSlot === 'SUPERFLEX' ? (player.Points * 2) : player.Points;
+
+        if (slotEl) {
+          slotEl.classList.remove('empty');
+          (slotEl.querySelector('.player-name') as HTMLElement).textContent = player.Player;
+          (slotEl.querySelector('.player-team') as HTMLElement).textContent = player.Team;
+          (slotEl.querySelector('.slot-points') as HTMLElement).textContent = displayPoints.toFixed(1);
         }
 
-        if (assignedSlot) {
-          roster[assignedSlot] = player;
-          const slotEl = document.getElementById(`slot-${assignedSlot.toLowerCase()}`) as HTMLElement;
-          
-          // Double points for Superflex UI display
-          const displayPoints = assignedSlot === 'SUPERFLEX' ? (player.Points * 2) : player.Points;
-
-          if (slotEl) {
-            slotEl.classList.remove('empty');
-            (slotEl.querySelector('.player-name') as HTMLElement).textContent = player.Player;
-            (slotEl.querySelector('.player-team') as HTMLElement).textContent = player.Team;
-            (slotEl.querySelector('.slot-points') as HTMLElement).textContent = displayPoints.toFixed(1);
-          }
-
-          // Calculate running total with doubled superflex score
-          let total = 0;
-          Object.entries(roster).forEach(([slot, p]) => { 
-            if (p) {
-              total += slot === 'SUPERFLEX' ? p.Points * 2 : p.Points;
-            } 
-          });
-          (document.getElementById('roster-total') as HTMLElement).textContent = total.toFixed(1);
-        }
+        let total = 0;
+        Object.entries(roster).forEach(([slot, p]) => { 
+          if (p) {
+            total += slot === 'SUPERFLEX' ? (p.Points * 2) : p.Points;
+          } 
+        });
+        (document.getElementById('roster-total') as HTMLElement).textContent = total.toFixed(1);
 
         draftContainer.style.display = 'none';
         wheelContainer.style.display = 'block';
@@ -573,16 +644,13 @@ import stats from '../data/fantasy-stats.json';
           const finalScoreNum = parseFloat(finalScoreStr);
           
           setTimeout(async () => {
-            // ALWAYS save to personal browser history
             const updatedHistory = saveHistory(finalScoreNum);
             renderHistory(updatedHistory, finalScoreNum);
 
-            // CHECK AUTH FOR GLOBAL LEADERBOARD
             const { data: { session } } = await supabase.auth.getSession();
             const authMessageEl = document.getElementById('auth-status-message') as HTMLElement;
 
             if (session && session.user) {
-              // Attempt to pull username from metadata, fallback to the first half of their email
               const playerName = session.user.user_metadata?.username || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || "Anonymous";
               
               const { error } = await supabase
@@ -591,7 +659,8 @@ import stats from '../data/fantasy-stats.json';
               
               if (error) {
                 console.error("Error saving to global leaderboard:", error);
-                authMessageEl.textContent = "Error communicating with leaderboard servers.";
+                authMessageEl.textContent = "Error communicating with leaderboard. Check your Supabase SQL policies.";
+                authMessageEl.style.color = '#f87171'; // Red error text
               } else {
                 const updatedBoard = await loadGlobalLeaderboard();
                 renderGlobalLeaderboard(updatedBoard);
@@ -600,7 +669,6 @@ import stats from '../data/fantasy-stats.json';
               }
               tabLeaderboard.click();
             } else {
-              // If not logged in, just show personal scores
               authMessageEl.textContent = "Log in to post your score to the Global Leaderboard!";
               tabHistory.click();
             }

@@ -163,22 +163,29 @@ import stats from '../data/fantasy-stats.json';
       
       .game-over-banner {
         display: none; 
-        background: #38bdf8;
-        color: #111111;
+        background: #18181b;
+        border: 1px solid #38bdf8;
+        color: white;
         text-align: center;
         padding: 1rem;
         border-radius: 6px;
         margin-bottom: 1rem;
-        font-weight: bold;
-        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.15);
       }
       .game-over-banner h3 {
         margin: 0 0 0.25rem 0;
         font-size: 1.3rem;
+        color: #38bdf8;
       }
       .game-over-banner p {
-        margin: 0;
+        margin: 0 0 0.5rem 0;
         font-size: 1.1rem;
+        font-weight: bold;
+      }
+      .auth-message {
+        font-size: 0.85rem;
+        color: #a1a1aa;
+        font-style: italic;
       }
 
       .tabs-nav {
@@ -229,24 +236,11 @@ import stats from '../data/fantasy-stats.json';
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 1rem;
       }
       .score-item.new-score {
         border-color: #38bdf8;
         background: rgba(56, 189, 248, 0.1);
-      }
-      .score-rank {
-        color: #a1a1aa;
-        font-size: 0.9rem;
-      }
-      .player-badge {
-        font-weight: bold;
-        color: #e4e4e7;
-        margin-left: 0.75rem;
-      }
-      .score-value {
-        font-weight: bold;
-        color: #38bdf8;
-        font-size: 1.1rem;
       }
       .empty-state {
         text-align: center;
@@ -290,6 +284,7 @@ import stats from '../data/fantasy-stats.json';
             <div id="game-over-banner" class="game-over-banner">
               <h3>Draft Complete!</h3>
               <p>Final Score: <span id="final-score-text">0.0</span> PPG</p>
+              <div id="auth-status-message" class="auth-message"></div>
             </div>
 
             <div class="tabs-nav">
@@ -314,12 +309,10 @@ import stats from '../data/fantasy-stats.json';
 
     <Footer />
 
-    <!-- We inject the server data into the browser window here -->
     <script is:inline define:vars={{ stats }}>
       window.gameStatsData = stats;
     </script>
 
-    <!-- The Game Engine (Fully Typed, Safe from Astro Parser Bugs) -->
     <script>
       import { supabase } from '../utils/supabase';
 
@@ -346,7 +339,9 @@ import stats from '../data/fantasy-stats.json';
       interface RosterState {
         [key: string]: Player | null;
       }
-      const roster: RosterState = { QB: null, RB1: null, RB2: null, WR1: null, WR2: null, TE: null, FLEX: null };
+      
+      // SUPERFLEX ADDED TO STATE
+      const roster: RosterState = { QB: null, RB1: null, RB2: null, WR1: null, WR2: null, TE: null, FLEX: null, SUPERFLEX: null };
       
       let currentDraftPool: Player[] = [];
 
@@ -389,16 +384,10 @@ import stats from '../data/fantasy-stats.json';
           li.className = 'score-item';
           if (score === newestScore) li.classList.add('new-score');
           
-          const rankSpan = document.createElement('span');
-          rankSpan.className = 'score-rank';
-          rankSpan.textContent = '#' + (index + 1);
-          
-          const valSpan = document.createElement('span');
-          valSpan.className = 'score-value';
-          valSpan.textContent = score.toFixed(1);
-          
-          li.appendChild(rankSpan);
-          li.appendChild(valSpan);
+          li.innerHTML = `
+            <span class="score-rank" style="color: #a1a1aa; font-weight: bold; width: 30px;">#${index + 1}</span>
+            <span class="score-value" style="color: #38bdf8; font-weight: bold; margin-left: auto;">${score.toFixed(1)}</span>
+          `;
           scoreHistoryList.appendChild(li);
         });
       }
@@ -431,27 +420,13 @@ import stats from '../data/fantasy-stats.json';
           const li = document.createElement('li');
           li.className = 'score-item';
           
-          const leftDiv = document.createElement('div');
-          leftDiv.style.display = 'flex';
-          leftDiv.style.alignItems = 'center';
-          
-          const rankSpan = document.createElement('span');
-          rankSpan.className = 'score-rank';
-          rankSpan.textContent = '#' + (index + 1);
-          
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'player-badge';
-          nameSpan.textContent = entry.player_name;
-          
-          leftDiv.appendChild(rankSpan);
-          leftDiv.appendChild(nameSpan);
-          
-          const valSpan = document.createElement('span');
-          valSpan.className = 'score-value';
-          valSpan.textContent = entry.score.toFixed(1);
-          
-          li.appendChild(leftDiv);
-          li.appendChild(valSpan);
+          li.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span class="score-rank" style="color: #a1a1aa; font-weight: bold; width: 30px;">#${index + 1}</span>
+              <span class="player-badge" style="color: #e4e4e7; font-weight: bold;">${entry.player_name}</span>
+            </div>
+            <span class="score-value" style="color: #38bdf8; font-weight: bold; margin-left: auto;">${entry.score.toFixed(1)}</span>
+          `;
           leaderboardList.appendChild(li);
         });
       }
@@ -484,14 +459,18 @@ import stats from '../data/fantasy-stats.json';
         const select = document.getElementById('player-select') as HTMLSelectElement;
         const btnDraft = document.getElementById('btn-draft') as HTMLButtonElement;
 
+        // Draft Pool Filter updated to include SUPERFLEX availability
         currentDraftPool = stats.filter((p: Player) => {
           if (p.Team !== team) return false;
+          
           const isDrafted = Object.values(roster).some(r => r && r.Player === p.Player);
           if (isDrafted) return false;
-          if (p.Position === 'QB') return !roster.QB;
-          if (p.Position === 'RB') return !roster.RB1 || !roster.RB2 || !roster.FLEX;
-          if (p.Position === 'WR') return !roster.WR1 || !roster.WR2 || !roster.FLEX;
-          if (p.Position === 'TE') return !roster.TE || !roster.FLEX;
+          
+          if (p.Position === 'QB') return !roster.QB || !roster.SUPERFLEX;
+          if (p.Position === 'RB') return !roster.RB1 || !roster.RB2 || !roster.FLEX || !roster.SUPERFLEX;
+          if (p.Position === 'WR') return !roster.WR1 || !roster.WR2 || !roster.FLEX || !roster.SUPERFLEX;
+          if (p.Position === 'TE') return !roster.TE || !roster.FLEX || !roster.SUPERFLEX;
+          
           return false;
         });
 
@@ -531,34 +510,50 @@ import stats from '../data/fantasy-stats.json';
         const player = currentDraftPool[parseInt(select.value)];
         let assignedSlot: string | null = null;
 
-        if (player.Position === 'QB') assignedSlot = 'QB';
+        // Assignment Hierarchy: Standard -> Flex -> Superflex
+        if (player.Position === 'QB') {
+          if (!roster.QB) assignedSlot = 'QB';
+          else assignedSlot = 'SUPERFLEX';
+        }
         else if (player.Position === 'RB') {
           if (!roster.RB1) assignedSlot = 'RB1';
           else if (!roster.RB2) assignedSlot = 'RB2';
-          else assignedSlot = 'FLEX';
+          else if (!roster.FLEX) assignedSlot = 'FLEX';
+          else assignedSlot = 'SUPERFLEX';
         }
         else if (player.Position === 'WR') {
           if (!roster.WR1) assignedSlot = 'WR1';
           else if (!roster.WR2) assignedSlot = 'WR2';
-          else assignedSlot = 'FLEX';
+          else if (!roster.FLEX) assignedSlot = 'FLEX';
+          else assignedSlot = 'SUPERFLEX';
         }
         else if (player.Position === 'TE') {
           if (!roster.TE) assignedSlot = 'TE';
-          else assignedSlot = 'FLEX';
+          else if (!roster.FLEX) assignedSlot = 'FLEX';
+          else assignedSlot = 'SUPERFLEX';
         }
 
         if (assignedSlot) {
           roster[assignedSlot] = player;
           const slotEl = document.getElementById(`slot-${assignedSlot.toLowerCase()}`) as HTMLElement;
+          
+          // Double points for Superflex UI display
+          const displayPoints = assignedSlot === 'SUPERFLEX' ? (player.Points * 2) : player.Points;
+
           if (slotEl) {
             slotEl.classList.remove('empty');
             (slotEl.querySelector('.player-name') as HTMLElement).textContent = player.Player;
             (slotEl.querySelector('.player-team') as HTMLElement).textContent = player.Team;
-            (slotEl.querySelector('.slot-points') as HTMLElement).textContent = player.Points.toFixed(1);
+            (slotEl.querySelector('.slot-points') as HTMLElement).textContent = displayPoints.toFixed(1);
           }
 
+          // Calculate running total with doubled superflex score
           let total = 0;
-          Object.values(roster).forEach(p => { if (p) total += p.Points; });
+          Object.entries(roster).forEach(([slot, p]) => { 
+            if (p) {
+              total += slot === 'SUPERFLEX' ? p.Points * 2 : p.Points;
+            } 
+          });
           (document.getElementById('roster-total') as HTMLElement).textContent = total.toFixed(1);
         }
 
@@ -578,23 +573,37 @@ import stats from '../data/fantasy-stats.json';
           const finalScoreNum = parseFloat(finalScoreStr);
           
           setTimeout(async () => {
-            const playerName = prompt(`Draft Complete! Final Score: ${finalScoreStr} PPG\n\nEnter your name for the global leaderboard:`) || "Anonymous Player";
-            
+            // ALWAYS save to personal browser history
             const updatedHistory = saveHistory(finalScoreNum);
             renderHistory(updatedHistory, finalScoreNum);
 
-            const { error } = await supabase
-              .from('fantasy_leaderboard')
-              .insert([{ player_name: playerName, score: finalScoreNum }]);
-            
-            if (error) {
-              console.error("Error saving to global leaderboard:", error);
-            } else {
-              const updatedBoard = await loadGlobalLeaderboard();
-              renderGlobalLeaderboard(updatedBoard);
-            }
+            // CHECK AUTH FOR GLOBAL LEADERBOARD
+            const { data: { session } } = await supabase.auth.getSession();
+            const authMessageEl = document.getElementById('auth-status-message') as HTMLElement;
 
-            tabLeaderboard.click();
+            if (session && session.user) {
+              // Attempt to pull username from metadata, fallback to the first half of their email
+              const playerName = session.user.user_metadata?.username || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || "Anonymous";
+              
+              const { error } = await supabase
+                .from('fantasy_leaderboard')
+                .insert([{ player_name: playerName, score: finalScoreNum }]);
+              
+              if (error) {
+                console.error("Error saving to global leaderboard:", error);
+                authMessageEl.textContent = "Error communicating with leaderboard servers.";
+              } else {
+                const updatedBoard = await loadGlobalLeaderboard();
+                renderGlobalLeaderboard(updatedBoard);
+                authMessageEl.textContent = `Score published globally as ${playerName}!`;
+                authMessageEl.style.color = '#38bdf8';
+              }
+              tabLeaderboard.click();
+            } else {
+              // If not logged in, just show personal scores
+              authMessageEl.textContent = "Log in to post your score to the Global Leaderboard!";
+              tabHistory.click();
+            }
 
             const banner = document.getElementById('game-over-banner') as HTMLElement;
             (document.getElementById('final-score-text') as HTMLElement).textContent = finalScoreStr;

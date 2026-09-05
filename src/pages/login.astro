@@ -8,10 +8,10 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 <!doctype html>
 <html lang="en">
     <head>
-        <BaseHead title={`Account - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+        <BaseHead title={`Account & Dashboard - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
         <style>
             main {
-                max-width: 600px;
+                max-width: 650px;
                 margin: 0 auto;
                 padding: 3em 1em;
             }
@@ -89,15 +89,72 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             .hidden {
                 display: none !important;
             }
+
+            /* Dashboard Specific Styles */
+            .dashboard-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin: 2rem 0;
+            }
+            @media (min-width: 500px) {
+                .dashboard-grid {
+                    grid-template-columns: 1fr 1fr;
+                }
+            }
+            .stat-card {
+                background: #18181b;
+                border: 1px solid #27272a;
+                border-radius: 6px;
+                padding: 1.5rem;
+                text-align: center;
+            }
+            .stat-card h4 {
+                margin: 0 0 1rem 0;
+                color: #38bdf8;
+                font-size: 1.1rem;
+            }
+            .stat-big {
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: white;
+            }
+            .stat-sub {
+                color: #a1a1aa;
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+            }
+            .score-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .score-item {
+                background: #111111;
+                border: 1px solid #27272a;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .score-rank { color: #a1a1aa; font-weight: bold; }
+            .score-val { color: #38bdf8; font-weight: bold; }
+            .loading-text { color: #a1a1aa; font-style: italic; font-size: 0.9rem; }
         </style>
     </head>
     <body>
         <Header />
         <main>
-            <h1 style="text-align: center; color: white;">Account Access</h1>
+            <h1 style="text-align: center; color: white;">Manager Dashboard</h1>
             <div class="auth-container">
-                <!-- Logged Out View -->
+                
+                <!-- Logged Out View (Login / Signup Forms) -->
                 <div id="logged-out-view">
+                    <p style="text-align: center; color: #a1a1aa; margin-bottom: 2rem;">Log in to access your personal dashboard.</p>
                     <div class="form-group">
                         <label for="signup-username">Username <span style="color: #ef4444;">*</span></label>
                         <input type="text" id="signup-username" placeholder="CoolSportsFan99" required />
@@ -118,10 +175,34 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 
                 <!-- Logged In Dashboard View -->
                 <div id="logged-in-view" class="hidden">
-                    <h3 style="color: white; text-align: center;">Welcome back, <span id="display-username">User</span>!</h3>
-                    <p style="text-align: center; color: #a1a1aa; font-size: 0.9rem;" id="display-email"></p>
+                    <h2 style="color: white; text-align: center; margin-bottom: 0;">Welcome, <span id="display-username">User</span>!</h2>
+                    <p style="text-align: center; color: #a1a1aa; font-size: 0.9rem; margin-top: 0.5rem;" id="display-email"></p>
                     
+                    <!-- Stats Grid -->
+                    <div class="dashboard-grid">
+                        
+                        <!-- Pick'em Card -->
+                        <div class="stat-card">
+                            <h4>Pick'em Accuracy</h4>
+                            <div id="pickem-loading" class="loading-text">Analyzing season data...</div>
+                            <div id="pickem-stats" class="hidden">
+                                <div class="stat-big" id="pickem-percent">0%</div>
+                                <div class="stat-sub"><span id="pickem-correct">0</span> / <span id="pickem-graded">0</span> Correct</div>
+                            </div>
+                        </div>
+
+                        <!-- Fantasy Card -->
+                        <div class="stat-card">
+                            <h4>Top Fantasy Drafts</h4>
+                            <div id="fantasy-loading" class="loading-text">Loading scores...</div>
+                            <ul class="score-list hidden" id="fantasy-scores-list"></ul>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Account Settings -->
                     <div class="account-section">
+                        <h4 style="color: white; margin-top: 0; margin-bottom: 1rem;">Account Settings</h4>
                         <div class="form-group">
                             <label for="new-username">Change Username</label>
                             <input type="text" id="new-username" placeholder="Enter new username" />
@@ -129,7 +210,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                         <button type="button" id="update-username-btn">Update Username</button>
                     </div>
 
-                    <div class="account-section" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div class="account-section" style="display: flex; flex-direction: column; gap: 0.5rem; padding-top: 1rem; margin-top: 1rem;">
                         <button type="button" id="logout-btn">Log Out</button>
                     </div>
                 </div>
@@ -160,6 +241,167 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
             const homeUrl = '/my-sports-blog/';
 
+            // Dashboard Data Loading Function
+            async function loadDashboardData(user: any) {
+                const username = user.user_metadata?.username || 'Anonymous';
+                
+                // 1. Fetch Top 3 Fantasy Scores
+                try {
+                    const { data: fantasyData, error: fantasyError } = await supabase
+                        .from('fantasy_leaderboard')
+                        .select('score')
+                        .eq('player_name', username)
+                        .order('score', { ascending: false })
+                        .limit(3);
+                        
+                    const fLoading = document.getElementById('fantasy-loading');
+                    const fList = document.getElementById('fantasy-scores-list');
+                    
+                    if (fLoading && fList) {
+                        fLoading.classList.add('hidden');
+                        fList.classList.remove('hidden');
+                        fList.innerHTML = '';
+                        
+                        if (fantasyError || !fantasyData || fantasyData.length === 0) {
+                            fList.innerHTML = '<li class="score-item" style="justify-content: center; color: #a1a1aa;">No drafts completed yet.</li>';
+                        } else {
+                            fantasyData.forEach((entry: { score: number }, idx: number) => {
+                                fList.innerHTML += `
+                                    <li class="score-item">
+                                        <span class="score-rank">#${idx + 1}</span>
+                                        <span class="score-val">${entry.score.toFixed(1)} PPG</span>
+                                    </li>
+                                `;
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error("Fantasy data load error:", e);
+                }
+
+                // 2. Fetch and Grade Pick'em Stats
+                try {
+                    const { data: picksData, error: picksError } = await supabase
+                        .from('user_picks')
+                        .select('game_id, selected_team')
+                        .eq('user_id', user.id);
+
+                    if (picksError) throw picksError;
+
+                    const gameMasterMap: { [key: string]: any } = {};
+                    const weekPromises = [];
+                    
+                    for (let w = 1; w <= 18; w++) {
+                        weekPromises.push(
+                            fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=${w}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    data.events?.forEach((event: any) => {
+                                        const comp = event.competitions[0];
+                                        const homeTeamInfo = comp.competitors.find((c: any) => c.homeAway === 'home');
+                                        const awayTeamInfo = comp.competitors.find((c: any) => c.homeAway === 'away');
+                                        
+                                        let homeSpread = 'TBD';
+                                        let awaySpread = 'TBD';
+                                        
+                                        if (comp.odds && comp.odds.length > 0) {
+                                            const details = comp.odds[0].details || '';
+                                            if (details.toUpperCase() === 'EVEN') {
+                                                homeSpread = '+0';
+                                                awaySpread = '+0';
+                                            } else {
+                                                const parts = details.split(' ');
+                                                if (parts.length >= 2) {
+                                                    const favAbbrev = parts[0];
+                                                    const val = parseFloat(parts[1]); 
+                                                    const oppositeVal = val > 0 ? `-${val}` : `+${Math.abs(val)}`;
+                                                    const currentValStr = val > 0 ? `+${val}` : `${val}`;
+                                                    
+                                                    if (homeTeamInfo.team.abbreviation === favAbbrev) {
+                                                        homeSpread = currentValStr;
+                                                        awaySpread = oppositeVal;
+                                                    } else if (awayTeamInfo.team.abbreviation === favAbbrev) {
+                                                        awaySpread = currentValStr;
+                                                        homeSpread = oppositeVal;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        gameMasterMap[event.id] = {
+                                            away: awayTeamInfo.team.displayName,
+                                            awaySpread: awaySpread,
+                                            awayScore: parseInt(awayTeamInfo.score) || 0,
+                                            home: homeTeamInfo.team.displayName,
+                                            homeSpread: homeSpread,
+                                            homeScore: parseInt(homeTeamInfo.score) || 0,
+                                            completed: event.status.type.completed
+                                        };
+                                    });
+                                })
+                                .catch(() => {})
+                        );
+                    }
+
+                    await Promise.all(weekPromises);
+
+                    let total = 0, graded = 0, correct = 0;
+
+                    picksData?.forEach((row: any) => {
+                        const game = gameMasterMap[row.game_id];
+                        if (!game) return;
+
+                        total++;
+                        
+                        if (game.completed && game.awaySpread !== 'TBD' && game.homeSpread !== 'TBD') {
+                            const homeScore = game.homeScore;
+                            const awayScore = game.awayScore;
+                            
+                            let pickWon = false;
+                            let push = false;
+
+                            if (row.selected_team === game.away) {
+                                const adjustedAway = awayScore + parseFloat(game.awaySpread);
+                                if (adjustedAway > homeScore) pickWon = true;
+                                else if (adjustedAway === homeScore) push = true;
+                            } else if (row.selected_team === game.home) {
+                                const adjustedHome = homeScore + parseFloat(game.homeSpread);
+                                if (adjustedHome > awayScore) pickWon = true;
+                                else if (adjustedHome === homeScore) push = true;
+                            }
+
+                            if (!push) {
+                                graded++;
+                                if (pickWon) correct++;
+                            }
+                        }
+                    });
+
+                    const percent = graded > 0 ? (correct / graded) * 100 : 0;
+
+                    const pLoading = document.getElementById('pickem-loading');
+                    const pStats = document.getElementById('pickem-stats');
+                    
+                    if (pLoading && pStats) {
+                        pLoading.classList.add('hidden');
+                        pStats.classList.remove('hidden');
+                        
+                        const percEl = document.getElementById('pickem-percent');
+                        const corrEl = document.getElementById('pickem-correct');
+                        const gradEl = document.getElementById('pickem-graded');
+                        
+                        if (percEl) percEl.textContent = `${percent.toFixed(1)}%`;
+                        if (corrEl) corrEl.textContent = correct.toString();
+                        if (gradEl) gradEl.textContent = graded.toString();
+                    }
+
+                } catch (e) {
+                    console.error("Pickem data load error:", e);
+                    const pLoading = document.getElementById('pickem-loading');
+                    if (pLoading) pLoading.textContent = 'Error calculating stats.';
+                }
+            }
+
             async function checkSession() {
                 try {
                     const { data: { session }, error } = await supabase.auth.getSession();
@@ -174,6 +416,9 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                         if (displayUsername) displayUsername.textContent = username;
                         if (displayEmail) displayEmail.textContent = session.user.email || '';
                         if (newUsernameInput) newUsernameInput.value = username;
+
+                        // Trigger dashboard fetch once user is confirmed
+                        loadDashboardData(session.user);
                     } else {
                         loggedOutView?.classList.remove('hidden');
                         loggedInView?.classList.add('hidden');
@@ -218,10 +463,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                         console.error('Signup error:', error);
                         showMessage(error.message, true);
                     } else {
-                        showMessage('Account created successfully! Redirecting...');
-                        setTimeout(() => {
-                            window.location.href = homeUrl;
-                        }, 1000);
+                        showMessage('Account created successfully! Loading dashboard...');
+                        setTimeout(() => { window.location.reload(); }, 1000);
                     }
                 } catch (err: any) {
                     console.error('Signup exception:', err);
@@ -245,10 +488,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                         console.error('Login error:', error);
                         showMessage(error.message, true);
                     } else {
-                        showMessage('Success! Redirecting...');
-                        setTimeout(() => {
-                            window.location.href = homeUrl;
-                        }, 800);
+                        showMessage('Success! Loading dashboard...');
+                        setTimeout(() => { window.location.reload(); }, 800);
                     }
                 } catch (err: any) {
                     console.error('Login exception:', err);
@@ -285,7 +526,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 showMessage('Logging out...');
                 await supabase.auth.signOut();
                 showMessage('');
-                checkSession();
+                window.location.reload();
             });
         </script>
     </body>

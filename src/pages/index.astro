@@ -32,7 +32,9 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
       .blog-grid a:hover h4 {
         text-decoration: underline;
       }
-      .pickem-guide {
+      
+      /* Updated to a universal class for all challenge guides */
+      .challenge-guide {
         background: #111111;
         border: 1px solid #222222;
         border-radius: 8px;
@@ -42,26 +44,26 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
         margin-bottom: 3rem;
         color: white;
       }
-      .pickem-guide h2 {
+      .challenge-guide h2 {
         margin-top: 0;
         margin-bottom: 1rem;
         font-size: 1.8rem;
       }
-      .pickem-guide h3 {
+      .challenge-guide h3 {
         color: #38bdf8;
         margin-top: 1.5rem;
         margin-bottom: 0.5rem;
         font-size: 1.2rem;
       }
-      .pickem-guide p, .pickem-guide li {
+      .challenge-guide p, .challenge-guide li {
         color: #d4d4d8;
         line-height: 1.6;
       }
-      .pickem-guide ul {
+      .challenge-guide ul {
         padding-left: 1.2rem;
         margin-top: 0.5rem;
       }
-      .pickem-guide a {
+      .challenge-guide a {
         color: #38bdf8;
         text-decoration: underline;
       }
@@ -83,7 +85,7 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
       <hr />
 
       <!-- Pick'em Challenge Guide Section -->
-      <section class="pickem-guide">
+      <section class="challenge-guide">
         <h2>Pick'em Challenge</h2>
         <p>Whether you are here for bragging rights or just to test your football knowledge, playing is simple. Here is a quick guide on how to set up your account and lock in your selections.</p>
 
@@ -110,6 +112,37 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
           <li><strong>Weekly Standings:</strong> The weekly page ranks players by their total Win % Against the Spread for that specific week, with games graded automatically in real time.</li>
           <li><strong>Season-Long Leaderboard:</strong> Check out the <a href={`${basePath}/leaderboard/`}>Season Leaderboard</a> to track cumulative performance across all 18 weeks of the NFL season.</li>
           <li><strong>Push Handling:</strong> A tied outcome against the spread (a "push") is ignored and will not negatively impact your graded win percentage on either leaderboard.</li>
+        </ul>
+      </section>
+
+      <hr />
+
+      <!-- Fantasy Challenge Guide Section -->
+      <section class="challenge-guide">
+        <h2>Fantasy Challenge</h2>
+        <p>Whether you are looking to build an unstoppable lineup or just test your luck and strategy, playing is simple. Here is a quick guide on how to set up your account and draft the ultimate roster.</p>
+
+        <h3>Step 1: Create Your Account</h3>
+        <p>To claim bragging rights and save your highest scores, you need a registered account.</p>
+        <ul>
+          <li>Head over to the <a href={`${basePath}/login/`}>Account Access page</a> to sign up with your email and username.</li>
+          <li>Choose a custom username to represent yourself on the global standings.</li>
+          <li>While you can test the game out as a guest, logging in ensures your final scores are permanently linked to your profile and published directly to the global leaderboard.</li>
+        </ul>
+
+        <h3>Step 2: Draft Your Roster</h3>
+        <p>This isn't a standard snake draft—your options are left to chance!</p>
+        <ul>
+          <li>Spin the wheel to land on a random NFL team, then draft one of their available players to fill your roster.</li>
+          <li>Select the player you want, then assign them to an open, valid slot (QB, RB, WR, TE, or FLEX) using the dropdown menus.</li>
+          <li><strong>Important:</strong> You have one <strong>Superflex</strong> slot available. Any player assigned to this spot will earn double their average points (2x PPG), adding a massive layer of strategy! If you land on a bad team, you can use your 1-time <strong>Respin</strong> to try again—but once it is gone, it's gone for the rest of the draft.</li>
+        </ul>
+
+        <h3>Step 3: Climb the Leaderboards</h3>
+        <p>Your goal is to build a complete 8-man roster with the highest total Points Per Game (PPG) possible.</p>
+        <ul>
+          <li><strong>My Scores:</strong> Your personal top 5 drafts are automatically saved to your browser so you can constantly try to beat your own high score.</li>
+          <li><strong>Global Leaderboard:</strong> Once your final roster spot is filled, logged-in users will automatically push their total score to the Global Leaderboard. Check the standings tab to see if you have what it takes to hold the #1 overall spot!</li>
         </ul>
       </section>
 

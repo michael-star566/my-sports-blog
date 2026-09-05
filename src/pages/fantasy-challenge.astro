@@ -16,7 +16,7 @@ import stats from '../data/fantasy-stats.json';
     <BaseHead title={`Fantasy Challenge - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
     <style>
       main {
-        max-width: 1500px; /* Widened to comfortably fit 3 columns */
+        max-width: 1500px;
         width: 100%;
         margin: 0 auto;
         padding: 2em 1em;
@@ -41,7 +41,6 @@ import stats from '../data/fantasy-stats.json';
         align-items: center;
       }
       
-      /* Desktop Layout: 3 Columns */
       @media (min-width: 1100px) {
         .game-container {
           flex-direction: row;
@@ -67,7 +66,6 @@ import stats from '../data/fantasy-stats.json';
         display: block;
       }
 
-      /* Inline Draft UI */
       #draft-container {
         display: none;
         flex-direction: column;
@@ -153,7 +151,7 @@ import stats from '../data/fantasy-stats.json';
         color: white;
       }
 
-      /* Results & Leaderboard Panel */
+      /* Results Panel */
       .results-panel {
         background: #111111;
         border: 1px solid #222222;
@@ -163,7 +161,6 @@ import stats from '../data/fantasy-stats.json';
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
       }
       
-      /* Game Over Notification hidden by default */
       .game-over-banner {
         display: none; 
         background: #38bdf8;
@@ -184,7 +181,6 @@ import stats from '../data/fantasy-stats.json';
         font-size: 1.1rem;
       }
 
-      /* Tabs UI */
       .tabs-nav {
         display: flex;
         border-bottom: 2px solid #27272a;
@@ -217,7 +213,6 @@ import stats from '../data/fantasy-stats.json';
         display: block;
       }
 
-      /* Score Lists */
       .score-list {
         list-style: none;
         padding: 0;
@@ -243,9 +238,14 @@ import stats from '../data/fantasy-stats.json';
         color: #a1a1aa;
         font-size: 0.9rem;
       }
-      .score-value {
+      .player-badge {
         font-weight: bold;
         color: #e4e4e7;
+        margin-left: 0.75rem;
+      }
+      .score-value {
+        font-weight: bold;
+        color: #38bdf8;
         font-size: 1.1rem;
       }
       .empty-state {
@@ -253,17 +253,6 @@ import stats from '../data/fantasy-stats.json';
         color: #52525b;
         font-style: italic;
         padding: 2rem 0;
-      }
-      .leaderboard-link {
-        display: block;
-        text-align: center;
-        margin-top: 1rem;
-        color: #38bdf8;
-        text-decoration: none;
-        font-weight: bold;
-      }
-      .leaderboard-link:hover {
-        text-decoration: underline;
       }
     </style>
   </head>
@@ -274,7 +263,7 @@ import stats from '../data/fantasy-stats.json';
       <p class="subtitle">Spin the wheel. Draft your player. Build the ultimate roster.</p>
       
       <div class="game-container">
-        <!-- Left Column: Wheel OR Draft UI -->
+        
         <div class="interactive-section">
           <div id="wheel-container">
             <SpinWheel />
@@ -283,11 +272,7 @@ import stats from '../data/fantasy-stats.json';
           <div id="draft-container">
             <h3>Drafting from <span id="draft-team-name" class="highlight-text"></span></h3>
             <p class="draft-sub">Select a player to fill an open roster spot.</p>
-
-            <select id="player-select" size="8">
-              <!-- Populated dynamically by JavaScript -->
-            </select>
-
+            <select id="player-select" size="8"></select>
             <div class="draft-actions">
               <button id="btn-skip" class="btn-skip">Skip Team</button>
               <button id="btn-draft" class="btn-draft">Draft Player</button>
@@ -295,12 +280,10 @@ import stats from '../data/fantasy-stats.json';
           </div>
         </div>
 
-        <!-- Middle Column: The Roster Board -->
         <div class="roster-section">
           <RosterBoard />
         </div>
 
-        <!-- Right Column: Results & Leaderboard -->
         <div class="results-section">
           <div class="results-panel">
             
@@ -310,19 +293,18 @@ import stats from '../data/fantasy-stats.json';
             </div>
 
             <div class="tabs-nav">
-              <button class="tab-btn active" id="tab-history">My Scores</button>
-              <button class="tab-btn" id="tab-leaderboard">Leaderboard</button>
+              <button class="tab-btn active" id="tab-leaderboard">Global Leaderboard</button>
+              <button class="tab-btn" id="tab-history">My Scores</button>
             </div>
 
-            <div class="tab-content active" id="content-history">
-              <ul id="score-history-list" class="score-list">
-                <!-- Injected via JS -->
+            <div class="tab-content active" id="content-leaderboard">
+              <ul id="leaderboard-list" class="score-list">
+                <div class="empty-state">Loading global scores...</div>
               </ul>
             </div>
 
-            <div class="tab-content" id="content-leaderboard">
-              <p class="empty-state" style="margin-bottom: 0;">Global leaderboard integration coming soon.</p>
-              <a href="/my-sports-blog/leaderboard/" class="leaderboard-link">View Season Standings</a>
+            <div class="tab-content" id="content-history">
+              <ul id="score-history-list" class="score-list"></ul>
             </div>
 
           </div>
@@ -332,72 +314,153 @@ import stats from '../data/fantasy-stats.json';
 
     <Footer />
 
-    <!-- The Game Engine -->
-    <script define:vars={{ stats }}>
-      // 1. Set up our empty state
-      const roster = {
-        QB: null,
-        RB1: null,
-        RB2: null,
-        WR1: null,
-        WR2: null,
-        TE: null,
-        FLEX: null
-      };
+    <!-- We inject the server data into the browser window here -->
+    <script is:inline define:vars={{ stats }}>
+      window.gameStatsData = stats;
+    </script>
 
-      let currentDraftPool = [];
+    <!-- The Game Engine (Fully Typed, Safe from Astro Parser Bugs) -->
+    <script>
+      import { supabase } from '../utils/supabase';
 
-      const wheelContainer = document.getElementById('wheel-container');
-      const draftContainer = document.getElementById('draft-container');
+      interface Player {
+        Player: string;
+        Team: string;
+        Position: string;
+        Points: number;
+      }
+
+      interface LeaderboardEntry {
+        player_name: string;
+        score: number;
+      }
+
+      declare global {
+        interface Window {
+          gameStatsData: Player[];
+        }
+      }
       
-      // Tab Elements
-      const tabHistory = document.getElementById('tab-history');
-      const tabLeaderboard = document.getElementById('tab-leaderboard');
-      const contentHistory = document.getElementById('content-history');
-      const contentLeaderboard = document.getElementById('content-leaderboard');
-      const scoreHistoryList = document.getElementById('score-history-list');
+      const stats = window.gameStatsData || [];
+      
+      interface RosterState {
+        [key: string]: Player | null;
+      }
+      const roster: RosterState = { QB: null, RB1: null, RB2: null, WR1: null, WR2: null, TE: null, FLEX: null };
+      
+      let currentDraftPool: Player[] = [];
 
-      // Local Storage Setup
-      function loadScores() {
-        const saved = localStorage.getItem('fantasyScores');
+      const wheelContainer = document.getElementById('wheel-container') as HTMLElement;
+      const draftContainer = document.getElementById('draft-container') as HTMLElement;
+      
+      const tabHistory = document.getElementById('tab-history') as HTMLButtonElement;
+      const tabLeaderboard = document.getElementById('tab-leaderboard') as HTMLButtonElement;
+      const contentHistory = document.getElementById('content-history') as HTMLElement;
+      const contentLeaderboard = document.getElementById('content-leaderboard') as HTMLElement;
+      const scoreHistoryList = document.getElementById('score-history-list') as HTMLUListElement;
+      const leaderboardList = document.getElementById('leaderboard-list') as HTMLUListElement;
+
+      // --- LOCAL HISTORY (Personal browser tracking) ---
+      function loadHistory(): number[] {
+        const saved = localStorage.getItem('fantasyHistory');
         return saved ? JSON.parse(saved) : [];
       }
       
-      function saveScore(score) {
-        const scores = loadScores();
+      function saveHistory(score: number): number[] {
+        const scores = loadHistory();
         scores.push(score);
-        // Sort highest scores to the top
         scores.sort((a, b) => b - a); 
-        // Keep top 10 scores to prevent overflow
         const top10 = scores.slice(0, 10);
-        localStorage.setItem('fantasyScores', JSON.stringify(top10));
+        localStorage.setItem('fantasyHistory', JSON.stringify(top10));
         return top10;
       }
-
-      function renderScores(scores, newestScore = null) {
+      
+      function renderHistory(scores: number[], newestScore: number | null = null) {
         scoreHistoryList.innerHTML = '';
         if (scores.length === 0) {
-          scoreHistoryList.innerHTML = '<div class="empty-state">No completed drafts yet. Spin the wheel!</div>';
+          const emptyDiv = document.createElement('div');
+          emptyDiv.className = 'empty-state';
+          emptyDiv.textContent = 'No personal drafts yet.';
+          scoreHistoryList.appendChild(emptyDiv);
           return;
         }
-
         scores.forEach((score, index) => {
           const li = document.createElement('li');
           li.className = 'score-item';
           if (score === newestScore) li.classList.add('new-score');
           
-          li.innerHTML = `
-            <span class="score-rank">#${index + 1}</span>
-            <span class="score-value">${score.toFixed(1)}</span>
-          `;
+          const rankSpan = document.createElement('span');
+          rankSpan.className = 'score-rank';
+          rankSpan.textContent = '#' + (index + 1);
+          
+          const valSpan = document.createElement('span');
+          valSpan.className = 'score-value';
+          valSpan.textContent = score.toFixed(1);
+          
+          li.appendChild(rankSpan);
+          li.appendChild(valSpan);
           scoreHistoryList.appendChild(li);
         });
       }
 
-      // Initial Render
-      renderScores(loadScores());
+      // --- SUPABASE GLOBAL LEADERBOARD ---
+      async function loadGlobalLeaderboard() {
+        const { data, error } = await supabase
+          .from('fantasy_leaderboard')
+          .select('player_name, score')
+          .order('score', { ascending: false })
+          .limit(10);
+          
+        if (error) {
+          console.error("Error fetching leaderboard:", error);
+          return [];
+        }
+        return data || [];
+      }
 
-      // Tab Switching Logic
+      function renderGlobalLeaderboard(board: LeaderboardEntry[]) {
+        leaderboardList.innerHTML = '';
+        if (board.length === 0) {
+          const emptyDiv = document.createElement('div');
+          emptyDiv.className = 'empty-state';
+          emptyDiv.textContent = 'No scores yet. Be the first!';
+          leaderboardList.appendChild(emptyDiv);
+          return;
+        }
+        board.forEach((entry, index) => {
+          const li = document.createElement('li');
+          li.className = 'score-item';
+          
+          const leftDiv = document.createElement('div');
+          leftDiv.style.display = 'flex';
+          leftDiv.style.alignItems = 'center';
+          
+          const rankSpan = document.createElement('span');
+          rankSpan.className = 'score-rank';
+          rankSpan.textContent = '#' + (index + 1);
+          
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'player-badge';
+          nameSpan.textContent = entry.player_name;
+          
+          leftDiv.appendChild(rankSpan);
+          leftDiv.appendChild(nameSpan);
+          
+          const valSpan = document.createElement('span');
+          valSpan.className = 'score-value';
+          valSpan.textContent = entry.score.toFixed(1);
+          
+          li.appendChild(leftDiv);
+          li.appendChild(valSpan);
+          leaderboardList.appendChild(li);
+        });
+      }
+
+      // Initialize both scoreboards on page load
+      renderHistory(loadHistory());
+      loadGlobalLeaderboard().then(renderGlobalLeaderboard);
+
+      // --- UI TOGGLES ---
       tabHistory.addEventListener('click', () => {
         tabHistory.classList.add('active');
         tabLeaderboard.classList.remove('active');
@@ -412,31 +475,27 @@ import stats from '../data/fantasy-stats.json';
         contentHistory.classList.remove('active');
       });
 
-      // 2. Listen for the wheel to stop spinning
-      document.addEventListener('teamDrafted', (e) => {
-        const team = e.detail;
-        const teamName = document.getElementById('draft-team-name');
-        const select = document.getElementById('player-select');
-        const btnDraft = document.getElementById('btn-draft');
+      // --- GAMEPLAY LOGIC ---
+      document.addEventListener('teamDrafted', (e: Event) => {
+        const customEvent = e as CustomEvent;
+        const team = customEvent.detail;
+        
+        const teamName = document.getElementById('draft-team-name') as HTMLElement;
+        const select = document.getElementById('player-select') as HTMLSelectElement;
+        const btnDraft = document.getElementById('btn-draft') as HTMLButtonElement;
 
-        // Filter players based on team, duplicates, and available slots
-        currentDraftPool = stats.filter(p => {
+        currentDraftPool = stats.filter((p: Player) => {
           if (p.Team !== team) return false;
-          
           const isDrafted = Object.values(roster).some(r => r && r.Player === p.Player);
           if (isDrafted) return false;
-
           if (p.Position === 'QB') return !roster.QB;
           if (p.Position === 'RB') return !roster.RB1 || !roster.RB2 || !roster.FLEX;
           if (p.Position === 'WR') return !roster.WR1 || !roster.WR2 || !roster.FLEX;
           if (p.Position === 'TE') return !roster.TE || !roster.FLEX;
-          
           return false;
         });
 
-        // Sort highest scorers to the top of the dropdown
         currentDraftPool.sort((a, b) => b.Points - a.Points);
-
         teamName.textContent = team;
         select.innerHTML = '';
 
@@ -450,30 +509,27 @@ import stats from '../data/fantasy-stats.json';
         } else {
           currentDraftPool.forEach((p, idx) => {
             const opt = document.createElement('option');
-            opt.value = idx;
+            opt.value = idx.toString();
             opt.text = `${p.Player} (${p.Position}) - ${p.Points} PPG`;
             select.appendChild(opt);
           });
           btnDraft.disabled = false;
         }
-
         wheelContainer.style.display = 'none';
         draftContainer.style.display = 'flex';
       });
 
-      // 3. Skip Button Logic
-      document.getElementById('btn-skip').addEventListener('click', () => {
+      (document.getElementById('btn-skip') as HTMLButtonElement).addEventListener('click', () => {
         draftContainer.style.display = 'none';
         wheelContainer.style.display = 'block';
       });
 
-      // 4. Draft Button Logic
-      document.getElementById('btn-draft').addEventListener('click', () => {
-        const select = document.getElementById('player-select');
+      (document.getElementById('btn-draft') as HTMLButtonElement).addEventListener('click', async () => {
+        const select = document.getElementById('player-select') as HTMLSelectElement;
         if (select.disabled || !select.value) return;
 
-        const player = currentDraftPool[select.value];
-        let assignedSlot = null;
+        const player = currentDraftPool[parseInt(select.value)];
+        let assignedSlot: string | null = null;
 
         if (player.Position === 'QB') assignedSlot = 'QB';
         else if (player.Position === 'RB') {
@@ -493,51 +549,57 @@ import stats from '../data/fantasy-stats.json';
 
         if (assignedSlot) {
           roster[assignedSlot] = player;
-          
-          const slotEl = document.getElementById(`slot-${assignedSlot.toLowerCase()}`);
+          const slotEl = document.getElementById(`slot-${assignedSlot.toLowerCase()}`) as HTMLElement;
           if (slotEl) {
             slotEl.classList.remove('empty');
-            slotEl.querySelector('.player-name').textContent = player.Player;
-            slotEl.querySelector('.player-team').textContent = player.Team;
-            slotEl.querySelector('.slot-points').textContent = player.Points.toFixed(1);
+            (slotEl.querySelector('.player-name') as HTMLElement).textContent = player.Player;
+            (slotEl.querySelector('.player-team') as HTMLElement).textContent = player.Team;
+            (slotEl.querySelector('.slot-points') as HTMLElement).textContent = player.Points.toFixed(1);
           }
 
           let total = 0;
-          Object.values(roster).forEach(p => {
-            if (p) total += p.Points;
-          });
-          document.getElementById('roster-total').textContent = total.toFixed(1);
+          Object.values(roster).forEach(p => { if (p) total += p.Points; });
+          (document.getElementById('roster-total') as HTMLElement).textContent = total.toFixed(1);
         }
 
         draftContainer.style.display = 'none';
         wheelContainer.style.display = 'block';
 
-        // Check Win Condition
         const isFull = Object.values(roster).every(p => p !== null);
         if (isFull) {
-          // Disable the wheel
-          const spinBtn = document.getElementById('spin-btn');
+          const spinBtn = document.getElementById('spin-btn') as HTMLButtonElement;
           if(spinBtn) {
             spinBtn.disabled = true;
             spinBtn.style.opacity = '0.5';
             spinBtn.textContent = 'DONE';
           }
           
-          // Retrieve final score
-          const finalScoreStr = document.getElementById('roster-total').textContent;
+          const finalScoreStr = (document.getElementById('roster-total') as HTMLElement).textContent || "0";
           const finalScoreNum = parseFloat(finalScoreStr);
           
-          // Save score and render updated history
-          const updatedScores = saveScore(finalScoreNum);
-          renderScores(updatedScores, finalScoreNum);
+          setTimeout(async () => {
+            const playerName = prompt(`Draft Complete! Final Score: ${finalScoreStr} PPG\n\nEnter your name for the global leaderboard:`) || "Anonymous Player";
+            
+            const updatedHistory = saveHistory(finalScoreNum);
+            renderHistory(updatedHistory, finalScoreNum);
 
-          // Force view to "My Scores" tab
-          tabHistory.click();
+            const { error } = await supabase
+              .from('fantasy_leaderboard')
+              .insert([{ player_name: playerName, score: finalScoreNum }]);
+            
+            if (error) {
+              console.error("Error saving to global leaderboard:", error);
+            } else {
+              const updatedBoard = await loadGlobalLeaderboard();
+              renderGlobalLeaderboard(updatedBoard);
+            }
 
-          // Show the custom victory banner instead of an alert
-          const banner = document.getElementById('game-over-banner');
-          document.getElementById('final-score-text').textContent = finalScoreStr;
-          banner.style.display = 'block';
+            tabLeaderboard.click();
+
+            const banner = document.getElementById('game-over-banner') as HTMLElement;
+            (document.getElementById('final-score-text') as HTMLElement).textContent = finalScoreStr;
+            banner.style.display = 'block';
+          }, 300);
         }
       });
     </script>

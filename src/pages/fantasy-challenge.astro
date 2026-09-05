@@ -16,7 +16,7 @@ import stats from '../data/fantasy-stats.json';
     <BaseHead title={`Fantasy Challenge - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
     <style>
       main {
-        max-width: 1200px;
+        max-width: 1500px; /* Widened to comfortably fit 3 columns */
         width: 100%;
         margin: 0 auto;
         padding: 2em 1em;
@@ -41,40 +41,41 @@ import stats from '../data/fantasy-stats.json';
         align-items: center;
       }
       
-      @media (min-width: 900px) {
+      /* Desktop Layout: 3 Columns */
+      @media (min-width: 1100px) {
         .game-container {
           flex-direction: row;
           align-items: flex-start;
           justify-content: center;
-          gap: 4rem;
+          gap: 3rem;
         }
       }
 
-      .interactive-section, .roster-section {
+      .interactive-section, .roster-section, .results-section {
         width: 100%;
         display: flex;
         justify-content: center;
+        max-width: 400px;
       }
 
       .interactive-section {
-        min-height: 480px; /* Keeps the page from jumping up and down when swapping views */
+        min-height: 480px;
       }
 
       #wheel-container {
         width: 100%;
-        display: block; /* Visible by default */
+        display: block;
       }
 
       /* Inline Draft UI */
       #draft-container {
-        display: none; /* Hidden by default */
+        display: none;
         flex-direction: column;
         background: #111111;
         border: 2px solid #38bdf8;
         border-radius: 8px;
         padding: 1.5rem;
         width: 100%;
-        max-width: 400px;
         box-shadow: 0 8px 24px rgba(0,0,0,0.6);
       }
       #draft-container h3 {
@@ -93,7 +94,6 @@ import stats from '../data/fantasy-stats.json';
         text-align: center;
       }
       
-      /* Styling the select as an open list box */
       select {
         width: 100%;
         background: #18181b;
@@ -121,17 +121,19 @@ import stats from '../data/fantasy-stats.json';
         display: flex;
         gap: 1rem;
       }
-      .btn-draft {
+      .btn-draft, .btn-skip {
         flex: 1;
-        background: #38bdf8;
-        color: #111111;
-        border: none;
         padding: 0.75rem;
         font-weight: 800;
         font-size: 0.95rem;
         border-radius: 6px;
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: all 0.2s ease;
+      }
+      .btn-draft {
+        background: #38bdf8;
+        color: #111111;
+        border: none;
       }
       .btn-draft:hover:not(:disabled) {
         background: #0ea5e9;
@@ -142,20 +144,126 @@ import stats from '../data/fantasy-stats.json';
         cursor: not-allowed;
       }
       .btn-skip {
-        flex: 1;
         background: transparent;
         color: #a1a1aa;
         border: 1px solid #52525b;
-        padding: 0.75rem;
-        font-weight: bold;
-        font-size: 0.95rem;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
       }
       .btn-skip:hover {
         background: #27272a;
         color: white;
+      }
+
+      /* Results & Leaderboard Panel */
+      .results-panel {
+        background: #111111;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        width: 100%;
+        padding: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+      
+      /* Game Over Notification hidden by default */
+      .game-over-banner {
+        display: none; 
+        background: #38bdf8;
+        color: #111111;
+        text-align: center;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+      }
+      .game-over-banner h3 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.3rem;
+      }
+      .game-over-banner p {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      /* Tabs UI */
+      .tabs-nav {
+        display: flex;
+        border-bottom: 2px solid #27272a;
+        margin-bottom: 1rem;
+      }
+      .tab-btn {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: #a1a1aa;
+        padding: 0.75rem;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+      }
+      .tab-btn.active {
+        color: #38bdf8;
+        border-bottom: 2px solid #38bdf8;
+      }
+      .tab-btn:hover:not(.active) {
+        color: #f4f4f5;
+      }
+      .tab-content {
+        display: none;
+        min-height: 250px;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Score Lists */
+      .score-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .score-item {
+        background: #18181b;
+        border: 1px solid #27272a;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .score-item.new-score {
+        border-color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+      }
+      .score-rank {
+        color: #a1a1aa;
+        font-size: 0.9rem;
+      }
+      .score-value {
+        font-weight: bold;
+        color: #e4e4e7;
+        font-size: 1.1rem;
+      }
+      .empty-state {
+        text-align: center;
+        color: #52525b;
+        font-style: italic;
+        padding: 2rem 0;
+      }
+      .leaderboard-link {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        color: #38bdf8;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .leaderboard-link:hover {
+        text-decoration: underline;
       }
     </style>
   </head>
@@ -166,9 +274,8 @@ import stats from '../data/fantasy-stats.json';
       <p class="subtitle">Spin the wheel. Draft your player. Build the ultimate roster.</p>
       
       <div class="game-container">
-        <!-- Left Side: Wheel OR Draft UI -->
+        <!-- Left Column: Wheel OR Draft UI -->
         <div class="interactive-section">
-          
           <div id="wheel-container">
             <SpinWheel />
           </div>
@@ -177,7 +284,6 @@ import stats from '../data/fantasy-stats.json';
             <h3>Drafting from <span id="draft-team-name" class="highlight-text"></span></h3>
             <p class="draft-sub">Select a player to fill an open roster spot.</p>
 
-            <!-- size="8" turns this into an open scrolling list box -->
             <select id="player-select" size="8">
               <!-- Populated dynamically by JavaScript -->
             </select>
@@ -187,12 +293,39 @@ import stats from '../data/fantasy-stats.json';
               <button id="btn-draft" class="btn-draft">Draft Player</button>
             </div>
           </div>
-
         </div>
 
-        <!-- Right Side: The Roster Board -->
+        <!-- Middle Column: The Roster Board -->
         <div class="roster-section">
           <RosterBoard />
+        </div>
+
+        <!-- Right Column: Results & Leaderboard -->
+        <div class="results-section">
+          <div class="results-panel">
+            
+            <div id="game-over-banner" class="game-over-banner">
+              <h3>Draft Complete!</h3>
+              <p>Final Score: <span id="final-score-text">0.0</span> PPG</p>
+            </div>
+
+            <div class="tabs-nav">
+              <button class="tab-btn active" id="tab-history">My Scores</button>
+              <button class="tab-btn" id="tab-leaderboard">Leaderboard</button>
+            </div>
+
+            <div class="tab-content active" id="content-history">
+              <ul id="score-history-list" class="score-list">
+                <!-- Injected via JS -->
+              </ul>
+            </div>
+
+            <div class="tab-content" id="content-leaderboard">
+              <p class="empty-state" style="margin-bottom: 0;">Global leaderboard integration coming soon.</p>
+              <a href="/my-sports-blog/leaderboard/" class="leaderboard-link">View Season Standings</a>
+            </div>
+
+          </div>
         </div>
       </div>
     </main>
@@ -216,6 +349,68 @@ import stats from '../data/fantasy-stats.json';
 
       const wheelContainer = document.getElementById('wheel-container');
       const draftContainer = document.getElementById('draft-container');
+      
+      // Tab Elements
+      const tabHistory = document.getElementById('tab-history');
+      const tabLeaderboard = document.getElementById('tab-leaderboard');
+      const contentHistory = document.getElementById('content-history');
+      const contentLeaderboard = document.getElementById('content-leaderboard');
+      const scoreHistoryList = document.getElementById('score-history-list');
+
+      // Local Storage Setup
+      function loadScores() {
+        const saved = localStorage.getItem('fantasyScores');
+        return saved ? JSON.parse(saved) : [];
+      }
+      
+      function saveScore(score) {
+        const scores = loadScores();
+        scores.push(score);
+        // Sort highest scores to the top
+        scores.sort((a, b) => b - a); 
+        // Keep top 10 scores to prevent overflow
+        const top10 = scores.slice(0, 10);
+        localStorage.setItem('fantasyScores', JSON.stringify(top10));
+        return top10;
+      }
+
+      function renderScores(scores, newestScore = null) {
+        scoreHistoryList.innerHTML = '';
+        if (scores.length === 0) {
+          scoreHistoryList.innerHTML = '<div class="empty-state">No completed drafts yet. Spin the wheel!</div>';
+          return;
+        }
+
+        scores.forEach((score, index) => {
+          const li = document.createElement('li');
+          li.className = 'score-item';
+          if (score === newestScore) li.classList.add('new-score');
+          
+          li.innerHTML = `
+            <span class="score-rank">#${index + 1}</span>
+            <span class="score-value">${score.toFixed(1)}</span>
+          `;
+          scoreHistoryList.appendChild(li);
+        });
+      }
+
+      // Initial Render
+      renderScores(loadScores());
+
+      // Tab Switching Logic
+      tabHistory.addEventListener('click', () => {
+        tabHistory.classList.add('active');
+        tabLeaderboard.classList.remove('active');
+        contentHistory.classList.add('active');
+        contentLeaderboard.classList.remove('active');
+      });
+
+      tabLeaderboard.addEventListener('click', () => {
+        tabLeaderboard.classList.add('active');
+        tabHistory.classList.remove('active');
+        contentLeaderboard.classList.add('active');
+        contentHistory.classList.remove('active');
+      });
 
       // 2. Listen for the wheel to stop spinning
       document.addEventListener('teamDrafted', (e) => {
@@ -245,7 +440,6 @@ import stats from '../data/fantasy-stats.json';
         teamName.textContent = team;
         select.innerHTML = '';
 
-        // Handle empty pool scenarios
         if (currentDraftPool.length === 0) {
           const opt = document.createElement('option');
           opt.text = 'No available players for open slots';
@@ -263,7 +457,6 @@ import stats from '../data/fantasy-stats.json';
           btnDraft.disabled = false;
         }
 
-        // Swap Views
         wheelContainer.style.display = 'none';
         draftContainer.style.display = 'flex';
       });
@@ -282,7 +475,6 @@ import stats from '../data/fantasy-stats.json';
         const player = currentDraftPool[select.value];
         let assignedSlot = null;
 
-        // Slot prioritization logic (Main position first, then FLEX)
         if (player.Position === 'QB') assignedSlot = 'QB';
         else if (player.Position === 'RB') {
           if (!roster.RB1) assignedSlot = 'RB1';
@@ -302,7 +494,6 @@ import stats from '../data/fantasy-stats.json';
         if (assignedSlot) {
           roster[assignedSlot] = player;
           
-          // Inject player data directly into the RosterBoard HTML
           const slotEl = document.getElementById(`slot-${assignedSlot.toLowerCase()}`);
           if (slotEl) {
             slotEl.classList.remove('empty');
@@ -311,7 +502,6 @@ import stats from '../data/fantasy-stats.json';
             slotEl.querySelector('.slot-points').textContent = player.Points.toFixed(1);
           }
 
-          // Calculate running total
           let total = 0;
           Object.values(roster).forEach(p => {
             if (p) total += p.Points;
@@ -319,22 +509,35 @@ import stats from '../data/fantasy-stats.json';
           document.getElementById('roster-total').textContent = total.toFixed(1);
         }
 
-        // Swap back to Wheel View
         draftContainer.style.display = 'none';
         wheelContainer.style.display = 'block';
 
         // Check Win Condition
         const isFull = Object.values(roster).every(p => p !== null);
         if (isFull) {
-          setTimeout(() => {
-            alert('Draft Complete! Your final roster averages ' + document.getElementById('roster-total').textContent + ' PPG.');
-            const spinBtn = document.getElementById('spin-btn');
-            if(spinBtn) {
-              spinBtn.disabled = true;
-              spinBtn.style.opacity = '0.5';
-              spinBtn.textContent = 'DONE';
-            }
-          }, 300);
+          // Disable the wheel
+          const spinBtn = document.getElementById('spin-btn');
+          if(spinBtn) {
+            spinBtn.disabled = true;
+            spinBtn.style.opacity = '0.5';
+            spinBtn.textContent = 'DONE';
+          }
+          
+          // Retrieve final score
+          const finalScoreStr = document.getElementById('roster-total').textContent;
+          const finalScoreNum = parseFloat(finalScoreStr);
+          
+          // Save score and render updated history
+          const updatedScores = saveScore(finalScoreNum);
+          renderScores(updatedScores, finalScoreNum);
+
+          // Force view to "My Scores" tab
+          tabHistory.click();
+
+          // Show the custom victory banner instead of an alert
+          const banner = document.getElementById('game-over-banner');
+          document.getElementById('final-score-text').textContent = finalScoreStr;
+          banner.style.display = 'block';
         }
       });
     </script>

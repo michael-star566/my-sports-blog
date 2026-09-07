@@ -21,8 +21,8 @@ const pathPrefix = '/my-sports-blog';
                 <div class="dropdown">
                     <button class="dropbtn">Blog ▾</button>
                     <div class="dropdown-content">
-                        <a href={`${pathPrefix}/blog/nfl/`}>NFL Blogs</a>
-                        <a href={`${pathPrefix}/blog/nba/`}>NBA Blogs</a>
+                        <a href={`${pathPrefix}/blog/?category=nfl`}>NFL Blogs</a>
+                        <a href={`${pathPrefix}/blog/?category=nba`}>NBA Blogs</a>
                     </div>
                 </div>
 
@@ -32,8 +32,8 @@ const pathPrefix = '/my-sports-blog';
                 <div class="dropdown">
                     <button class="dropbtn">Power Rankings ▾</button>
                     <div class="dropdown-content">
-                        <a href={`${pathPrefix}/power-rankings/nfl/`}>NFL Power Rankings</a>
-                        <a href={`${pathPrefix}/power-rankings/nba/`}>NBA Power Rankings</a>
+                        <a href={`${pathPrefix}/power-rankings/?league=nfl`}>NFL Power Rankings</a>
+                        <a href={`${pathPrefix}/power-rankings/?league=nba`}>NBA Power Rankings</a>
                     </div>
                 </div>
                 

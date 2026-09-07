@@ -1,14 +1,16 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
+// src/pages/blog/index.astro
 import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { Image } from 'astro:assets';
 
+// Fetches all your current blog posts (NFL)
 const posts = (await getCollection('blog')).sort(
-    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
 const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
@@ -16,101 +18,204 @@ const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_UR
 
 <!doctype html>
 <html lang="en">
-    <head>
-        <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-        <style>
-            main {
-                width: 960px;
-            }
-            ul {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 2rem;
-                list-style-type: none;
-                margin: 0;
-                padding: 0;
-            }
-            ul li {
-                width: calc(50% - 1rem);
-            }
-            ul li * {
-                text-decoration: none;
-                transition: 0.2s ease;
-            }
-            ul li:first-child {
-                width: 100%;
-                margin-bottom: 1rem;
-                text-align: center;
-            }
-            ul li:first-child img {
-                width: 100%;
-            }
-            ul li:first-child .title {
-                font-size: 2.369rem;
-            }
-            ul li img {
-                margin-bottom: 0.5rem;
-                border-radius: 12px;
-            }
-            ul li a {
-                display: block;
-            }
-            .title {
-                margin: 0;
-                color: rgb(var(--black));
-                line-height: 1;
-            }
-            .date {
-                margin: 0;
-                color: rgb(var(--gray));
-            }
-            ul li a:hover h4,
-            ul li a:hover .date {
-                color: rgb(var(--accent));
-            }
-            ul a:hover img {
-                box-shadow: var(--box-shadow);
-            }
-            @media (max-width: 720px) {
-                ul {
-                    gap: 0.5em;
-                }
-                ul li {
-                    width: 100%;
-                    text-align: center;
-                }
-                ul li:first-child {
-                    margin-bottom: 0;
-                }
-                ul li:first-child .title {
-                    font-size: 1.563em;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <Header />
-        <main>
-            <section>
-                <ul>
-                    {
-                        posts.map((post) => (
-                            <li>
-                                <a href={`${basePath}/blog/${post.id}/`}>
-                                    {post.data.heroImage && (
-                                        <Image width={720} height={360} src={post.data.heroImage} alt="" />
-                                    )}
-                                    <h4 class="title">{post.data.title}</h4>
-                                    <p class="date">
-                                        <FormattedDate date={post.data.pubDate} />
-                                    </p>
-                                </a>
-                            </li>
-                        ))
-                    }
-                </ul>
-            </section>
-        </main>
-        <Footer />
-    </body>
+  <head>
+    <BaseHead title={`Blog - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      main {
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 3em 1em;
+        color: white;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 0.5rem;
+      }
+      .subtitle {
+        text-align: center;
+        color: #a1a1aa;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+      }
+      .league-toggle-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #222222;
+      }
+      .league-toggle-container label {
+        font-weight: bold;
+        color: #e4e4e7;
+      }
+      select {
+        background: #18181b;
+        color: white;
+        border: 1px solid #27272a;
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        outline: none;
+      }
+      select:focus {
+        border-color: #38bdf8;
+      }
+      
+      /* Blog Grid Styling */
+      .blog-grid ul {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      .blog-grid li {
+        background: #111111;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+      }
+      .blog-grid li:hover {
+        transform: translateY(-3px);
+        border-color: #38bdf8;
+      }
+      .blog-grid a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .blog-content {
+        padding: 1.5rem;
+      }
+      .blog-content h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+        color: white;
+      }
+      .blog-content .date {
+        margin: 0;
+        color: #a1a1aa;
+        font-size: 0.9rem;
+      }
+      .blog-grid img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* NBA Coming Soon Styling */
+      .coming-soon-container {
+        background: #111111;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        padding: 4rem 2rem;
+        text-align: center;
+      }
+      .coming-soon-container h2 {
+        color: #38bdf8;
+        margin-bottom: 1rem;
+      }
+      .coming-soon-container p {
+        color: #a1a1aa;
+        font-size: 1.1rem;
+        line-height: 1.6;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <h1>Sports Blog & Analysis</h1>
+      <p class="subtitle">Latest breakdowns, projections, and betting insights.</p>
+
+      <!-- Category Toggle -->
+      <div class="league-toggle-container">
+        <label for="blog-category-select">Select Category:</label>
+        <select id="blog-category-select">
+          <option value="nfl" selected>NFL Articles</option>
+          <option value="nba">NBA Articles</option>
+        </select>
+      </div>
+
+      <!-- NFL Blog Feed (Your actual blog posts) -->
+      <div id="nfl-view" class="blog-grid">
+        <ul>
+          {posts.map((post) => (
+            <li>
+              <a href={`${basePath}/blog/${post.id}/`}>
+                {post.data.heroImage && (
+                  <Image width={720} height={360} src={post.data.heroImage} alt="" />
+                )}
+                <div class="blog-content">
+                  <h4>{post.data.title}</h4>
+                  <p class="date">
+                    <FormattedDate date={post.data.pubDate} />
+                  </p>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- NBA Blog Feed (Coming Soon Placeholder) -->
+      <div id="nba-view" class="hidden">
+        <div class="coming-soon-container">
+          <h2>NBA Content Coming Soon</h2>
+          <p>We are currently finalizing the 2026-27 Monte Carlo simulation data. Check back shortly for in-depth NBA breakdowns, futures analysis, and model projections.</p>
+        </div>
+      </div>
+
+    </main>
+    <Footer />
+
+    <script>
+      const categorySelector = document.getElementById('blog-category-select') as HTMLSelectElement | null;
+      const nflView = document.getElementById('nfl-view') as HTMLElement | null;
+      const nbaView = document.getElementById('nba-view') as HTMLElement | null;
+
+      function updateView(category: string) {
+        if (!nflView || !nbaView || !categorySelector) return;
+        
+        categorySelector.value = category;
+        
+        if (category === 'nba') {
+          nflView.classList.add('hidden');
+          nbaView.classList.remove('hidden');
+        } else {
+          nflView.classList.remove('hidden');
+          nbaView.classList.add('hidden');
+        }
+      }
+
+      // Read URL query parameter directly from the header dropdown link (e.g. ?category=nba)
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryParam = urlParams.get('category');
+      
+      if (categoryParam === 'nba' || categoryParam === 'nfl') {
+        updateView(categoryParam);
+      }
+
+      // Allow manual toggling on the page
+      if (categorySelector) {
+        categorySelector.addEventListener('change', () => {
+          updateView(categorySelector.value);
+        });
+      }
+    </script>
+  </body>
 </html>

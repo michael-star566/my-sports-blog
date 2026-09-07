@@ -2,83 +2,171 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../components/FormattedDate.astro';
+import { Image } from 'astro:assets';
+
+const SITE_TITLE = 'Unfiltered Analytics: 2026 NFL Chaos, Underdogs, and Championships';
+const SITE_DESCRIPTION = 'Sharp, data-driven NFL projections, conference breakdowns, and value-hunting futures.';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const basePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
-    <BaseHead title="Blog & Analysis | Sports Analytics Blog" description="Data-backed insights, model previews, and statistical breakdowns." />
-  </head>
-  <body class="bg-gray-950 text-white min-h-screen flex flex-col">
-    <Header />
-    
-    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
-      
-      <!-- Header Section with Blog Category Dropdown Toggle -->
-      <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 border-b border-gray-800 pb-6">
-        <div>
-          <h1 class="text-3xl font-bold tracking-tight">Sports Blog & Analysis</h1>
-          <p class="text-gray-400 mt-1">Data-backed insights, model previews, and statistical breakdowns.</p>
-        </div>
-
-        <!-- Blog Category Dropdown -->
-        <div class="flex items-center gap-3">
-          <label for="blogCategorySelect" class="text-sm font-medium text-gray-300">Category:</label>
-          <select 
-            id="blogCategorySelect" 
-            class="bg-gray-900 border border-gray-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none cursor-pointer"
-          >
-            <option value="nfl">NFL Blog Articles</option>
-            <option value="nba" selected>NBA Blog Articles</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- NFL Blog Section Feed -->
-      <div id="nfl-blog-feed" class="blog-feed hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <article class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-md hover:border-gray-700 transition-colors">
-            <span class="text-xs text-blue-400 uppercase tracking-wider font-semibold">NFL Analysis</span>
-            <h2 class="text-xl font-bold mt-2 mb-2">Early Season AFC Contender Breakdown</h2>
-            <p class="text-gray-400 text-sm mb-4">Examining underlying metrics and advanced passing numbers heading into Week 1.</p>
-            <a href="#" class="text-blue-400 hover:underline text-sm font-medium">Read Article &rarr;</a>
-          </article>
-        </div>
-      </div>
-
-      <!-- NBA Blog Section Feed (Default) -->
-      <div id="nba-blog-feed" class="blog-feed">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <article class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-md hover:border-gray-700 transition-colors">
-            <span class="text-xs text-yellow-400 uppercase tracking-wider font-semibold">NBA Model Preview</span>
-            <h2 class="text-xl font-bold mt-2 mb-2">2026-27 NBA Model: OKC & San Antonio Lead the Way</h2>
-            <p class="text-gray-400 text-sm mb-4">Deep dive into our 10,000-run Monte Carlo simulation results, win-total ceilings, and conference parity.</p>
-            <a href="#" class="text-blue-400 hover:underline text-sm font-medium">Read Article &rarr;</a>
-          </article>
-        </div>
-      </div>
-
-    </main>
-
-    <Footer />
-
-    <script>
-      const blogSelect = document.getElementById('blogCategorySelect') as HTMLSelectElement | null;
-      const nflBlogFeed = document.getElementById('nfl-blog-feed') as HTMLElement | null;
-      const nbaBlogFeed = document.getElementById('nba-blog-feed') as HTMLElement | null;
-
-      if (blogSelect && nflBlogFeed && nbaBlogFeed) {
-        blogSelect.addEventListener('change', (e) => {
-          const target = e.target as HTMLSelectElement;
-          if (target.value === 'nfl') {
-            nflBlogFeed.classList.remove('hidden');
-            nbaBlogFeed.classList.add('hidden');
-          } else {
-            nflBlogFeed.classList.add('hidden');
-            nbaBlogFeed.classList.remove('hidden');
-          }
-        });
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      .blog-grid ul {
+        list-style-type: none;
+        padding: 0;
       }
-    </script>
+      .blog-grid a {
+        text-decoration: none;
+        color: inherit;
+      }
+      .blog-grid a:hover h4 {
+        text-decoration: underline;
+      }
+      
+      /* Updated to a universal class for all challenge guides */
+      .challenge-guide {
+        background: #111111;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+        color: white;
+      }
+      .challenge-guide h2 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
+      }
+      .challenge-guide h3 {
+        color: #38bdf8;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+      }
+      .challenge-guide p, .challenge-guide li {
+        color: #d4d4d8;
+        line-height: 1.6;
+      }
+      .challenge-guide ul {
+        padding-left: 1.2rem;
+        margin-top: 0.5rem;
+      }
+      .challenge-guide a {
+        color: #38bdf8;
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="home-hero">
+        <h1>{SITE_TITLE}</h1>
+        <p class="hero-lead">
+          <strong>Sharp, data-driven NFL projections, conference breakdowns, and value-hunting futures that strip away the noise to show you where the betting markets and models actually align.</strong>
+        </p>
+        <p>
+          Whether you're looking for deep-dive conference predictions, schedule matrix breakdowns, or major regular-season award picks, every projection is built to cut through the mainstream narrative and find the real value. <a href={`${basePath}/blog/`}>Click here</a> to see my NFL Predictions.
+        </p>
+      </section>
+
+      <hr />
+
+      <!-- Pick'em Challenge Guide Section -->
+      <section class="challenge-guide">
+        <h2>Pick'em Challenge</h2>
+        <p>Whether you are here for bragging rights or just to test your football knowledge, playing is simple. Here is a quick guide on how to set up your account and lock in your selections.</p>
+
+        <h3>Step 1: Create Your Account</h3>
+        <p>To participate and save your selections, you need a registered account.</p>
+        <ul>
+          <li>Head over to the <a href={`${basePath}/login/`}>Account Access page</a> to sign up with your email and username.</li>
+          <li>Choose a custom username to represent yourself on the global leaderboard.</li>
+          <li>Once logged in, your profile is permanently linked to your weekly picks, ensuring your data is securely saved.</li>
+        </ul>
+
+        <h3>Step 2: Make Your Selections</h3>
+        <p>We play <strong>Against the Spread (ATS)</strong>, which means you aren't just picking who will win the game outright. Instead, you are predicting whether a team will cover the assigned point spread.</p>
+        <ul>
+          <li>Go to the <a href={`${basePath}/picks/`}>Weekly Picks page</a> and select your desired NFL week from the dropdown menu to load the schedule and live odds.</li>
+          <li>Click the box of the team you believe will cover the spread.</li>
+          <li>Your pick will immediately highlight in green, indicating it is locked and saved.</li>
+          <li><strong>Important:</strong> All game boxes automatically lock at the exact time of kickoff. Once a game has started, the buttons disable, and no further changes can be made. If Vegas hasn't released a spread yet, the game will display as "TBD" until the line is live.</li>
+        </ul>
+
+        <h3>Step 3: Climb the Leaderboards</h3>
+        <p>Your goal is to make the most accurate picks over the course of the season across multiple competitive tracks.</p>
+        <ul>
+          <li><strong>Weekly Standings:</strong> The weekly page ranks players by their total Win % Against the Spread for that specific week, with games graded automatically in real time.</li>
+          <li><strong>Season-Long Leaderboard:</strong> Check out the <a href={`${basePath}/leaderboard/`}>Season Leaderboard</a> to track cumulative performance across all 18 weeks of the NFL season.</li>
+          <li><strong>Push Handling:</strong> A tied outcome against the spread (a "push") is ignored and will not negatively impact your graded win percentage on either leaderboard.</li>
+        </ul>
+      </section>
+
+      <hr />
+
+      <!-- Fantasy Challenge Guide Section -->
+      <section class="challenge-guide">
+        <h2>Fantasy Challenge</h2>
+        <p>Whether you are looking to build an unstoppable lineup or just test your luck and strategy, playing is simple. Here is a quick guide on how to set up your account and draft the ultimate roster.</p>
+
+        <h3>Step 1: Create Your Account</h3>
+        <p>To claim bragging rights and save your highest scores, you need a registered account.</p>
+        <ul>
+          <li>Head over to the <a href={`${basePath}/login/`}>Account Access page</a> to sign up with your email and username.</li>
+          <li>Choose a custom username to represent yourself on the global standings.</li>
+          <li>While you can test the game out as a guest, logging in ensures your final scores are permanently linked to your profile and published directly to the global leaderboard.</li>
+        </ul>
+
+        <h3>Step 2: Draft Your Roster</h3>
+        <p>This isn't a standard snake draft—your options are left to chance!</p>
+        <ul>
+          <li>Spin the wheel to land on a random NFL team, then draft one of their available players to fill your roster.</li>
+          <li>Select the player you want, then assign them to an open, valid slot (QB, RB, WR, TE, or FLEX) using the dropdown menus.</li>
+          <li><strong>Important:</strong> You have one <strong>Superflex</strong> slot available. Any player assigned to this spot will earn double their average points (2x PPG), adding a massive layer of strategy! If you land on a bad team, you can use your 1-time <strong>Respin</strong> to try again—but once it is gone, it's gone for the rest of the draft.</li>
+        </ul>
+
+        <h3>Step 3: Climb the Leaderboards</h3>
+        <p>Your goal is to build a complete 8-man roster with the highest total Points Per Game (PPG) possible.</p>
+        <ul>
+          <li><strong>My Scores:</strong> Your personal top 5 drafts are automatically saved to your browser so you can constantly try to beat your own high score.</li>
+          <li><strong>Global Leaderboard:</strong> Once your final roster spot is filled, logged-in users will automatically push their total score to the Global Leaderboard. Check the standings tab to see if you have what it takes to hold the #1 overall spot!</li>
+        </ul>
+      </section>
+
+      <hr />
+
+      <section class="blog-grid">
+        <h2>Latest Breakdowns</h2>
+        <ul>
+          {posts.map((post) => (
+            <li>
+              <a href={`${basePath}/blog/${post.id}/`}>
+                {post.data.heroImage && (
+                  <Image width={720} height={360} src={post.data.heroImage} alt="" />
+                )}
+                <h4 class="title">{post.data.title}</h4>
+                <p class="date">
+                  <FormattedDate date={post.data.pubDate} />
+                </p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+    <Footer />
   </body>
 </html>

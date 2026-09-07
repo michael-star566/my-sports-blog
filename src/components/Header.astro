@@ -16,10 +16,28 @@ const pathPrefix = '/my-sports-blog';
         <div class="nav-links-wrapper" id="nav-links-container">
             <div class="internal-links">
                 <HeaderLink href={`${pathPrefix}/`}>Home</HeaderLink>
-                <HeaderLink href={`${pathPrefix}/blog/`}>Blog</HeaderLink>
-                <HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
-                <HeaderLink href={`${pathPrefix}/power-rankings/`}>Power Rankings</HeaderLink>
                 
+                <!-- Blog Dropdown -->
+                <div class="dropdown">
+                    <button class="dropbtn">Blog ▾</button>
+                    <div class="dropdown-content">
+                        <a href={`${pathPrefix}/blog/nfl/`}>NFL Blogs</a>
+                        <a href={`${pathPrefix}/blog/nba/`}>NBA Blogs</a>
+                    </div>
+                </div>
+
+                <HeaderLink href={`${pathPrefix}/comments/`}>Comments</HeaderLink>
+                
+                <!-- Power Rankings Dropdown -->
+                <div class="dropdown">
+                    <button class="dropbtn">Power Rankings ▾</button>
+                    <div class="dropdown-content">
+                        <a href={`${pathPrefix}/power-rankings/nfl/`}>NFL Power Rankings</a>
+                        <a href={`${pathPrefix}/power-rankings/nba/`}>NBA Power Rankings</a>
+                    </div>
+                </div>
+                
+                <!-- Challenges Dropdown -->
                 <div class="dropdown">
                     <button class="dropbtn">Challenges ▾</button>
                     <div class="dropdown-content">

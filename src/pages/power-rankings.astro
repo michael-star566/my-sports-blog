@@ -2,131 +2,283 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+// Preseason power rankings with Trend first, then Rank, then Team
+const rankings = [
+  { trend: "N/A", rank: 1, team: "LA Rams" },
+  { trend: "N/A", rank: 2, team: "Jacksonville Jaguars" },
+  { trend: "N/A", rank: 3, team: "Seattle Seahawks" },
+  { trend: "N/A", rank: 4, team: "New England Patriots" },
+  { trend: "N/A", rank: 5, team: "Detroit Lions" },
+  { trend: "N/A", rank: 6, team: "Denver Broncos" },
+  { trend: "N/A", rank: 7, team: "Baltimore Ravens" },
+  { trend: "N/A", rank: 8, team: "San Francisco 49ers" },
+  { trend: "N/A", rank: 9, team: "LA Chargers" },
+  { trend: "N/A", rank: 10, team: "Cincinnati Bengals" },
+  { trend: "N/A", rank: 11, team: "Chicago Bears" },
+  { trend: "N/A", rank: 12, team: "Kansas City Chiefs" },
+  { trend: "N/A", rank: 13, team: "Buffalo Bills" },
+  { trend: "N/A", rank: 14, team: "Green Bay Packers" },
+  { trend: "N/A", rank: 15, team: "Houston Texans" },
+  { trend: "N/A", rank: 16, team: "New York Giants" },
+  { trend: "N/A", rank: 17, team: "Dallas Cowboys" },
+  { trend: "N/A", rank: 18, team: "Minnesota Vikings" },
+  { trend: "N/A", rank: 19, team: "Indianapolis Colts" },
+  { trend: "N/A", rank: 20, team: "Philadelphia Eagles" },
+  { trend: "N/A", rank: 21, team: "New Orleans Saints" },
+  { trend: "N/A", rank: 22, team: "Carolina Panthers" },
+  { trend: "N/A", rank: 23, team: "Tampa Bay Buccaneers" },
+  { trend: "N/A", rank: 24, team: "Las Vegas Raiders" },
+  { trend: "N/A", rank: 25, team: "Washington Commanders" },
+  { trend: "N/A", rank: 26, team: "Pittsburgh Steelers" },
+  { trend: "N/A", rank: 27, team: "Tennessee Titans" },
+  { trend: "N/A", rank: 28, team: "Cleveland Browns" },
+  { trend: "N/A", rank: 29, team: "Atlanta Falcons" },
+  { trend: "N/A", rank: 30, team: "Miami Dolphins" },
+  { trend: "N/A", rank: 31, team: "New York Jets" },
+  { trend: "N/A", rank: 32, team: "Arizona Cardinals" }
+];
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
-    <BaseHead title="Power Rankings | Sports Analytics Blog" description="Advanced model projections and standings." />
-  </head>
-  <body class="bg-gray-950 text-white min-h-screen flex flex-col">
-    <Header />
-    
-    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
+    <BaseHead title={`Power Rankings - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+    <style>
+      /* Enforce strict box modeling so padding never expands the container width */
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      main {
+        max-width: 700px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 3em 1em;
+        color: white;
+        overflow-x: hidden;
+      }
+      .rankings-container {
+        background: #111111;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        width: 100%;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 0.5rem;
+      }
+      .subtitle {
+        text-align: center;
+        color: #a1a1aa;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+      }
+      .league-toggle-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #222222;
+      }
+      .league-toggle-container label {
+        font-weight: bold;
+        color: #e4e4e7;
+      }
+      .dropdown-container {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      select {
+        background: #18181b;
+        color: white;
+        border: 1px solid #27272a;
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        outline: none;
+        max-width: 100%;
+      }
+      select:focus {
+        border-color: #38bdf8;
+      }
+      select option:disabled {
+        color: #52525b;
+        font-style: italic;
+      }
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+      th, td {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid #27272a;
+      }
+      th {
+        color: #38bdf8;
+        font-weight: bold;
+        background: #18181b;
+      }
+      tr:hover {
+        background: #18181b;
+      }
+      .col-trend {
+        width: 25%;
+        text-align: center;
+        font-weight: bold;
+        color: #a1a1aa;
+      }
+      .col-rank {
+        width: 15%;
+        text-align: center;
+        font-weight: bold;
+      }
+      .col-team {
+        width: 60%;
+        font-weight: bold;
+        font-size: 1.05rem;
+      }
+      .hidden {
+        display: none !important;
+      }
       
-      <!-- Header Section with League Dropdown Toggle -->
-      <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 border-b border-gray-800 pb-6">
-        <div>
-          <h1 class="text-3xl font-bold tracking-tight">League Power Rankings</h1>
-          <p class="text-gray-400 mt-1">Select a league to view advanced model projections and standings.</p>
-        </div>
+      /* Mobile responsiveness adjustments */
+      @media (max-width: 600px) {
+        main {
+          padding: 2em 0.5em; 
+        }
+        .rankings-container {
+          padding: 1.5rem 0.5rem;
+        }
+        th, td {
+          padding: 0.6rem 0.25rem; 
+          font-size: 0.85rem;
+        }
+        .col-team {
+          font-size: 0.9rem;
+        }
+        .league-toggle-container {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      
+      <!-- Top Level League Toggle -->
+      <div class="league-toggle-container">
+        <label for="league-select">Select League:</label>
+        <select id="league-select">
+          <option value="nfl" selected>NFL Power Rankings</option>
+          <option value="nba">NBA Power Rankings</option>
+        </select>
+      </div>
 
-        <!-- Dropdown Toggle -->
-        <div class="flex items-center gap-3">
-          <label for="powerRankingSelect" class="text-sm font-medium text-gray-300">View League:</label>
-          <select 
-            id="powerRankingSelect" 
-            class="bg-gray-900 border border-gray-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none cursor-pointer"
-          >
-            <option value="nfl">NFL Power Rankings</option>
-            <option value="nba" selected>NBA Power Rankings (2026-27 Model)</option>
+      <!-- NFL Rankings View -->
+      <div id="nfl-view" class="rankings-container">
+        <h1>Preseason Power Rankings</h1>
+        <p class="subtitle">My NFL power rankings going into week 1</p>
+
+        <div class="dropdown-container">
+          <select id="week-selector">
+            <option value="preseason" selected>Preseason Rankings</option>
+            <option value="week1" disabled>Week 1 (TBD)</option>
+            <option value="week2" disabled>Week 2 (TBD)</option>
+            <option value="week3" disabled>Week 3 (TBD)</option>
+            <option value="week4" disabled>Week 4 (TBD)</option>
+            <option value="week5" disabled>Week 5 (TBD)</option>
+            <option value="week6" disabled>Week 6 (TBD)</option>
+            <option value="week7" disabled>Week 7 (TBD)</option>
+            <option value="week8" disabled>Week 8 (TBD)</option>
+            <option value="week9" disabled>Week 9 (TBD)</option>
+            <option value="week10" disabled>Week 10 (TBD)</option>
+            <option value="week11" disabled>Week 11 (TBD)</option>
+            <option value="week12" disabled>Week 12 (TBD)</option>
+            <option value="week13" disabled>Week 13 (TBD)</option>
+            <option value="week14" disabled>Week 14 (TBD)</option>
+            <option value="week15" disabled>Week 15 (TBD)</option>
+            <option value="week16" disabled>Week 16 (TBD)</option>
+            <option value="week17" disabled>Week 17 (TBD)</option>
+            <option value="week18" disabled>Week 18 (TBD)</option>
           </select>
         </div>
-      </div>
 
-      <!-- NFL Power Rankings Container -->
-      <div id="nfl-power-section" class="power-section hidden">
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg">
-          <h2 class="text-xl font-semibold mb-4 text-blue-400">NFL Power Rankings</h2>
-          <p class="text-gray-400 mb-6">Current NFL analytical data feed and power ratings.</p>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr class="border-b border-gray-800 text-gray-400">
-                  <th class="py-3 px-4">Team</th>
-                  <th class="py-3 px-4">Record / Tier</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-800/60">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-trend">Trend</th>
+                <th class="col-rank">Rank</th>
+                <th class="col-team">Team</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rankings.map((item) => (
                 <tr>
-                  <td class="py-3 px-4 font-medium">Kansas City Chiefs</td>
-                  <td class="py-3 px-4 text-blue-400">Tier 1 Contender</td>
+                  <td class="col-trend">{item.trend}</td>
+                  <td class="col-rank">{item.rank}</td>
+                  <td class="col-team">{item.team}</td>
                 </tr>
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- NBA Power Rankings Container (Default) -->
-      <div id="nba-power-section" class="power-section">
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold text-blue-400">2026-27 NBA Monte Carlo Projections (10,000 Runs)</h2>
-            <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full">Injury-Adjusted Model</span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr class="border-b border-gray-800 text-gray-400 uppercase text-xs tracking-wider">
-                  <th class="py-3 px-4">Team</th>
-                  <th class="py-3 px-4 text-center">Avg Wins</th>
-                  <th class="py-3 px-4 text-center">High</th>
-                  <th class="py-3 px-4 text-center">Low</th>
-                  <th class="py-3 px-4 text-center">Playoff %</th>
-                  <th class="py-3 px-4 text-center">Title %</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-800/60">
-                <tr class="hover:bg-gray-800/40 transition-colors">
-                  <td class="py-3 px-4 font-medium">San Antonio Spurs</td>
-                  <td class="py-3 px-4 text-center">60.7</td>
-                  <td class="py-3 px-4 text-center text-green-400">68</td>
-                  <td class="py-3 px-4 text-center text-red-400">52</td>
-                  <td class="py-3 px-4 text-center">100.0%</td>
-                  <td class="py-3 px-4 text-center font-bold text-yellow-400">35.2%</td>
-                </tr>
-                <tr class="hover:bg-gray-800/40 transition-colors">
-                  <td class="py-3 px-4 font-medium">Oklahoma City Thunder</td>
-                  <td class="py-3 px-4 text-center">60.7</td>
-                  <td class="py-3 px-4 text-center text-green-400">68</td>
-                  <td class="py-3 px-4 text-center text-red-400">51</td>
-                  <td class="py-3 px-4 text-center">100.0%</td>
-                  <td class="py-3 px-4 text-center font-bold text-yellow-400">35.3%</td>
-                </tr>
-                <tr class="hover:bg-gray-800/40 transition-colors">
-                  <td class="py-3 px-4 font-medium">Detroit Pistons</td>
-                  <td class="py-3 px-4 text-center">50.4</td>
-                  <td class="py-3 px-4 text-center text-green-400">59</td>
-                  <td class="py-3 px-4 text-center text-red-400">41</td>
-                  <td class="py-3 px-4 text-center">100.0%</td>
-                  <td class="py-3 px-4 text-center font-bold text-yellow-400">7.0%</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <!-- NBA Rankings View (Placeholder) -->
+      <div id="nba-view" class="rankings-container hidden">
+        <h1>NBA Power Rankings</h1>
+        <p class="subtitle">Data coming soon. Check back when the model is ready.</p>
+        
+        <!-- You can drop your Astro HTML for NBA tables here once it is prepared -->
+        
       </div>
 
     </main>
-    
     <Footer />
 
     <script>
-      const powerSelect = document.getElementById('powerRankingSelect') as HTMLSelectElement | null;
-      const nflPowerSection = document.getElementById('nfl-power-section') as HTMLElement | null;
-      const nbaPowerSection = document.getElementById('nba-power-section') as HTMLElement | null;
+      // League Toggle Logic
+      const leagueSelector = document.getElementById('league-select') as HTMLSelectElement | null;
+      const nflView = document.getElementById('nfl-view') as HTMLElement | null;
+      const nbaView = document.getElementById('nba-view') as HTMLElement | null;
 
-      if (powerSelect && nflPowerSection && nbaPowerSection) {
-        powerSelect.addEventListener('change', (e) => {
-          const target = e.target as HTMLSelectElement;
-          if (target.value === 'nfl') {
-            nflPowerSection.classList.remove('hidden');
-            nbaPowerSection.classList.add('hidden');
+      if (leagueSelector && nflView && nbaView) {
+        leagueSelector.addEventListener('change', () => {
+          if (leagueSelector.value === 'nfl') {
+            nflView.classList.remove('hidden');
+            nbaView.classList.add('hidden');
           } else {
-            nflPowerSection.classList.add('hidden');
-            nbaPowerSection.classList.remove('hidden');
+            nflView.classList.add('hidden');
+            nbaView.classList.remove('hidden');
+          }
+        });
+      }
+
+      // Existing Week Selector Logic for NFL
+      const weekSelector = document.getElementById('week-selector') as HTMLSelectElement | null;
+      
+      if (weekSelector) {
+        weekSelector.addEventListener('change', () => {
+          const selectedValue = weekSelector.value;
+          
+          if (selectedValue !== 'preseason') {
+             alert('Rankings for ' + selectedValue + ' are currently TBD!');
+             weekSelector.value = 'preseason'; 
           }
         });
       }

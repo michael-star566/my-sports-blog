@@ -97,10 +97,10 @@ const pathPrefix = '/my-sports-blog';
                 const tbody = document.getElementById('leaderboard-body');
 
                 try {
-                    // 1. Fetch all user picks across all weeks from Supabase
+                    // 1. Fetch all user picks across all weeks from Supabase, including the locked_spread
                     const { data: picksData, error: picksError } = await supabase
                         .from('user_picks')
-                        .select('user_id, game_id, selected_team');
+                        .select('user_id, game_id, selected_team, locked_spread');
                     if (picksError) throw picksError;
 
                     // 2. Fetch all usernames mapping
@@ -114,7 +114,7 @@ const pathPrefix = '/my-sports-blog';
                         usernameMap[profile.id] = profile.username || 'Anonymous Player';
                     });
 
-                    // 3. Loop through all 18 weeks and fetch ESPN scores/odds concurrently
+                    // 3. Loop through all 18 weeks and fetch ESPN scores concurrently
                     const gameMasterMap: { [key: string]: any } = {};
                     
                     const weekPromises = [];
@@ -128,39 +128,10 @@ const pathPrefix = '/my-sports-blog';
                                         const homeTeamInfo = comp.competitors.find((c: any) => c.homeAway === 'home');
                                         const awayTeamInfo = comp.competitors.find((c: any) => c.homeAway === 'away');
                                         
-                                        let homeSpread = 'TBD';
-                                        let awaySpread = 'TBD';
-                                        
-                                        if (comp.odds && comp.odds.length > 0) {
-                                            const details = comp.odds[0].details || '';
-                                            if (details.toUpperCase() === 'EVEN') {
-                                                homeSpread = '+0';
-                                                awaySpread = '+0';
-                                            } else {
-                                                const parts = details.split(' ');
-                                                if (parts.length >= 2) {
-                                                    const favAbbrev = parts[0];
-                                                    const val = parseFloat(parts[1]); 
-                                                    const oppositeVal = val > 0 ? `-${val}` : `+${Math.abs(val)}`;
-                                                    const currentValStr = val > 0 ? `+${val}` : `${val}`;
-                                                    
-                                                    if (homeTeamInfo.team.abbreviation === favAbbrev) {
-                                                        homeSpread = currentValStr;
-                                                        awaySpread = oppositeVal;
-                                                    } else if (awayTeamInfo.team.abbreviation === favAbbrev) {
-                                                        awaySpread = currentValStr;
-                                                        homeSpread = oppositeVal;
-                                                    }
-                                                }
-                                            }
-                                        }
-
                                         gameMasterMap[event.id] = {
                                             away: awayTeamInfo.team.displayName,
-                                            awaySpread: awaySpread,
                                             awayScore: parseInt(awayTeamInfo.score) || 0,
                                             home: homeTeamInfo.team.displayName,
-                                            homeSpread: homeSpread,
                                             homeScore: parseInt(homeTeamInfo.score) || 0,
                                             completed: event.status.type.completed
                                         };
@@ -188,21 +159,23 @@ const pathPrefix = '/my-sports-blog';
                         
                         userStats[uid].total++;
                         
-                        if (game.completed && game.awaySpread !== 'TBD' && game.homeSpread !== 'TBD') {
+                        // Use the database's locked_spread for grading instead of ESPN's live odds
+                        if (game.completed && row.locked_spread && row.locked_spread !== 'TBD') {
                             const homeScore = game.homeScore;
                             const awayScore = game.awayScore;
                             
                             let pickWon = false;
                             let push = false;
+                            const lockedSpreadValue = parseFloat(row.locked_spread);
 
                             if (row.selected_team === game.away) {
-                                const adjustedAway = awayScore + parseFloat(game.awaySpread);
+                                const adjustedAway = awayScore + lockedSpreadValue;
                                 if (adjustedAway > homeScore) pickWon = true;
                                 else if (adjustedAway === homeScore) push = true;
                             } else if (row.selected_team === game.home) {
-                                const adjustedHome = homeScore + parseFloat(game.homeSpread);
+                                const adjustedHome = homeScore + lockedSpreadValue;
                                 if (adjustedHome > awayScore) pickWon = true;
-                                else if (adjustedHome === homeScore) push = true;
+                                else if (adjustedHome === awayScore) push = true;
                             }
 
                             if (!push) {

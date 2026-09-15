@@ -4,40 +4,76 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
-// Preseason NFL power rankings
-const rankings = [
-  { trend: "N/A", rank: 1, team: "LA Rams" },
-  { trend: "N/A", rank: 2, team: "Jacksonville Jaguars" },
-  { trend: "N/A", rank: 3, team: "Seattle Seahawks" },
-  { trend: "N/A", rank: 4, team: "New England Patriots" },
-  { trend: "N/A", rank: 5, team: "Detroit Lions" },
-  { trend: "N/A", rank: 6, team: "Denver Broncos" },
-  { trend: "N/A", rank: 7, team: "Baltimore Ravens" },
-  { trend: "N/A", rank: 8, team: "San Francisco 49ers" },
-  { trend: "N/A", rank: 9, team: "LA Chargers" },
-  { trend: "N/A", rank: 10, team: "Cincinnati Bengals" },
-  { trend: "N/A", rank: 11, team: "Chicago Bears" },
-  { trend: "N/A", rank: 12, team: "Kansas City Chiefs" },
-  { trend: "N/A", rank: 13, team: "Buffalo Bills" },
-  { trend: "N/A", rank: 14, team: "Green Bay Packers" },
-  { trend: "N/A", rank: 15, team: "Houston Texans" },
-  { trend: "N/A", rank: 16, team: "New York Giants" },
-  { trend: "N/A", rank: 17, team: "Dallas Cowboys" },
-  { trend: "N/A", rank: 18, team: "Minnesota Vikings" },
-  { trend: "N/A", rank: 19, team: "Indianapolis Colts" },
-  { trend: "N/A", rank: 20, team: "Philadelphia Eagles" },
-  { trend: "N/A", rank: 21, team: "New Orleans Saints" },
-  { trend: "N/A", rank: 22, team: "Carolina Panthers" },
-  { trend: "N/A", rank: 23, team: "Tampa Bay Buccaneers" },
-  { trend: "N/A", rank: 24, team: "Las Vegas Raiders" },
-  { trend: "N/A", rank: 25, team: "Washington Commanders" },
-  { trend: "N/A", rank: 26, team: "Pittsburgh Steelers" },
-  { trend: "N/A", rank: 27, team: "Tennessee Titans" },
-  { trend: "N/A", rank: 28, team: "Cleveland Browns" },
-  { trend: "N/A", rank: 29, team: "Atlanta Falcons" },
-  { trend: "N/A", rank: 30, team: "Miami Dolphins" },
-  { trend: "N/A", rank: 31, team: "New York Jets" },
-  { trend: "N/A", rank: 32, team: "Arizona Cardinals" }
+// Preseason NFL power rankings (Baseline)
+const preseasonRankings = [
+  { trend: "—", rank: 1, team: "LA Rams" },
+  { trend: "—", rank: 2, team: "Jacksonville Jaguars" },
+  { trend: "—", rank: 3, team: "Seattle Seahawks" },
+  { trend: "—", rank: 4, team: "New England Patriots" },
+  { trend: "—", rank: 5, team: "Detroit Lions" },
+  { trend: "—", rank: 6, team: "Denver Broncos" },
+  { trend: "—", rank: 7, team: "Baltimore Ravens" },
+  { trend: "—", rank: 8, team: "San Francisco 49ers" },
+  { trend: "—", rank: 9, team: "LA Chargers" },
+  { trend: "—", rank: 10, team: "Cincinnati Bengals" },
+  { trend: "—", rank: 11, team: "Chicago Bears" },
+  { trend: "—", rank: 12, team: "Kansas City Chiefs" },
+  { trend: "—", rank: 13, team: "Buffalo Bills" },
+  { trend: "—", rank: 14, team: "Green Bay Packers" },
+  { trend: "—", rank: 15, team: "Houston Texans" },
+  { trend: "—", rank: 16, team: "New York Giants" },
+  { trend: "—", rank: 17, team: "Dallas Cowboys" },
+  { trend: "—", rank: 18, team: "Minnesota Vikings" },
+  { trend: "—", rank: 19, team: "Indianapolis Colts" },
+  { trend: "—", rank: 20, team: "Philadelphia Eagles" },
+  { trend: "—", rank: 21, team: "New Orleans Saints" },
+  { trend: "—", rank: 22, team: "Carolina Panthers" },
+  { trend: "—", rank: 23, team: "Tampa Bay Buccaneers" },
+  { trend: "—", rank: 24, team: "Las Vegas Raiders" },
+  { trend: "—", rank: 25, team: "Washington Commanders" },
+  { trend: "—", rank: 26, team: "Pittsburgh Steelers" },
+  { trend: "—", rank: 27, team: "Tennessee Titans" },
+  { trend: "—", rank: 28, team: "Cleveland Browns" },
+  { trend: "—", rank: 29, team: "Atlanta Falcons" },
+  { trend: "—", rank: 30, team: "Miami Dolphins" },
+  { trend: "—", rank: 31, team: "New York Jets" },
+  { trend: "—", rank: 32, team: "Arizona Cardinals" }
+];
+
+// Week 2 NFL power rankings
+const week2Rankings = [
+  { trend: "▲ +1", rank: 1, team: "Jacksonville Jaguars" },
+  { trend: "▲ +5", rank: 2, team: "Baltimore Ravens" },
+  { trend: "▲ +5", rank: 3, team: "San Francisco 49ers" },
+  { trend: "▼ -1", rank: 4, team: "Seattle Seahawks" },
+  { trend: "▲ +5", rank: 5, team: "Cincinnati Bengals" },
+  { trend: "▲ +6", rank: 6, team: "Kansas City Chiefs" },
+  { trend: "▼ -6", rank: 7, team: "LA Rams" },
+  { trend: "▲ +5", rank: 8, team: "Buffalo Bills" },
+  { trend: "▲ +2", rank: 9, team: "Chicago Bears" },
+  { trend: "▼ -5", rank: 10, team: "Detroit Lions" },
+  { trend: "▲ +4", rank: 11, team: "Houston Texans" },
+  { trend: "▼ -8", rank: 12, team: "New England Patriots" },
+  { trend: "▲ +8", rank: 13, team: "New Orleans Saints" },
+  { trend: "▲ +2", rank: 14, team: "New York Giants" },
+  { trend: "▼ -9", rank: 15, team: "Denver Broncos" },
+  { trend: "▲ +2", rank: 16, team: "Minnesota Vikings" },
+  { trend: "▼ -8", rank: 17, team: "LA Chargers" },
+  { trend: "▼ -4", rank: 18, team: "Green Bay Packers" },
+  { trend: "▼ -2", rank: 19, team: "Dallas Cowboys" },
+  { trend: "▲ +2", rank: 20, team: "Carolina Panthers" },
+  { trend: "▼ -2", rank: 21, team: "Indianapolis Colts" },
+  { trend: "▲ +10", rank: 22, team: "Arizona Cardinals" },
+  { trend: "▼ -3", rank: 23, team: "Philadelphia Eagles" },
+  { trend: "—", rank: 24, team: "Las Vegas Raiders" },
+  { trend: "▼ -2", rank: 25, team: "Tampa Bay Buccaneers" },
+  { trend: "—", rank: 26, team: "Pittsburgh Steelers" },
+  { trend: "▲ +4", rank: 27, team: "New York Jets" },
+  { trend: "▼ -3", rank: 28, team: "Washington Commanders" },
+  { trend: "—", rank: 29, team: "Atlanta Falcons" },
+  { trend: "▼ -3", rank: 30, team: "Tennessee Titans" },
+  { trend: "▼ -3", rank: 31, team: "Cleveland Browns" },
+  { trend: "▼ -2", rank: 32, team: "Miami Dolphins" }
 ];
 
 // 10,000-Run Monte Carlo NBA Projections
@@ -73,6 +109,13 @@ const nbaRankings = [
   { team: "Utah Jazz", avgWins: 33.7, high: 50, low: 19, playoff: "8.0", finals: "0.0", title: "0.0" },
   { team: "Washington Wizards", avgWins: 33.6, high: 48, low: 20, playoff: "5.2", finals: "0.1", title: "0.0" }
 ];
+
+// Helper to dynamically style trend strings based on movement
+function getTrendHTML(trend: string) {
+  if (trend.includes('▲')) return `<span style="color: #4ade80;">${trend}</span>`;
+  if (trend.includes('▼')) return `<span style="color: #f87171;">${trend}</span>`;
+  return `<span style="color: #a1a1aa;">${trend}</span>`;
+}
 ---
 
 <!doctype html>
@@ -253,14 +296,24 @@ const nbaRankings = [
 
       <!-- NFL Rankings View -->
       <div id="nfl-view" class="rankings-container">
-        <h1>Preseason Power Rankings</h1>
-        <p class="subtitle">My NFL power rankings going into week 1</p>
+        <h1 id="nfl-title">Week 2 Power Rankings</h1>
+        <p id="nfl-subtitle" class="subtitle">My NFL power rankings heading into Week 2</p>
+
+        <!-- NFL Methodology Explanation -->
+        <div class="model-explanation nfl-explanation">
+          <h3>Predictive Power Rating Methodology</h3>
+          <p style="margin-bottom: 0.5rem;">These rankings function as a <strong>forward-looking predictive model</strong> rather than a traditional win-loss resume. They evaluate who would win on a neutral field this week by factoring in:</p>
+          <ul>
+            <li><strong>Baseline Roster Talent:</strong> Weighing overall roster strength, quarterback play, and elite matchups over single-game variance.</li>
+            <li><strong>Game Script & Efficiency:</strong> Looking past the final score to measure true margin of victory, opponent quality, and how a team fundamentally executed.</li>
+            <li><strong>Contextual Adjustments:</strong> Accounting for critical missing personnel or major travel disadvantages that skewed a previous result.</li>
+          </ul>
+        </div>
 
         <div class="dropdown-container">
           <select id="week-selector">
-            <option value="preseason" selected>Preseason Rankings</option>
-            <option value="week1" disabled>Week 1 (TBD)</option>
-            <option value="week2" disabled>Week 2 (TBD)</option>
+            <option value="preseason">Preseason Rankings</option>
+            <option value="week2" selected>Week 2 Rankings</option>
             <option value="week3" disabled>Week 3 (TBD)</option>
             <option value="week4" disabled>Week 4 (TBD)</option>
             <option value="week5" disabled>Week 5 (TBD)</option>
@@ -289,10 +342,19 @@ const nbaRankings = [
                 <th class="col-team">Team</th>
               </tr>
             </thead>
-            <tbody>
-              {rankings.map((item) => (
+            <tbody id="tbody-preseason" class="hidden">
+              {preseasonRankings.map((item) => (
                 <tr>
-                  <td class="col-trend">{item.trend}</td>
+                  <td class="col-trend" set:html={getTrendHTML(item.trend)} />
+                  <td class="col-rank">{item.rank}</td>
+                  <td class="col-team">{item.team}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tbody id="tbody-week2">
+              {week2Rankings.map((item) => (
+                <tr>
+                  <td class="col-trend" set:html={getTrendHTML(item.trend)} />
                   <td class="col-rank">{item.rank}</td>
                   <td class="col-team">{item.team}</td>
                 </tr>
@@ -380,14 +442,31 @@ const nbaRankings = [
         });
       }
 
-      // Existing Week Selector Logic for NFL
+      // Dynamic Week Selector Logic for NFL
       const weekSelector = document.getElementById('week-selector') as HTMLSelectElement | null;
+      const nflTitle = document.getElementById('nfl-title');
+      const nflSubtitle = document.getElementById('nfl-subtitle');
+      const tbodyPreseason = document.getElementById('tbody-preseason');
+      const tbodyWeek2 = document.getElementById('tbody-week2');
+
       if (weekSelector) {
         weekSelector.addEventListener('change', () => {
           const selectedValue = weekSelector.value;
-          if (selectedValue !== 'preseason') {
-             alert('Rankings for ' + selectedValue + ' are currently TBD!');
-             weekSelector.value = 'preseason'; 
+          
+          if (selectedValue === 'preseason') {
+              if (nflTitle) nflTitle.textContent = 'Preseason Power Rankings';
+              if (nflSubtitle) nflSubtitle.textContent = 'My NFL power rankings going into week 1';
+              tbodyPreseason?.classList.remove('hidden');
+              tbodyWeek2?.classList.add('hidden');
+          } else if (selectedValue === 'week2') {
+              if (nflTitle) nflTitle.textContent = 'Week 2 Power Rankings';
+              if (nflSubtitle) nflSubtitle.textContent = 'My NFL power rankings heading into Week 2';
+              tbodyPreseason?.classList.add('hidden');
+              tbodyWeek2?.classList.remove('hidden');
+          } else {
+              alert('Rankings for ' + selectedValue + ' are currently TBD!');
+              // Revert to Week 2 as the default active week if they click a TBD option
+              weekSelector.value = 'week2'; 
           }
         });
       }

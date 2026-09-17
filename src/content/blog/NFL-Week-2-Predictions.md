@@ -23,5 +23,5 @@ pubDate: 'Sep 17 2026'
 <p style="text-indent: 2rem;">When the dust settles in Orchard Park, expect an absolute track meet. Detroit’s defensive liabilities are simply too glaring to survive four quarters of a shootout against this caliber of quarterback play.</p>
 
 <p><strong>Prediction:</strong> Bills 38–31</p>
-
+<p><strong>Best Bet:</strong> DJ Moore 60+ Receiving Yards</p>
 <p style="text-indent: 2rem; font-style: italic; text-align: center;">The rest of the Week 2 slate breakdown is coming soon. Stay tuned for the Sunday projections!</p>

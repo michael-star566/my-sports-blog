@@ -16,12 +16,12 @@ pubDate: 'Sep 17 2026'
 
 <h3 style="text-align: center; font-weight: bold; font-size: 1.35rem;">Detroit Lions at Buffalo Bills</h3>
 
-<p><strong>Prediction:</strong> Bills 38–31</p>
-
 <p style="text-indent: 2rem;">Detroit’s offense is built to keep pace in any environment. Jahmyr Gibbs is primed to replicate his opening-week dominance, projected to eclipse 100 rushing yards with at least one touchdown, and potentially a second. Through the air, Amon-Ra St. Brown should feast on high-percentage targets, while the game script sets up Jameson Williams for a long-ball touchdown.</p>
 
 <p style="text-indent: 2rem;">But Detroit’s problem isn't scoring, it's stopping the bleeding defensively. The gaps they put on film last week are precisely what a phenomenal quarterback like Josh Allen is built to exploit. Allen looked unstoppable in his opener, and his connection with DJ Moore is already electric. Our data points to a massive night for Moore, projecting 6 receptions for 107 yards and two touchdowns. With James Cook modeled for a rushing score and Dalton Kincaid adding 4 receptions for 73 yards, Buffalo will dictate a relentless pace.</p>
 
 <p style="text-indent: 2rem;">When the dust settles in Orchard Park, expect an absolute track meet. Detroit’s defensive liabilities are simply too glaring to survive four quarters of a shootout against this caliber of quarterback play.</p>
+
+<p><strong>Prediction:</strong> Bills 38–31</p>
 
 <p style="text-indent: 2rem; font-style: italic; text-align: center;">The rest of the Week 2 slate breakdown is coming soon. Stay tuned for the Sunday projections!</p>

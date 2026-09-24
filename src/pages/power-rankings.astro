@@ -76,6 +76,42 @@ const week2Rankings = [
   { trend: "▼ -2", rank: 32, team: "Miami Dolphins" }
 ];
 
+// Week 3 NFL power rankings (Movement compared to Week 2)
+const week3Rankings = [
+  { trend: "▲ +2", rank: 1, team: "San Francisco 49ers" },
+  { trend: "▲ +6", rank: 2, team: "Buffalo Bills" },
+  { trend: "▲ +2", rank: 3, team: "Cincinnati Bengals" },
+  { trend: "—", rank: 4, team: "Seattle Seahawks" },
+  { trend: "▲ +1", rank: 5, team: "Kansas City Chiefs" },
+  { trend: "▲ +1", rank: 6, team: "LA Rams" },
+  { trend: "▲ +8", rank: 7, team: "Denver Broncos" },
+  { trend: "▼ -7", rank: 8, team: "Jacksonville Jaguars" },
+  { trend: "▲ +4", rank: 9, team: "New Orleans Saints" },
+  { trend: "▼ -8", rank: 10, team: "Baltimore Ravens" },
+  { trend: "▼ -1", rank: 11, team: "Detroit Lions" },
+  { trend: "—", rank: 12, team: "New England Patriots" },
+  { trend: "▲ +3", rank: 13, team: "Minnesota Vikings" },
+  { trend: "▼ -5", rank: 14, team: "Chicago Bears" },
+  { trend: "▼ -4", rank: 15, team: "Houston Texans" },
+  { trend: "▲ +4", rank: 16, team: "Carolina Panthers" },
+  { trend: "▲ +2", rank: 17, team: "Dallas Cowboys" },
+  { trend: "▲ +5", rank: 18, team: "Philadelphia Eagles" },
+  { trend: "▲ +2", rank: 19, team: "Indianapolis Colts" },
+  { trend: "▼ -2", rank: 20, team: "Green Bay Packers" },
+  { trend: "▲ +3", rank: 21, team: "Las Vegas Raiders" },
+  { trend: "▼ -8", rank: 22, team: "New York Giants" },
+  { trend: "▲ +4", rank: 23, team: "New York Jets" },
+  { trend: "▼ -2", rank: 24, team: "Arizona Cardinals" },
+  { trend: "▲ +6", rank: 25, team: "Cleveland Browns" },
+  { trend: "▼ -9", rank: 26, team: "LA Chargers" },
+  { trend: "▲ +3", rank: 27, team: "Tennessee Titans" },
+  { trend: "▼ -3", rank: 28, team: "Tampa Bay Buccaneers" },
+  { trend: "▼ -3", rank: 29, team: "Pittsburgh Steelers" },
+  { trend: "▼ -1", rank: 30, team: "Atlanta Falcons" },
+  { trend: "▼ -3", rank: 31, team: "Washington Commanders" },
+  { trend: "—", rank: 32, team: "Miami Dolphins" }
+];
+
 // 10,000-Run Monte Carlo NBA Projections
 const nbaRankings = [
   { team: "San Antonio Spurs", avgWins: 61.5, high: 68, low: 46, playoff: "100.0", finals: "45.6", title: "36.2" },
@@ -296,8 +332,8 @@ function getTrendHTML(trend: string) {
 
       <!-- NFL Rankings View -->
       <div id="nfl-view" class="rankings-container">
-        <h1 id="nfl-title">Week 2 Power Rankings</h1>
-        <p id="nfl-subtitle" class="subtitle">My NFL power rankings heading into Week 2</p>
+        <h1 id="nfl-title">Week 3 Power Rankings</h1>
+        <p id="nfl-subtitle" class="subtitle">My NFL power rankings heading into Week 3</p>
 
         <!-- NFL Methodology Explanation -->
         <div class="model-explanation nfl-explanation">
@@ -313,8 +349,8 @@ function getTrendHTML(trend: string) {
         <div class="dropdown-container">
           <select id="week-selector">
             <option value="preseason">Preseason Rankings</option>
-            <option value="week2" selected>Week 2 Rankings</option>
-            <option value="week3" disabled>Week 3 (TBD)</option>
+            <option value="week2">Week 2 Rankings</option>
+            <option value="week3" selected>Week 3 Rankings</option>
             <option value="week4" disabled>Week 4 (TBD)</option>
             <option value="week5" disabled>Week 5 (TBD)</option>
             <option value="week6" disabled>Week 6 (TBD)</option>
@@ -351,8 +387,17 @@ function getTrendHTML(trend: string) {
                 </tr>
               ))}
             </tbody>
-            <tbody id="tbody-week2">
+            <tbody id="tbody-week2" class="hidden">
               {week2Rankings.map((item) => (
+                <tr>
+                  <td class="col-trend" set:html={getTrendHTML(item.trend)} />
+                  <td class="col-rank">{item.rank}</td>
+                  <td class="col-team">{item.team}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tbody id="tbody-week3">
+              {week3Rankings.map((item) => (
                 <tr>
                   <td class="col-trend" set:html={getTrendHTML(item.trend)} />
                   <td class="col-rank">{item.rank}</td>
@@ -448,6 +493,7 @@ function getTrendHTML(trend: string) {
       const nflSubtitle = document.getElementById('nfl-subtitle');
       const tbodyPreseason = document.getElementById('tbody-preseason');
       const tbodyWeek2 = document.getElementById('tbody-week2');
+      const tbodyWeek3 = document.getElementById('tbody-week3');
 
       if (weekSelector) {
         weekSelector.addEventListener('change', () => {
@@ -458,15 +504,23 @@ function getTrendHTML(trend: string) {
               if (nflSubtitle) nflSubtitle.textContent = 'My NFL power rankings going into week 1';
               tbodyPreseason?.classList.remove('hidden');
               tbodyWeek2?.classList.add('hidden');
+              tbodyWeek3?.classList.add('hidden');
           } else if (selectedValue === 'week2') {
               if (nflTitle) nflTitle.textContent = 'Week 2 Power Rankings';
               if (nflSubtitle) nflSubtitle.textContent = 'My NFL power rankings heading into Week 2';
               tbodyPreseason?.classList.add('hidden');
               tbodyWeek2?.classList.remove('hidden');
+              tbodyWeek3?.classList.add('hidden');
+          } else if (selectedValue === 'week3') {
+              if (nflTitle) nflTitle.textContent = 'Week 3 Power Rankings';
+              if (nflSubtitle) nflSubtitle.textContent = 'My NFL power rankings heading into Week 3';
+              tbodyPreseason?.classList.add('hidden');
+              tbodyWeek2?.classList.add('hidden');
+              tbodyWeek3?.classList.remove('hidden');
           } else {
               alert('Rankings for ' + selectedValue + ' are currently TBD!');
-              // Revert to Week 2 as the default active week if they click a TBD option
-              weekSelector.value = 'week2'; 
+              // Revert to Week 3 as the default active week if they click a TBD option
+              weekSelector.value = 'week3'; 
           }
         });
       }

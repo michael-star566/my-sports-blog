@@ -1,8 +1,9 @@
 ---
 title: 'Thursday Night Football Week 3'
 description: 'Previewing the Week 3 Thursday Night Football matchup between the Atlanta Falcons and Green Bay Packers, including our final score prediction and top prop bet.'
-pubDate: 'Sep 24 2026'
+pubDate: 'Sep 24 2026 7:10 PM'
 category: 'nfl'
+---
 ---
 
 <h2 style="text-align: center; font-weight: bold; font-size: 1.75rem;">Thursday Night Football Week 3</h2>

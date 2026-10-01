@@ -112,6 +112,42 @@ const week3Rankings = [
   { trend: "—", rank: 32, team: "Miami Dolphins" }
 ];
 
+// Week 4 NFL power rankings (Movement compared to Week 3)
+const week4Rankings = [
+  { trend: "—", rank: 1, team: "San Francisco 49ers" },
+  { trend: "▲ +3", rank: 2, team: "Kansas City Chiefs" },
+  { trend: "▲ +4", rank: 3, team: "Denver Broncos" },
+  { trend: "▼ -2", rank: 4, team: "Buffalo Bills" },
+  { trend: "▲ +3", rank: 5, team: "Jacksonville Jaguars" },
+  { trend: "▲ +4", rank: 6, team: "Baltimore Ravens" },
+  { trend: "▼ -3", rank: 7, team: "Seattle Seahawks" },
+  { trend: "▼ -5", rank: 8, team: "Cincinnati Bengals" },
+  { trend: "▲ +4", rank: 9, team: "Minnesota Vikings" },
+  { trend: "▲ +4", rank: 10, team: "Chicago Bears" },
+  { trend: "▼ -5", rank: 11, team: "LA Rams" },
+  { trend: "▼ -1", rank: 12, team: "Detroit Lions" },
+  { trend: "▲ +6", rank: 13, team: "Indianapolis Colts" },
+  { trend: "▲ +7", rank: 14, team: "Las Vegas Raiders" },
+  { trend: "▲ +9", rank: 15, team: "Arizona Cardinals" },
+  { trend: "▼ -7", rank: 16, team: "New Orleans Saints" },
+  { trend: "▼ -5", rank: 17, team: "New England Patriots" },
+  { trend: "▼ -1", rank: 18, team: "Dallas Cowboys" },
+  { trend: "▲ +3", rank: 19, team: "New York Giants" },
+  { trend: "▲ +5", rank: 20, team: "Cleveland Browns" },
+  { trend: "▲ +8", rank: 21, team: "Pittsburgh Steelers" },
+  { trend: "▲ +8", rank: 22, team: "Atlanta Falcons" },
+  { trend: "▲ +8", rank: 23, team: "Washington Commanders" },
+  { trend: "▼ -8", rank: 24, team: "Carolina Panthers" },
+  { trend: "▼ -2", rank: 25, team: "New York Jets" },
+  { trend: "▼ -8", rank: 26, team: "Philadelphia Eagles" },
+  { trend: "▼ -12", rank: 27, team: "Houston Texans" },
+  { trend: "▼ -8", rank: 28, team: "Green Bay Packers" },
+  { trend: "▼ -3", rank: 29, team: "LA Chargers" },
+  { trend: "▼ -2", rank: 30, team: "Tampa Bay Buccaneers" },
+  { trend: "▼ -4", rank: 31, team: "Tennessee Titans" },
+  { trend: "—", rank: 32, team: "Miami Dolphins" }
+];
+
 // 10,000-Run Monte Carlo NBA Projections
 const nbaRankings = [
   { team: "San Antonio Spurs", avgWins: 61.5, high: 68, low: 46, playoff: "100.0", finals: "45.6", title: "36.2" },
@@ -332,8 +368,8 @@ function getTrendHTML(trend: string) {
 
       <!-- NFL Rankings View -->
       <div id="nfl-view" class="rankings-container">
-        <h1 id="nfl-title">Week 3 Power Rankings</h1>
-        <p id="nfl-subtitle" class="subtitle">My NFL power rankings heading into Week 3</p>
+        <h1 id="nfl-title">Week 4 Power Rankings</h1>
+        <p id="nfl-subtitle" class="subtitle">My NFL power rankings heading into Week 4</p>
 
         <!-- NFL Methodology Explanation -->
         <div class="model-explanation nfl-explanation">
@@ -350,8 +386,8 @@ function getTrendHTML(trend: string) {
           <select id="week-selector">
             <option value="preseason">Preseason Rankings</option>
             <option value="week2">Week 2 Rankings</option>
-            <option value="week3" selected>Week 3 Rankings</option>
-            <option value="week4" disabled>Week 4 (TBD)</option>
+            <option value="week3">Week 3 Rankings</option>
+            <option value="week4" selected>Week 4 Rankings</option>
             <option value="week5" disabled>Week 5 (TBD)</option>
             <option value="week6" disabled>Week 6 (TBD)</option>
             <option value="week7" disabled>Week 7 (TBD)</option>
@@ -396,8 +432,17 @@ function getTrendHTML(trend: string) {
                 </tr>
               ))}
             </tbody>
-            <tbody id="tbody-week3">
+            <tbody id="tbody-week3" class="hidden">
               {week3Rankings.map((item) => (
+                <tr>
+                  <td class="col-trend" set:html={getTrendHTML(item.trend)} />
+                  <td class="col-rank">{item.rank}</td>
+                  <td class="col-team">{item.team}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tbody id="tbody-week4">
+              {week4Rankings.map((item) => (
                 <tr>
                   <td class="col-trend" set:html={getTrendHTML(item.trend)} />
                   <td class="col-rank">{item.rank}</td>
@@ -494,6 +539,7 @@ function getTrendHTML(trend: string) {
       const tbodyPreseason = document.getElementById('tbody-preseason');
       const tbodyWeek2 = document.getElementById('tbody-week2');
       const tbodyWeek3 = document.getElementById('tbody-week3');
+      const tbodyWeek4 = document.getElementById('tbody-week4');
 
       if (weekSelector) {
         weekSelector.addEventListener('change', () => {
@@ -505,22 +551,32 @@ function getTrendHTML(trend: string) {
               tbodyPreseason?.classList.remove('hidden');
               tbodyWeek2?.classList.add('hidden');
               tbodyWeek3?.classList.add('hidden');
+              tbodyWeek4?.classList.add('hidden');
           } else if (selectedValue === 'week2') {
               if (nflTitle) nflTitle.textContent = 'Week 2 Power Rankings';
               if (nflSubtitle) nflSubtitle.textContent = 'My NFL power rankings heading into Week 2';
               tbodyPreseason?.classList.add('hidden');
               tbodyWeek2?.classList.remove('hidden');
               tbodyWeek3?.classList.add('hidden');
+              tbodyWeek4?.classList.add('hidden');
           } else if (selectedValue === 'week3') {
               if (nflTitle) nflTitle.textContent = 'Week 3 Power Rankings';
               if (nflSubtitle) nflSubtitle.textContent = 'My NFL power rankings heading into Week 3';
               tbodyPreseason?.classList.add('hidden');
               tbodyWeek2?.classList.add('hidden');
               tbodyWeek3?.classList.remove('hidden');
+              tbodyWeek4?.classList.add('hidden');
+          } else if (selectedValue === 'week4') {
+              if (nflTitle) nflTitle.textContent = 'Week 4 Power Rankings';
+              if (nflSubtitle) nflSubtitle.textContent = 'My NFL power rankings heading into Week 4';
+              tbodyPreseason?.classList.add('hidden');
+              tbodyWeek2?.classList.add('hidden');
+              tbodyWeek3?.classList.add('hidden');
+              tbodyWeek4?.classList.remove('hidden');
           } else {
               alert('Rankings for ' + selectedValue + ' are currently TBD!');
-              // Revert to Week 3 as the default active week if they click a TBD option
-              weekSelector.value = 'week3'; 
+              // Revert to Week 4 as the default active week if they click a TBD option
+              weekSelector.value = 'week4'; 
           }
         });
       }
